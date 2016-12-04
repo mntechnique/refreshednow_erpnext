@@ -1,0 +1,7 @@
+{
+	"js/refreshednow.min.js": [
+		"public/js/available_cleaners.html",
+		"public/js/daily_allocation.html"
+	]
+}
+
