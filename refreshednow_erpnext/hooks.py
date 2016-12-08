@@ -15,7 +15,7 @@ app_license = "GPLv3"
 # ------------------
 
 # include js, css files in header of desk.html
-app_include_css = "/assets/css/refreshednow.min.css"
+# app_include_css = "/assets/css/refreshednow.min.css"
 app_include_js = "/assets/js/refreshednow.min.js"
 
 # include js, css files in header of web template
