@@ -149,7 +149,7 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 					type: "GET",
 					args: me.get_args(start, end),
 					callback: function(r) {
-
+						console.log(me.get_events_method);
 
 						var events = r.message;
 						me.prepare_events(events);
@@ -260,6 +260,8 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 		// 	}
 		// 	d["textColor"] = "#36414C";
 		// })
+		console.log(this.page.fields_dict["service_type"].$input.val());
+
 		console.log("In 'prepare_events'");
 	},
 	update_event: function(event, revertFunc) {

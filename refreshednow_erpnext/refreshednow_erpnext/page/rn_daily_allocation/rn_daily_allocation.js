@@ -49,6 +49,7 @@ frappe.pages['rn-daily-allocation'].on_page_load = function(wrapper) {
 				            }
 				        }
 					}
+					console.log(page.fields_dict["service_type"].$input.val());
 				}
 			});
 		});
