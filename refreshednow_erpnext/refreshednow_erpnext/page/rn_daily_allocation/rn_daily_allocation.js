@@ -20,10 +20,13 @@ frappe.pages['rn-daily-allocation'].on_page_load = function(wrapper) {
 				},
 				method: "refreshednow_erpnext.api.get_cleaners",
 				callback: function(r) {
-					var resources = r.message.resources;
+
+					console.log(r);
+
+					var resources = r.message;
 					var options = prepare_options(resources);
 
-					cal = new refreshednow_erpnext.RNCalendar(options, page);
+					cal = new refreshednow_erpnext.RNCalendar(options, page, "refreshednow_erpnext.api.get_timeslots");
 					cal.filters = [
 									{
 										"fieldtype": "Link",
@@ -37,19 +40,16 @@ frappe.pages['rn-daily-allocation'].on_page_load = function(wrapper) {
 										"label": __("Date")
 									},
 								];
-					cal.get_events_method = "refreshednow_erpnext.api.get_timeslots";
-					cal.set_filters_from_route_options();
+					//cal.get_events_method = "refreshednow_erpnext.api.get_timeslots";
 					cal.add_filters();
-					
-					//Filter should be on Service Items only.
+					cal.set_filters_from_route_options()
 					page.fields_dict["service_type"].get_query = function() {
 						return {
-				            "filters": {
-				                "item_group": "Services"
-				            }
-				        }
+							"filters": {
+								"item_group": "Services"
+							}
+						}
 					}
-					console.log(page.fields_dict["service_type"].$input.val());
 				}
 			});
 		});
@@ -57,7 +57,12 @@ frappe.pages['rn-daily-allocation'].on_page_load = function(wrapper) {
 
 
 function prepare_options(resources) {
-	return	{ 
+	return	{
+		header:{
+			left: null,
+			center: 'title',
+			right: null
+		},
 		schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
 		allDaySlot: false,
 		selectHelper: true,

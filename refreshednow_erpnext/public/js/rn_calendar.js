@@ -4,16 +4,21 @@ frappe.provide("frappe.views.calendar");
 frappe.provide("frappe.views.calendars");
 
 refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
-	init: function(options, page) {
+	init: function(options, page, get_events_method) {
 
-		console.log({"Init": options});
+		//console.log({"Init": options});
 
 		//$.extend(this, options);
 		//this.make_page();
 		this.options = options;
 		this.page = page;
+		this.get_events_method = get_events_method;
 		this.setup_options();
 		this.make();
+	},
+	show: function() {
+		var me = this;
+		me.set_filters_from_route_options();
 	},
 	// make_page: function() {
 	// 	var me = this;
@@ -134,23 +139,19 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 		var me = this;
 
 		this.cal_options = {
-			header: {
-				left: 'prev,next today',
-				center: 'title',
-				right: 'month,agendaWeek,agendaDay'
-			},
 			editable: true,
 			selectable: true,
 			selectHelper: true,
 			forceEventDuration: true,
 			events: function(start, end, timezone, callback) {
+				console.log(me.get_events_method);
 				return frappe.call({
 					method: me.get_events_method, //|| "frappe.desk.calendar.get_events",
 					type: "GET",
 					args: me.get_args(start, end),
 					callback: function(r) {
-						console.log(me.get_events_method);
 
+						console.log("Events callback");
 						var events = r.message;
 						me.prepare_events(events);
 						callback(events);
@@ -158,6 +159,10 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 				})
 				console.log("In 'events'");
 			},
+			// resources: function(){
+
+
+			// }
 			eventClick: function(event, jsEvent, view) {
 				// edit event description or delete
 				// var doctype = event.doctype || me.doctype;
@@ -208,8 +213,8 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 			$.extend(this.cal_options, this.options);
 		}
 
-		console.log(this.cal_options);
-		console.log(this.options);
+		// console.log(this.cal_options);
+		// console.log(this.options);
 	},
 	get_args: function(start, end) {
 		var args = {
