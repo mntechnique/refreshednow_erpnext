@@ -1,0 +1,15 @@
+<div class="panel panel-default" style="margin-top:5%;">
+  <div class="panel-heading">{{ caller_info["caller_type"] }}</div>
+    <div class="panel-body">
+        <div class="row">
+                <div class="col-xs-6">
+                <label>Name : </label> <a href="/desk#Form/Customer/{{ caller_info.name }}">{{ caller_info.name }}</a>
+                </div>
+                <div class="col-xs-6"><label>Mobile : </label> {{ caller_info.mobile_number }}</div>
+        </div>
+        <div class="row">
+                <div class="col-xs-6"><label>Email : </label> {{ caller_info.email_id }}</div>
+                <div class="col-xs-6"><label>Type : </label> {{ caller_info.caller_type }}</div>
+        </div>
+    </div>
+</div>

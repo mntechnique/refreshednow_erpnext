@@ -2,7 +2,8 @@
 	"js/refreshednow.min.js": [
 		"public/js/available_cleaners.html",
 		"public/js/daily_allocation.html",
-		"public/js/rn_calendar.js"
+		"public/js/rn_calendar.js",
+        "public/js/caller_information.html"
 	]
 }
 
