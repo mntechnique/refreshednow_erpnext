@@ -61,3 +61,20 @@ def get_caller_number(caller_number):
 			})
 		return out
 	return frappe._dict({"name":"New Lead","caller_type":"New Lead"})
+
+def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1)):
+  """
+  Generate Timeslots based on list of hours and duration
+
+  :param hours: list of hours = [frappe.utils.datetime.datetime(2016, 12, 14, 9), 
+                                frappe.utils.datetime.datetime(2016, 12, 14, 18)]
+  :param duration: default duration of one hour.
+  """
+  out = []
+  slots = sorted([(hours[0], hours[0])] + [(hours[1], hours[1])])
+  for start, end in ((slots[i][1], slots[i+1][0]) for i in range(len(slots)-1)):
+      assert start <= end, "Start time should be before end time"
+      while start + duration <= end:
+          out.append(frappe._dict({"start":start.isoformat(), "end":(start + duration).isoformat()}))
+          start += duration
+  return out
