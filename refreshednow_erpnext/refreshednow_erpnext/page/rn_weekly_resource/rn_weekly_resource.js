@@ -73,6 +73,9 @@ function prepare_options(resources) {
 		selectHelper: true,
 		forceEventDuration: true,
 		defaultView: "agendaWeek",
+		selectAllow: function(selectInfo) {
+			console.log(selectInfo);
+		},
 		// minTime: "10:00:00",
 		// maxTime: "16:00:00",
 		eventStartEditable: true,

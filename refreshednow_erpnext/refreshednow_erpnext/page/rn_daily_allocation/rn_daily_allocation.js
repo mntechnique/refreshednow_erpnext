@@ -68,11 +68,15 @@ function prepare_options(resources) {
 		selectHelper: true,
 		forceEventDuration: true,
 		defaultView: "agendaDay",
-		// minTime: "10:00:00",
-		// maxTime: "16:00:00",
+		snapDuration: "01:00:00",
+		minTime: "10:00:00",
+		maxTime: "16:00:00",
 		eventStartEditable: true,
 		eventDurationEditable: true,
 		resources: resources,
+		selectAllow: function(selectInfo) {
+			console.log(selectInfo);
+		},
 		eventClick: function(calEvent, jsEvent, view) {
 
 			alert('Event: ' + calEvent.title);
