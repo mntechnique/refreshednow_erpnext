@@ -1,11 +1,19 @@
 <div class="panel panel-default" style="margin-top:2%;">
-  <div class="panel-heading">
+     <div class="panel-heading">
         <div class="row" >
             <div class="col-xs-6">{{ caller_info["caller_type"] }}</div>
-            <div class="col-xs-6"><button id="btn-create-lead" class="btn btn-sm btn-secondary pull-right"
-             type="button"> Create </button></div>
         </div>
     </div>
+{% if caller_info["caller_type"] == "New Lead" %}
+    <div class="panel-body">
+        <div class="row">
+             <div class="col-xs-6"><button id="btn-create-lead" class="btn btn-sm btn-secondary pull-right"
+             type="button"> Create New Lead </button></div>
+              <div class="col-xs-6"><button id="btn-create-customer" class="btn btn-sm btn-secondary pull-left"
+             type="button"> Create Customer </button></div>
+        </div>
+    </div>
+{% else %}
     <div class="panel-body">
         <div class="row">
                 <div class="col-xs-6">
@@ -19,3 +27,7 @@
         </div>
     </div>
 </div>
+{% endif %}
+
+
+

@@ -94,3 +94,14 @@ def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1)):
           out.append(frappe._dict({"start":start.isoformat(), "end":(start + duration).isoformat()}))
           start += duration
   return out
+
+
+@frappe.whitelist()
+def create_contact(customer_name, caller_number):
+    cd = frappe.new_doc("Contact")
+    cd.mobile_no = caller_number
+    cd.first_name = "Contact ({m})".format(m=caller_number)
+    cd.customer = customer_name
+    cd.insert(ignore_permissions=True)
+    frappe.db.commit()
+    return cd.name
