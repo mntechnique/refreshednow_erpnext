@@ -62,11 +62,27 @@ def get_caller_number(caller_number):
 		return out
 	return frappe._dict({"name":"New Lead","caller_type":"New Lead"})
 
+
+@frappe.whitelist()
+def create_lead(caller_number):
+    #Create stub lead if lead is not found.
+    ld = frappe.new_doc("Lead")
+    ld.mobile_no = caller_number
+    ld.lead_name = "New Lead ({m})".format(m=caller_number)
+
+    #Set mandatory custom fields.
+    # ld.lead_owner = agent_id
+    # ld.owner = agent_id
+    # frappe.set_user(agent_id)
+    ld.insert(ignore_permissions=True)
+    frappe.db.commit()
+    return ld.name
+
 def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1)):
   """
   Generate Timeslots based on list of hours and duration
 
-  :param hours: list of hours = [frappe.utils.datetime.datetime(2016, 12, 14, 9), 
+  :param hours: list of hours = [frappe.utils.datetime.datetime(2016, 12, 14, 9),
                                 frappe.utils.datetime.datetime(2016, 12, 14, 18)]
   :param duration: default duration of one hour.
   """
