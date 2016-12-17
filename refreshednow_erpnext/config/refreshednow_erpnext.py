@@ -25,5 +25,17 @@ def get_data():
 					"description": _("Lookup customer from caller number"),
 				},
 			]
+		},
+		{
+			"label": _("Settings"),
+			"icon": "icon-star",
+			"items": [
+				{
+					"type": "doctype",
+					"name": "RN Settings",
+					"label": "RN Settings",
+					"description": _("Tool for settings."),
+				},
+			]
 		}
 	]

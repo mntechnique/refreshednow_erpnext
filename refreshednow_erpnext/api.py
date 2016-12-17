@@ -105,3 +105,13 @@ def create_contact(customer_name, caller_number):
     cd.insert(ignore_permissions=True)
     frappe.db.commit()
     return cd.name
+
+
+@frappe.whitelist()
+def get_settings(fieldname):
+	try:
+		out = frappe.db.get_value("RN Settings", "RN Settings", fieldname)
+	except Exception as e:
+		out = ""
+
+	return out
