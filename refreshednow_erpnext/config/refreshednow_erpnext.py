@@ -18,6 +18,12 @@ def get_data():
 					"label": "Weekly Availability of Resources",
 					"description": _("Weekly Availability of Resources."),
 				},
+				{
+					"type": "page",
+					"name": "customer-lookup",
+					"label": "Lookup Customer",
+					"description": _("Lookup customer from caller number"),
+				},
 			]
 		}
 	]
