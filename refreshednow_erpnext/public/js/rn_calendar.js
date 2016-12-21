@@ -10,16 +10,18 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 
 		//$.extend(this, options);
 		//this.make_page();
+		this.get_events_method = get_events_method;
 		this.options = options;
 		this.page = page;
-		this.get_events_method = get_events_method;
 		this.setup_options();
 		this.make();
 	},
-	show: function() {
-		var me = this;
-		me.set_filters_from_route_options();
-	},
+	// show: function() {
+	// 	var me = this;
+	// 	me.set_filters_from_route_options();
+
+	// 	console.log("In Show");
+	// },
 	// make_page: function() {
 	// 	var me = this;
 	// 	this.parent = frappe.make_page();
@@ -144,7 +146,7 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 			selectHelper: true,
 			forceEventDuration: true,
 			events: function(start, end, timezone, callback) {
-				return frappe.call({
+				return frappe.call({	
 					method: me.get_events_method, //|| "frappe.desk.calendar.get_events",
 					type: "GET",
 					args: me.get_args(start, end),

@@ -16,6 +16,18 @@ def get_cleaner_availability(date, service_item):
 	
 
 @frappe.whitelist()
+def rn_events_test(start, end, filters=None):
+	events = [
+		{ "id": '1', "start": '2016-12-20', "end": '2016-12-20', "title": 'event 1'},
+		{ "id": '2', "start": '2016-12-20T09:00:00', "end": '2016-12-20T14:00:00', "title": 'event 2'},
+		{ "id": '3', "start": '2016-12-21T11:30:00', "end": '2016-12-21T12:00:00', "title": 'event 3' },
+		{ "id": '4', "start": '2016-12-22T07:30:00', "end": '2016-12-22T09:30:00', "title": 'event 4' },
+		{ "id": '5', "start": '2016-12-23T10:00:00', "end": '2016-12-23T15:00:00', "title": 'event 5' },
+		{ "id": '6', "start": '2016-12-24T10:00:00', "end": '2016-12-24T15:00:00', "title": filters }
+	]
+	return events
+
+@frappe.whitelist()
 def rn_events(start, end, filters=None):
 	service_item = None
 
@@ -27,13 +39,13 @@ def rn_events(start, end, filters=None):
 
 	slots = []
 	
-	if filters["service_type"]:
+	if filters.get("service_type"):
 
 		service_item = frappe.get_doc("Item", filters["service_type"])
 		service_date = frappe.utils.data.get_datetime(filters["scheduled_date"]) or frappe.utils.datetime.datetime.today()
 
-		week_start = frappe.utils.datetime.datetime(2016, 12, 18) #service_date.replace(day=(service_date.day - (service_date.weekday() + 1)))
-		week_end = frappe.utils.datetime.datetime(2016, 12, 24) #service_date.replace(day=(service_date.day + (7 - (service_date.weekday() + 1))))
+		week_start = service_date.replace(day=(service_date.day - (service_date.weekday() + 1)))
+		week_end = service_date.replace(day=(service_date.day + (7 - (service_date.weekday() + 1))))
 		iter_date = week_start
 		days = (week_end - week_start).days + 1
 		
@@ -62,18 +74,9 @@ def rn_events(start, end, filters=None):
 
 			iter_date = iter_date.replace(day=(iter_date.day + 1))
 
-	print slots
-
 	return slots
 
-	# events = [
-	# 	{ "id": '1', "start": '2016-12-20', "end": '2016-12-20', "title": 'event 1'},
-	# 	{ "id": '2', "start": '2016-12-20T09:00:00', "end": '2016-12-20T14:00:00', "title": 'event 2'},
-	# 	{ "id": '3', "start": '2016-12-21T11:30:00', "end": '2016-12-21T12:00:00', "title": 'event 3' },
-	# 	{ "id": '4', "start": '2016-12-22T07:30:00', "end": '2016-12-22T09:30:00', "title": 'event 4' },
-	# 	{ "id": '5', "start": '2016-12-23T10:00:00', "end": '2016-12-23T15:00:00', "title": 'event 5' },
-	# 	{ "id": '6', "start": '2016-12-24T10:00:00', "end": '2016-12-24T15:00:00', "title": filters }
-	# ]
+
 	
 
 @frappe.whitelist()

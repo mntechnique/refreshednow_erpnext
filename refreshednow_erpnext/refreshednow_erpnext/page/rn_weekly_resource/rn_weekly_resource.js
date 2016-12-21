@@ -12,8 +12,7 @@ frappe.pages['rn-weekly-resource'].on_page_load = function(wrapper) {
 		"assets/refreshednow_erpnext/js/lib/fullcalendar.min.css"], 
 		function() {
 			var options = prepare_options(); 
-			var cal = new refreshednow_erpnext.RNCalendar(options, page) //, "refreshednow_erpnext.api.get_cleaner_availability");
-			console.log(cal);
+			var cal = new refreshednow_erpnext.RNCalendar(options, page, "refreshednow_erpnext.api.rn_events");
 			cal.filters = [
 							{
 								"fieldtype": "Link",
@@ -33,12 +32,12 @@ frappe.pages['rn-weekly-resource'].on_page_load = function(wrapper) {
 								"label": __("Customer")
 							},
 						];
-			cal.get_events_method = "refreshednow_erpnext.api.rn_events";
+			//cal.get_events_method = "refreshednow_erpnext.api.rn_events_test";
 			cal.add_filters();
 			cal.set_filters_from_route_options();
-			$(this.parent).on("show", function() {
-				me.$cal.fullCalendar("refetchEvents");
-			});
+			// $(this.parent).on("show", function() {
+			// 	me.$cal.fullCalendar("refetchEvents");
+			// });
 			page.fields_dict["service_type"].get_query = function() {
 				return {
 					"filters": {
@@ -47,6 +46,7 @@ frappe.pages['rn-weekly-resource'].on_page_load = function(wrapper) {
 				}
 			}
 
+			//console.log(cal);
 
 			// frappe.call({
 			// 	args: {
@@ -111,7 +111,7 @@ function prepare_options() {
 		forceEventDuration: true,
 		defaultView: "agendaWeek",
 		selectAllow: function(selectInfo) {
-			console.log(selectInfo);
+			//console.log(selectInfo);
 		},
 		// minTime: "10:00:00",
 		// maxTime: "16:00:00",
