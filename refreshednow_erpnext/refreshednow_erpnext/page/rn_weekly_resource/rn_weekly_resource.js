@@ -8,6 +8,16 @@ frappe.pages['rn-weekly-resource'].on_page_load = function(wrapper) {
 		single_column: true
 	});
 
+	wrapper.service_item_data = [];
+	frappe.call({
+		async:false,
+		method: "refreshednow_erpnext.api.get_service_items",
+		callback: function(r) {
+			wrapper.service_item_data = r.message;
+		}
+	})
+
+
 	frappe.require(["assets/refreshednow_erpnext/js/lib/fullcalendar.min.js", 
 		"assets/refreshednow_erpnext/js/lib/fullcalendar.min.css"], 
 		function() {
@@ -98,6 +108,16 @@ frappe.pages['rn-weekly-resource'].on_page_load = function(wrapper) {
 		});
 	}
 
+frappe.pages['rn-weekly-resource'].refresh = function(wrapper) {
+	frappe.call({
+		method: "refreshednow_erpnext.api.get_service_items",
+		callback: function(r) {
+			wrapper.service_item_data = r.message;
+		}
+	})
+
+}
+
 
 function prepare_options() {
 	return	{
@@ -113,8 +133,8 @@ function prepare_options() {
 		selectAllow: function(selectInfo) {
 			//console.log(selectInfo);
 		},
-		// minTime: "10:00:00",
-		// maxTime: "16:00:00",
+		minTime: "10:00:00",
+		maxTime: "16:00:00",
 		eventStartEditable: true,
 		eventDurationEditable: true,
 		eventClick: function(calEvent, jsEvent, view) {
@@ -127,7 +147,8 @@ function prepare_options() {
 			// $(this).css('border-color', 'green');
 			frappe.set_route("rn-daily-allocation");
 
-		}
+		}, 
+		defaultDate: frappe.datetime.get_today()
 	}
 }
 

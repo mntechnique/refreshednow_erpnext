@@ -33,10 +33,6 @@ def rn_events(start, end, filters=None):
 
 	filters = json.loads(filters)
 
-	print "filters"
-	print filters
-
-
 	slots = []
 	
 	if filters.get("service_type"):
@@ -181,3 +177,10 @@ def get_settings(fieldname):
 		out = ""
 
 	return out
+
+
+@frappe.whitelist()
+def get_service_items():
+	return frappe.get_all("Item", 
+		filters={"item_group": get_settings("rn_service_item_group")}, 
+		fields=["name", "item_code", "rn_start_time_hours", "rn_start_time_minutes", "rn_end_time_hours", "rn_end_time_minutes"])

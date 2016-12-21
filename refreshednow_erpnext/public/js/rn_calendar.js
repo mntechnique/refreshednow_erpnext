@@ -157,10 +157,6 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 					}
 				})
 			},
-			// resources: function(){
-
-
-			// }
 			eventClick: function(event, jsEvent, view) {
 				// edit event description or delete
 				// var doctype = event.doctype || me.doctype;
@@ -224,11 +220,36 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 		return args;
 	},
 	refresh: function() {
+		var me = this;
+
+		//Filter by scheduled date.
+		var scheduled_date = this.page.fields_dict["scheduled_date"].$input.val();
+		var selected_date = frappe.datetime.get_today();
+		
+		if (scheduled_date) {
+			selected_date = frappe.datetime.user_to_obj(scheduled_date);
+		}
+		me.$cal.fullCalendar("gotoDate", selected_date);
+
+		//Set mintime and maxtime by service item.
+		var service_item_name = this.page.fields_dict["service_type"].$input.val();
+		
+		var service_duration = {};
+
+		console.log(cur_page.page.service_item_data);
+
+		$.each(cur_page.page.service_item_data, function (k,v) { 
+			if (v["item_code"] == service_item_name) {
+				service_duration = { 
+				  "minTime": v["rn_start_time_hours"] + ":" + v["rn_start_time_minutes"] + ":00",
+				  "maxTime": v["rn_end_time_hours"] + ":" + v["rn_end_time_minutes"] + ":00" 
+				}
+			} 
+		});
+
+		console.log(service_duration);
+		this.$cal.fullCalendar('options', service_duration);
 		this.$cal.fullCalendar('refetchEvents');
-		// //For applying filters
-		// if (this.callback_on_refresh != null) {
-		// 	callback_on_refresh();
-		// }
 	},
 	prepare_events: function(events) {
 		// var me = this;
@@ -263,7 +284,7 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 		// 	}
 		// 	d["textColor"] = "#36414C";
 		// })
-		//console.log(this.page.fields_dict["service_type"].$input.val());
+//		console.log(this.page.fields_dict["service_type"].$input.val());
 
 		//console.log("In 'prepare_events'");
 	},
