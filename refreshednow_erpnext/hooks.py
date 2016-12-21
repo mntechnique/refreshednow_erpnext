@@ -111,3 +111,13 @@ app_include_js = "/assets/js/refreshednow.min.js"
 # 	"frappe.desk.doctype.event.event.get_events": "refreshednow_erpnext.event.get_events"
 # }
 
+fixtures = [
+	{"dt": "Custom Field", "filters": [["name", "in", [
+		"Item-rn_sb_service_item_info",
+		"Item-rn_start_time_hours",
+		"Item-rn_start_time_minutes",
+		"Item-cb_rn_sv_item",
+		"Item-rn_end_time_hours",
+		"Item-rn_end_time_minutes",
+	]]]}
+]

@@ -105,8 +105,7 @@ function prepare_options() {
 			left: null,
 			center: 'title',
 			right: null
-		}, 
-		schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
+		},
 		allDaySlot: false,
 		selectHelper: true,
 		forceEventDuration: true,

@@ -144,18 +144,16 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 			selectHelper: true,
 			forceEventDuration: true,
 			events: function(start, end, timezone, callback) {
-				console.log(me.get_events_method);
 				return frappe.call({
 					method: me.get_events_method, //|| "frappe.desk.calendar.get_events",
 					type: "GET",
 					args: me.get_args(start, end),
 					callback: function(r) {
-						var events = r.message;
+						var events = r.message || [];
 						me.prepare_events(events);
 						callback(events);
 					}
 				})
-				console.log("In 'events'");
 			},
 			// resources: function(){
 
@@ -167,7 +165,7 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 				// if(frappe.model.can_read(doctype)) {
 				// 	frappe.set_route("Form", doctype, event.name);
 				// }
-				console.log("In 'eventClick'");
+				//console.log("In 'eventClick'");
 			},
 			eventDrop: function(event, delta, revertFunc, jsEvent, ui, view) {
 				me.update_event(event, revertFunc);
@@ -199,7 +197,7 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 				// }
 
 				// frappe.set_route("Form", me.doctype, event.name);
-				console.log("In 'select'");
+				//console.log("In 'select'");
 			},
 			dayClick: function(date, allDay, jsEvent, view) {
 				jsEvent.day_clicked = true;
@@ -225,10 +223,10 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 	},
 	refresh: function() {
 		this.$cal.fullCalendar('refetchEvents');
-		//For applying filters
-		if (this.callback_on_refresh != null) {
-			callback_on_refresh();
-		}
+		// //For applying filters
+		// if (this.callback_on_refresh != null) {
+		// 	callback_on_refresh();
+		// }
 	},
 	prepare_events: function(events) {
 		// var me = this;
@@ -263,9 +261,9 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 		// 	}
 		// 	d["textColor"] = "#36414C";
 		// })
-		console.log(this.page.fields_dict["service_type"].$input.val());
+		//console.log(this.page.fields_dict["service_type"].$input.val());
 
-		console.log("In 'prepare_events'");
+		//console.log("In 'prepare_events'");
 	},
 	update_event: function(event, revertFunc) {
 		// var me = this;
@@ -283,7 +281,7 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 		// 		revertFunc();
 		// 	}
 		// });
-		console.log("In 'update_events'");
+	//	console.log("In 'update_events'");
 	},
 	get_update_args: function(event) {
 		// var me = this;
@@ -309,7 +307,7 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 		// args.doctype = event.doctype || this.doctype;
 
 		// return { args: args, field_map: this.field_map };
-		console.log("In 'get_update_args'");
+		//console.log("In 'get_update_args'");
 	},
 
 	fix_end_date_for_event_render: function(event) {
