@@ -150,8 +150,6 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 					type: "GET",
 					args: me.get_args(start, end),
 					callback: function(r) {
-
-						console.log("Events callback");
 						var events = r.message;
 						me.prepare_events(events);
 						callback(events);

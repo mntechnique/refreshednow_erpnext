@@ -8,66 +8,104 @@ frappe.pages['rn-weekly-resource'].on_page_load = function(wrapper) {
 		single_column: true
 	});
 
-
 	frappe.require(["assets/refreshednow_erpnext/js/lib/fullcalendar.min.js", 
 		"assets/refreshednow_erpnext/js/lib/fullcalendar.min.css"], 
-		function() { 
-
-			frappe.call({
-				args: {
-					date: "2016-12-07"
-				},
-				method: "refreshednow_erpnext.api.get_cleaner_availability",
-				callback: function(r) {
-
-					console.log(r);
-
-					var resources = r.message;
-					var options = prepare_options(resources);
-
-					cal = new refreshednow_erpnext.RNCalendar(options, page, "refreshednow_erpnext.api.get_cleaner_availability");
-					cal.filters = [
-									{
-										"fieldtype": "Link",
-										"fieldname": "service_type",
-										"options": "Item",
-										"label": __("Service Type")
-									},
-									{
-										"fieldtype": "Date",
-										"fieldname": "scheduled_date",
-										"label": __("Date")
-									},
-									{
-										"fieldtype": "Link",
-										"fieldname": "customer",
-										"options": "Customer",
-										"label": __("Customer")
-									},
-								];
-					//cal.get_events_method = "refreshednow_erpnext.api.get_timeslots";
-					cal.add_filters();
-					cal.set_filters_from_route_options()
-					page.fields_dict["service_type"].get_query = function() {
-						return {
-							"filters": {
-								"item_group": "Services"
-							}
-						}
+		function() {
+			var options = prepare_options(); 
+			var cal = new refreshednow_erpnext.RNCalendar(options, page) //, "refreshednow_erpnext.api.get_cleaner_availability");
+			console.log(cal);
+			cal.filters = [
+							{
+								"fieldtype": "Link",
+								"fieldname": "service_type",
+								"options": "Item",
+								"label": __("Service Type")
+							},
+							{
+								"fieldtype": "Date",
+								"fieldname": "scheduled_date",
+								"label": __("Date")
+							},
+							{
+								"fieldtype": "Link",
+								"fieldname": "customer",
+								"options": "Customer",
+								"label": __("Customer")
+							},
+						];
+			cal.get_events_method = "refreshednow_erpnext.api.rn_events";
+			cal.add_filters();
+			cal.set_filters_from_route_options();
+			$(this.parent).on("show", function() {
+				me.$cal.fullCalendar("refetchEvents");
+			});
+			page.fields_dict["service_type"].get_query = function() {
+				return {
+					"filters": {
+						"item_group": "Services"
 					}
 				}
-			});
+			}
+
+
+			// frappe.call({
+			// 	args: {
+			// 		date: "2016-12-07"
+			// 	},
+			// 	method: "refreshednow_erpnext.api.get_cleaner_availability",
+			// 	callback: function(r) {
+
+			// 		console.log(r);
+
+			// 		var resources = r.message;
+			// 		//var options = prepare_options(resources);
+
+			// 		cal = new refreshednow_erpnext.RNCalendar(options, page, "refreshednow_erpnext.api.get_cleaner_availability");
+			// 		cal.filters = [
+			// 						{
+			// 							"fieldtype": "Link",
+			// 							"fieldname": "service_type",
+			// 							"options": "Item",
+			// 							"label": __("Service Type")
+			// 						},
+			// 						{
+			// 							"fieldtype": "Date",
+			// 							"fieldname": "scheduled_date",
+			// 							"label": __("Date")
+			// 						},
+			// 						{
+			// 							"fieldtype": "Link",
+			// 							"fieldname": "customer",
+			// 							"options": "Customer",
+			// 							"label": __("Customer")
+			// 						},
+			// 					];
+			// 		//cal.get_events_method = "refreshednow_erpnext.api.get_timeslots";
+			// 		cal.add_filters();
+			// 		cal.set_filters_from_route_options();
+			// 		$(this.parent).on("show", function() {
+			// 			me.$cal.fullCalendar("refetchEvents");
+			// 		});
+			// 		page.fields_dict["service_type"].get_query = function() {
+			// 			return {
+			// 				"filters": {
+			// 					"item_group": "Services"
+			// 				}
+			// 			}
+			// 		}
+			// 	}
+			// });
 		});
 	}
 
 
-function prepare_options(resources) {
+function prepare_options() {
 	return	{
 		header:{
 			left: null,
 			center: 'title',
 			right: null
-		},
+		}, 
 		schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
 		allDaySlot: false,
 		selectHelper: true,
@@ -80,7 +118,6 @@ function prepare_options(resources) {
 		// maxTime: "16:00:00",
 		eventStartEditable: true,
 		eventDurationEditable: true,
-		resources: resources,
 		eventClick: function(calEvent, jsEvent, view) {
 
 			// alert('Event: ' + calEvent.title);
