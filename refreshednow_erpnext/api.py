@@ -25,30 +25,45 @@ def rn_events(start, end, filters=None):
 	print filters
 
 
+	slots = []
+	
 	if filters["service_type"]:
-
-		slots = []
 
 		service_item = frappe.get_doc("Item", filters["service_type"])
 		service_date = frappe.utils.data.get_datetime(filters["scheduled_date"]) or frappe.utils.datetime.datetime.today()
 
-		week_start = frappe.utils.datetime.datetime(2016, 12, 19) #service_date.replace(day=(service_date.day - (service_date.weekday() + 1)))
+		week_start = frappe.utils.datetime.datetime(2016, 12, 18) #service_date.replace(day=(service_date.day - (service_date.weekday() + 1)))
 		week_end = frappe.utils.datetime.datetime(2016, 12, 24) #service_date.replace(day=(service_date.day + (7 - (service_date.weekday() + 1))))
+		iter_date = week_start
+		days = (week_end - week_start).days + 1
 		
-		for x in xrange(0, (week_end-week_start).days):
+	
+		# print "Week Start: ", str(week_start)
+		# print "Week End: ",  str(week_end)
+		# print "Days: ",  days
+
+		for x in xrange(0, days):
+			#print "Week Start: ", str(week_start)
 			start_time = iter_date
 			start_time = start_time.replace(hour=int(service_item.rn_start_time_hours), minute=int(service_item.rn_start_time_minutes), second=0, microsecond=0)
 
 			end_time = iter_date
 			end_time = end_time.replace(hour=int(service_item.rn_end_time_hours), minute=int(service_item.rn_end_time_minutes), second=0, microsecond=0)
 		
+			# print "Start Time: ", start_time
+			# print "End Time: ", end_time
+
 			daily_slots = get_slots(hours=[start_time, end_time])
 
 			for slot in daily_slots:
-				slot.update( {"id": frappe.generate_hash(length=5), "title": 10 })
+				slot.update( {"id": frappe.generate_hash(length=5), "title": '10' })
 
-			slots.append(daily_slots)
-		
+			slots = slots + daily_slots
+
+			iter_date = iter_date.replace(day=(iter_date.day + 1))
+
+	print slots
+
 	return slots
 
 	# events = [
