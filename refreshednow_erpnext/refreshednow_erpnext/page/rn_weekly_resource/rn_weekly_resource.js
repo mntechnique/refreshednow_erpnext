@@ -101,7 +101,6 @@ function render_calendar(wrapper) {
 			//Remove previous calendar.
 			if (wrapper.rn_calendar) {
 				wrapper.rn_calendar.$cal.remove();
-				//wrapper.rn_calendar.footnote_area.remove();
 				wrapper.rn_calendar = null;
 			}
 
@@ -119,7 +118,7 @@ function prepare_options(minTime="07:00:00", maxTime="17:00:00", defaultDate, fi
 		},
 		allDaySlot: false,
 		selectHelper: true,
-		forceEventDuration: true,
+		forceEventDuration: false,
 		defaultView: "agendaWeek",
 		selectAllow: function(selectInfo) {
 		},
@@ -129,7 +128,7 @@ function prepare_options(minTime="07:00:00", maxTime="17:00:00", defaultDate, fi
 		eventDurationEditable: false,
 		disableDragging: true,
 		eventClick: function(calEvent, jsEvent, view) {
-			frappe.set_route("rn-daily-allocation");
+			frappe.set_route("rn-daily-allocation", calEvent.start.format("YYYY-MM-DD"), filters["service_type"]);
 		}, 
 		defaultDate: defaultDate,
 		events: function(start, end, timezone, callback) {
@@ -139,7 +138,6 @@ function prepare_options(minTime="07:00:00", maxTime="17:00:00", defaultDate, fi
 				args: {"start": minTime, "end": maxTime, "filters": filters},
 				callback: function(r) {
 					var events = r.message || [];
-					console.log(events);
 					callback(events);
 				}
 			})
