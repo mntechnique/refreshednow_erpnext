@@ -4,5 +4,8 @@
 		"public/js/daily_allocation.html",
 		"public/js/rn_calendar.js",
 		"public/js/caller_information.html"
+	],
+	"css/refreshednow.min.css": [
+		"public/css/rn_event.css"
 	]
 }

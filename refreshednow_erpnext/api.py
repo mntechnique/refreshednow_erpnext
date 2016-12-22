@@ -64,7 +64,7 @@ def rn_events(start, end, filters=None):
 			daily_slots = get_slots(hours=[start_time, end_time])
 
 			for slot in daily_slots:
-				slot.update( {"id": frappe.generate_hash(length=5), "title": '10' })
+				slot.update( {"id": frappe.generate_hash(length=5), "title": '10', "className": "rn-team" })
 
 			slots = slots + daily_slots
 
