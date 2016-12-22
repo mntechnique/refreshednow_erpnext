@@ -28,11 +28,15 @@ frappe.pages['rn-weekly-resource'].on_page_load = function(wrapper) {
 			//default: "RN-PLUS",
 			reqd: 1,
 			input_css: {"z-index": 1},
-			change: function() {
-				var selected = $(this).val();
-				console.log(selected);
-				render_calendar(wrapper);
-			}
+			change: function(selected) {
+				var items = [];
+				$.each(wrapper.service_item_data, function(k,v) {
+					items.push(v["item_code"]);
+				});
+				if ((!selected) || items.includes(selected)) {
+					render_calendar(wrapper);
+				}
+			},
 		}
 	)
 	page.fields_dict["service_type"].get_query = function() {
@@ -52,11 +56,9 @@ frappe.pages['rn-weekly-resource'].on_page_load = function(wrapper) {
 			label: __("Scheduled Date"),
 			default: frappe.datetime.get_today(),
 			input_css: {"z-index": 1},
-			change: function() {
-				var selected = $(this).val();
-				console.log(selected);
+			change: function(v) {
 				render_calendar(wrapper);
-			}
+			},
 		}
 	)
 
@@ -87,18 +89,28 @@ function render_calendar(wrapper) {
 			var scheduled_date = wrapper.page.fields_dict["scheduled_date"].$input.val();
 			if (scheduled_date) {
 				scheduled_date = frappe.datetime.user_to_obj(scheduled_date);
+			} else {
+				scheduled_date = frappe.datetime.get_today();
 			}
 
-			var options = prepare_options(minTime, maxTime, scheduled_date); 
+			var options = prepare_options(minTime, 
+				maxTime, 
+				scheduled_date, 
+				{"service_type": service_item_name, "scheduled_date": scheduled_date});
+
+			//Remove previous calendar.
 			if (wrapper.rn_calendar) {
 				wrapper.rn_calendar.$cal.remove();
-				wrapper.rn_calendar.footnote_area.remove();
+				//wrapper.rn_calendar.footnote_area.remove();
+				wrapper.rn_calendar = null;
 			}
-			wrapper.rn_calendar = new refreshednow_erpnext.RNCalendar(options, wrapper.page, "refreshednow_erpnext.api.rn_events");
+
+			wrapper.rn_calendar = new refreshednow_erpnext.RNCalendar(options, wrapper.page);
+			
 	});
 }
 
-function prepare_options(minTime="07:00:00", maxTime="17:00:00", defaultDate) {
+function prepare_options(minTime="07:00:00", maxTime="17:00:00", defaultDate, filters) {
 	return	{
 		header:{
 			left: null,
@@ -113,11 +125,24 @@ function prepare_options(minTime="07:00:00", maxTime="17:00:00", defaultDate) {
 		},
 		minTime: minTime,
 		maxTime: maxTime,
-		eventStartEditable: true,
-		eventDurationEditable: true,
+		eventStartEditable: false,
+		eventDurationEditable: false,
+		disableDragging: true,
 		eventClick: function(calEvent, jsEvent, view) {
 			frappe.set_route("rn-daily-allocation");
 		}, 
-		defaultDate: defaultDate || frappe.datetime.get_today()
+		defaultDate: defaultDate,
+		events: function(start, end, timezone, callback) {
+			return frappe.call({
+				method: "refreshednow_erpnext.api.rn_events",
+				type: "GET",
+				args: {"start": minTime, "end": maxTime, "filters": filters},
+				callback: function(r) {
+					var events = r.message || [];
+					console.log(events);
+					callback(events);
+				}
+			})
+		},
 	}
 }

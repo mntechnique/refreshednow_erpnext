@@ -4,13 +4,12 @@ frappe.provide("frappe.views.calendar");
 frappe.provide("frappe.views.calendars");
 
 refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
-	init: function(options, page, get_events_method) {
+	init: function(options, page) {
 
 		//console.log({"Init": options});
 
 		//$.extend(this, options);
 		//this.make_page();
-		this.get_events_method = get_events_method;
 		this.options = options;
 		this.page = page;
 		this.setup_options();
@@ -73,18 +72,22 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 
 	make: function() {
 		var me = this;
+		try {
+			this.$wrapper = this.page.main;
+			this.$cal = $("<div id='rnfc'>").appendTo(this.$wrapper);
+			// footnote = frappe.utils.set_footnote(this, this.$wrapper, __("Select or drag across time slots to create a new event."));
+			// footnote.css({"border-top": "0px"});
+			//
+			// $('<div class="help"></div>')
+			// 	.html(__("Select dates to create a new ") + __(me.doctype))
+			// 	.appendTo(this.$wrapper);
 
-		this.$wrapper = this.page.main;
-		this.$cal = $("<div id='rnfc'>").appendTo(this.$wrapper);
-		footnote = frappe.utils.set_footnote(this, this.$wrapper, __("Select or drag across time slots to create a new event."));
-		footnote.css({"border-top": "0px"});
-		//
-		// $('<div class="help"></div>')
-		// 	.html(__("Select dates to create a new ") + __(me.doctype))
-		// 	.appendTo(this.$wrapper);
-
-		this.$cal.fullCalendar(this.cal_options);
-		this.set_css();
+			this.$cal.fullCalendar(this.cal_options);
+			this.set_css();
+		} catch(exc) {
+			console.log("Bad filters");
+			//NOOP;
+		}
 	},
 	set_css: function() {
 		// flatify buttons
@@ -146,18 +149,18 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 			selectable: true,
 			selectHelper: true,
 			forceEventDuration: true,
-			events: function(start, end, timezone, callback) {
-				return frappe.call({	
-					method: me.get_events_method, //|| "frappe.desk.calendar.get_events",
-					type: "GET",
-					args: me.get_args(start, end),
-					callback: function(r) {
-						var events = r.message || [];
-						me.prepare_events(events);
-						callback(events);
-					}
-				})
-			},
+			// events: function(start, end, timezone, callback) {
+			// 	return frappe.call({	
+			// 		method: me.get_events_method, //|| "frappe.desk.calendar.get_events",
+			// 		type: "GET",
+			// 		args: me.get_args(start, end),
+			// 		callback: function(r) {
+			// 			var events = r.message || [];
+			// 			me.prepare_events(events);
+			// 			callback(events);
+			// 		}
+			// 	})
+			// },
 			eventClick: function(event, jsEvent, view) {
 				// edit event description or delete
 				// var doctype = event.doctype || me.doctype;
@@ -211,15 +214,15 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 		// console.log(this.cal_options);
 		// console.log(this.options);
 	},
-	get_args: function(start, end) {
-		var args = {
-			doctype: this.doctype,
-			start: this.get_system_datetime(start),
-			end: this.get_system_datetime(end),
-			filters: this.get_filters()
-		};
-		return args;
-	},
+	// get_args: function(start, end) {
+	// 	var args = {
+	// 		doctype: this.doctype,
+	// 		start: this.get_system_datetime(start),
+	// 		end: this.get_system_datetime(end),
+	// 		filters: this.get_filters()
+	// 	};
+	// 	return args;
+	// },
 	refresh: function() {
 		// var me = this;
 
@@ -252,43 +255,43 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 		// this.$cal.fullCalendar('options', {"agenda" : service_duration});
 		this.$cal.fullCalendar('refetchEvents');
 	},
-	prepare_events: function(events) {
-		// var me = this;
-		// $.each(events || [], function(i, d) {
-		// 	d.id = d.name;
-		// 	d.editable = frappe.model.can_write(d.doctype || me.doctype);
+// 	prepare_events: function(events) {
+// 		// var me = this;
+// 		// $.each(events || [], function(i, d) {
+// 		// 	d.id = d.name;
+// 		// 	d.editable = frappe.model.can_write(d.doctype || me.doctype);
 
-		// 	// do not allow submitted/cancelled events to be moved / extended
-		// 	if(d.docstatus && d.docstatus > 0) {
-		// 		d.editable = false;
-		// 	}
+// 		// 	// do not allow submitted/cancelled events to be moved / extended
+// 		// 	if(d.docstatus && d.docstatus > 0) {
+// 		// 		d.editable = false;
+// 		// 	}
 
-		// 	$.each(me.field_map, function(target, source) {
-		// 		d[target] = d[source];
-		// 	});
+// 		// 	$.each(me.field_map, function(target, source) {
+// 		// 		d[target] = d[source];
+// 		// 	});
 
-		// 	if(!me.field_map.allDay)
-		// 		d.allDay = 1;
+// 		// 	if(!me.field_map.allDay)
+// 		// 		d.allDay = 1;
 
-		// 	// convert to user tz
-		// 	d.start = frappe.datetime.convert_to_user_tz(d.start);
-		// 	d.end = frappe.datetime.convert_to_user_tz(d.end);
+// 		// 	// convert to user tz
+// 		// 	d.start = frappe.datetime.convert_to_user_tz(d.start);
+// 		// 	d.end = frappe.datetime.convert_to_user_tz(d.end);
 
-		// 	me.fix_end_date_for_event_render(d);
+// 		// 	me.fix_end_date_for_event_render(d);
 
-		// 	if(me.get_css_class) {
-		// 		$.extend(d, me.styles[me.get_css_class(d)] || {});
-		// 	} else if(me.style_map) {
-		// 		$.extend(d, me.styles[me.style_map[d.status]] || {});
-		// 	} else {
-		// 		$.extend(d, me.styles[frappe.utils.guess_style(d.status, "standard")]);
-		// 	}
-		// 	d["textColor"] = "#36414C";
-		// })
-//		console.log(this.page.fields_dict["service_type"].$input.val());
+// 		// 	if(me.get_css_class) {
+// 		// 		$.extend(d, me.styles[me.get_css_class(d)] || {});
+// 		// 	} else if(me.style_map) {
+// 		// 		$.extend(d, me.styles[me.style_map[d.status]] || {});
+// 		// 	} else {
+// 		// 		$.extend(d, me.styles[frappe.utils.guess_style(d.status, "standard")]);
+// 		// 	}
+// 		// 	d["textColor"] = "#36414C";
+// 		// })
+// //		console.log(this.page.fields_dict["service_type"].$input.val());
 
-		//console.log("In 'prepare_events'");
-	},
+// 		//console.log("In 'prepare_events'");
+// 	},
 	update_event: function(event, revertFunc) {
 		// var me = this;
 		// frappe.model.remove_from_locals(me.doctype, event.name);
