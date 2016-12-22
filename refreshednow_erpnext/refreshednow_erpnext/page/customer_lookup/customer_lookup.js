@@ -22,7 +22,7 @@ frappe.pages['customer-lookup'].on_page_load = function(wrapper) {
 				caller_number: $(txt).val()
 			},
 			freeze: true,
-			freeze_message: __("Retrieving Caller Details"),
+			freeze_message: __("Looking up caller number..."),
 			callback: function(r) {
 				page.wrapper.find("#rn-ccc").remove();
 				content.append(frappe.render_template("caller_information", {"caller_info": r.message}));
@@ -31,6 +31,13 @@ frappe.pages['customer-lookup'].on_page_load = function(wrapper) {
 				lookup_call_customer(content);
 			}
 		});
+	});
+
+	//Handle enter.
+	$(document).keypress(function(e) {
+		if (e.which == 13) {
+			btn.click();			
+		}
 	});
 }
 
@@ -44,14 +51,14 @@ function lookup_call_lead(content){
 				caller_number: $(txt).val()
 			},
 			freeze: true,
-			freeze_message: __("Retrieving Caller Details"),
+			freeze_message: __("Looking up caller number..."),
 			callback: function(r){
 				console.log(r.message);
 				var raw_url = window.location.origin;
+				console.log(r.message);
 				var str = "/desk#Form/Lead/"+r.message;
 				var url = raw_url + str;
-				var win = window.open(url,'_blank');
-				win.focus();
+				window.location = url;
 			}
 		});
 
@@ -82,15 +89,13 @@ function create_customer(customer_name, caller_number){
 				caller_number: caller_number,
 				customer_name: customer_name
 			},
-			freeze: true,
-			freeze_message: __("Retrieving Caller Details"),
 			callback: function(r){
 				console.log(r.message);
 				var raw_url = window.location.origin;
 				var str = "/desk#Form/Contact/"+r.message;
 				var url = raw_url + str;
-				var win = window.open(url,'_blank');
-				win.focus();
+				//var win = window.open(url);
+				window.location = url;
 			}
 		});
 }

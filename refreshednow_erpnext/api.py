@@ -106,7 +106,8 @@ def get_caller_number(caller_number):
 	if cname:
 		#Create stub lead if lead is not found.
 		c = frappe.get_doc("Customer",cname)
-		out = frappe._dict({"name":c.customer_name,
+		out = frappe._dict({"name":c.name,
+								"display_name": c.customer_name,
 								"mobile_number":caller_number,
 								"phone":frappe.db.get_value("Contact",{"mobile_no":caller_number},"phone"),
 								"caller_type":"Customer",
@@ -115,14 +116,18 @@ def get_caller_number(caller_number):
 	lname = frappe.db.get_value("Lead",{"mobile_no":caller_number},"name")
 	if lname:
 		l = frappe.get_doc("Lead",lname)
-		out = frappe._dict({"name":l.lead_name,
+		out = frappe._dict({"name":l.name,
+							"display_name": l.lead_name,
 							"mobile_number":caller_number,
 							"phone":l.phone,
 							"email_id":l.email_id,
 							"caller_type":"Lead"
 			})
 		return out
-	return frappe._dict({"name":"New Lead","caller_type":"New Lead"})
+	
+	return frappe._dict({"name": "", 
+						 "display_name": "New Lead", 
+						 "caller_type":"New Lead"})
 
 
 @frappe.whitelist()

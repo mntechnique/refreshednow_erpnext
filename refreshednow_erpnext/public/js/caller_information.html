@@ -19,7 +19,7 @@
             <div class="panel-body">
                 <div class="row">
                         <div class="col-xs-6">
-                        <label>Lead Name : </label> <a href="/desk#Form/Lead/{{ caller_info.name }}">{{ caller_info.name }}</a>
+                        <label>Lead Name : </label> <a href="/desk#Form/Lead/{{ caller_info.name }}">{{ caller_info.display_name }}</a>
                         </div>
                         <div class="col-xs-6"><label>Mobile : </label> {{ caller_info.mobile_number }}</div>
                 </div>
@@ -36,7 +36,7 @@
                         <label>Contact Name : </label> <a href="/desk#Form/Contact/{{ caller_info.mobile_number}}-{{ caller_info.name }}">{{ caller_info.name }}</a>
                         </div>
                          <div class="col-xs-4">
-                        <label>Customer Name : </label> <a href="/desk#Form/Customer/{{ caller_info.name }}">{{ caller_info.name }}</a>
+                        <label>Customer Name : </label> <a href="/desk#Form/Customer/{{ caller_info.name }}">{{ caller_info.display_name }}</a>
                         </div>
                         <div class="col-xs-4"><label>Mobile : </label> {{ caller_info.mobile_number }}</div>
                 </div>
