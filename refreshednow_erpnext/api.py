@@ -180,7 +180,19 @@ def get_settings(fieldname):
 
 
 @frappe.whitelist()
-def get_service_items():
-	return frappe.get_all("Item", 
+def get_service_item_timings():
+	service_items = frappe.get_all("Item", 
 		filters={"item_group": get_settings("rn_service_item_group")}, 
 		fields=["name", "item_code", "rn_start_time_hours", "rn_start_time_minutes", "rn_end_time_hours", "rn_end_time_minutes"])
+
+	out = []
+	for item in service_items:
+		out.append(
+			frappe._dict({
+				"item_code": item.get("item_code"),
+				"start_time": "{0}:{1}:00".format(item.get("rn_start_time_hours"), item.get("rn_start_time_minutes")),
+				"end_time": "{0}:{1}:00".format(item.get("rn_end_time_hours"), item.get("rn_end_time_minutes")),
+			})
+		)
+
+	return out

@@ -73,8 +73,9 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 
 	make: function() {
 		var me = this;
+
 		this.$wrapper = this.page.main;
-		this.$cal = $("<div>").appendTo(this.$wrapper);
+		this.$cal = $("<div id='rnfc'>").appendTo(this.$wrapper);
 		footnote = frappe.utils.set_footnote(this, this.$wrapper, __("Select or drag across time slots to create a new event."));
 		footnote.css({"border-top": "0px"});
 		//
@@ -220,35 +221,35 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 		return args;
 	},
 	refresh: function() {
-		var me = this;
+		// var me = this;
 
-		//Filter by scheduled date.
-		var scheduled_date = this.page.fields_dict["scheduled_date"].$input.val();
-		var selected_date = frappe.datetime.get_today();
+		// //Filter by scheduled date.
+		// var scheduled_date = this.page.fields_dict["scheduled_date"].$input.val();
+		// var selected_date = frappe.datetime.get_today();
 		
-		if (scheduled_date) {
-			selected_date = frappe.datetime.user_to_obj(scheduled_date);
-		}
-		me.$cal.fullCalendar("gotoDate", selected_date);
+		// if (scheduled_date) {
+		// 	selected_date = frappe.datetime.user_to_obj(scheduled_date);
+		// }
+		// me.$cal.fullCalendar("gotoDate", selected_date);
 
-		//Set mintime and maxtime by service item.
-		var service_item_name = this.page.fields_dict["service_type"].$input.val();
+		// //Set mintime and maxtime by service item.
+		// var service_item_name = this.page.fields_dict["service_type"].$input.val();
 		
-		var service_duration = {};
+		// var service_duration = {};
 
-		console.log(cur_page.page.service_item_data);
+		// console.log(cur_page.page.service_item_data);
 
-		$.each(cur_page.page.service_item_data, function (k,v) { 
-			if (v["item_code"] == service_item_name) {
-				service_duration = { 
-				  "minTime": v["rn_start_time_hours"] + ":" + v["rn_start_time_minutes"] + ":00",
-				  "maxTime": v["rn_end_time_hours"] + ":" + v["rn_end_time_minutes"] + ":00" 
-				}
-			} 
-		});
+		// $.each(cur_page.page.service_item_data, function (k,v) { 
+		// 	if (v["item_code"] == service_item_name) {
+		// 		service_duration = 
+		// 		{ 
+		// 		  "minTime": v["rn_start_time_hours"] + ":" + v["rn_start_time_minutes"] + ":00",
+		// 		  "maxTime": v["rn_end_time_hours"] + ":" + v["rn_end_time_minutes"] + ":00" 
+		// 		}
+		// 	} 
+		// });
 
-		console.log(service_duration);
-		this.$cal.fullCalendar('options', service_duration);
+		// this.$cal.fullCalendar('options', {"agenda" : service_duration});
 		this.$cal.fullCalendar('refetchEvents');
 	},
 	prepare_events: function(events) {
