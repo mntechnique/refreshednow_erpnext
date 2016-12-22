@@ -143,5 +143,6 @@ function prepare_options(minTime="07:00:00", maxTime="17:00:00", defaultDate, fi
 				}
 			})
 		},
+		displayEventTime: false
 	}
 }
