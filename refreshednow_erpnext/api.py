@@ -13,7 +13,7 @@ def get_cleaner_availability(date, service_item):
 	#   { "id": '5', "start": '2016-12-23T10:00:00', "end": '2016-12-23T15:00:00', "title": 'event 5' }
 	# ]
 	pass
-	
+
 
 @frappe.whitelist()
 def rn_events_test(start, end, filters=None):
@@ -34,7 +34,7 @@ def rn_events(start, end, filters=None):
 	filters = json.loads(filters)
 
 	slots = []
-	
+
 	if filters.get("service_type"):
 
 		service_item = frappe.get_doc("Item", filters["service_type"])
@@ -44,8 +44,8 @@ def rn_events(start, end, filters=None):
 		week_end = service_date.replace(day=(service_date.day + (7 - (service_date.weekday() + 1))))
 		iter_date = week_start
 		days = (week_end - week_start).days + 1
-		
-	
+
+
 		# print "Week Start: ", str(week_start)
 		# print "Week End: ",  str(week_end)
 		# print "Days: ",  days
@@ -57,7 +57,7 @@ def rn_events(start, end, filters=None):
 
 			end_time = iter_date
 			end_time = end_time.replace(hour=int(service_item.rn_end_time_hours), minute=int(service_item.rn_end_time_minutes), second=0, microsecond=0)
-		
+
 			# print "Start Time: ", start_time
 			# print "End Time: ", end_time
 
@@ -73,7 +73,7 @@ def rn_events(start, end, filters=None):
 	return slots
 
 
-	
+
 
 @frappe.whitelist()
 def get_cleaners(date):
@@ -162,7 +162,7 @@ def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1)):
 def create_contact(customer_name, caller_number):
 		cd = frappe.new_doc("Contact")
 		cd.mobile_no = caller_number
-		cd.first_name = "Contact ({m})".format(m=caller_number)
+		cd.first_name = "{m}".format(m=caller_number)
 		cd.customer = customer_name
 		cd.insert(ignore_permissions=True)
 		frappe.db.commit()
@@ -181,6 +181,6 @@ def get_settings(fieldname):
 
 @frappe.whitelist()
 def get_service_items():
-	return frappe.get_all("Item", 
-		filters={"item_group": get_settings("rn_service_item_group")}, 
+	return frappe.get_all("Item",
+		filters={"item_group": get_settings("rn_service_item_group")},
 		fields=["name", "item_code", "rn_start_time_hours", "rn_start_time_minutes", "rn_end_time_hours", "rn_end_time_minutes"])
