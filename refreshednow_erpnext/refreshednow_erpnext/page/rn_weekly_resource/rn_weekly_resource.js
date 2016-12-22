@@ -4,12 +4,12 @@ frappe.provide("refreshednow_erpnext.rn_calendar");
 frappe.pages['rn-weekly-resource'].on_page_load = function(wrapper) {	
 	var page = frappe.ui.make_app_page({
 		parent: wrapper,
-		title: 'Weekly Availability of Cleaners',
+		title: 'Weekly Availability of Cleaner Teams',
 		single_column: true
 	});
 
+	//Load service items and timings for setting time slots
 	wrapper.service_item_data = [];
-
 	frappe.call({
 		async:false,
 		method: "refreshednow_erpnext.api.get_service_item_timings",
@@ -131,6 +131,7 @@ function prepare_options(minTime="07:00:00", maxTime="17:00:00", defaultDate, fi
 			frappe.set_route("rn-daily-allocation", calEvent.start.format("YYYY-MM-DD"), filters["service_type"]);
 		}, 
 		defaultDate: defaultDate,
+		/* Fetch events via a callback function*/
 		events: function(start, end, timezone, callback) {
 			return frappe.call({
 				method: "refreshednow_erpnext.api.rn_events",

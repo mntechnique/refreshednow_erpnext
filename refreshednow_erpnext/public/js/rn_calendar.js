@@ -255,43 +255,43 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 		// this.$cal.fullCalendar('options', {"agenda" : service_duration});
 		this.$cal.fullCalendar('refetchEvents');
 	},
-// 	prepare_events: function(events) {
-// 		// var me = this;
-// 		// $.each(events || [], function(i, d) {
-// 		// 	d.id = d.name;
-// 		// 	d.editable = frappe.model.can_write(d.doctype || me.doctype);
+	prepare_events: function(events) {
+		// var me = this;
+		// $.each(events || [], function(i, d) {
+		// 	d.id = d.name;
+		// 	d.editable = frappe.model.can_write(d.doctype || me.doctype);
 
-// 		// 	// do not allow submitted/cancelled events to be moved / extended
-// 		// 	if(d.docstatus && d.docstatus > 0) {
-// 		// 		d.editable = false;
-// 		// 	}
+		// 	// do not allow submitted/cancelled events to be moved / extended
+		// 	if(d.docstatus && d.docstatus > 0) {
+		// 		d.editable = false;
+		// 	}
 
-// 		// 	$.each(me.field_map, function(target, source) {
-// 		// 		d[target] = d[source];
-// 		// 	});
+		// 	$.each(me.field_map, function(target, source) {
+		// 		d[target] = d[source];
+		// 	});
 
-// 		// 	if(!me.field_map.allDay)
-// 		// 		d.allDay = 1;
+		// 	if(!me.field_map.allDay)
+		// 		d.allDay = 1;
 
-// 		// 	// convert to user tz
-// 		// 	d.start = frappe.datetime.convert_to_user_tz(d.start);
-// 		// 	d.end = frappe.datetime.convert_to_user_tz(d.end);
+		// 	// convert to user tz
+		// 	d.start = frappe.datetime.convert_to_user_tz(d.start);
+		// 	d.end = frappe.datetime.convert_to_user_tz(d.end);
 
-// 		// 	me.fix_end_date_for_event_render(d);
+		// 	me.fix_end_date_for_event_render(d);
 
-// 		// 	if(me.get_css_class) {
-// 		// 		$.extend(d, me.styles[me.get_css_class(d)] || {});
-// 		// 	} else if(me.style_map) {
-// 		// 		$.extend(d, me.styles[me.style_map[d.status]] || {});
-// 		// 	} else {
-// 		// 		$.extend(d, me.styles[frappe.utils.guess_style(d.status, "standard")]);
-// 		// 	}
-// 		// 	d["textColor"] = "#36414C";
-// 		// })
-// //		console.log(this.page.fields_dict["service_type"].$input.val());
+		// 	if(me.get_css_class) {
+		// 		$.extend(d, me.styles[me.get_css_class(d)] || {});
+		// 	} else if(me.style_map) {
+		// 		$.extend(d, me.styles[me.style_map[d.status]] || {});
+		// 	} else {
+		// 		$.extend(d, me.styles[frappe.utils.guess_style(d.status, "standard")]);
+		// 	}
+		// 	d["textColor"] = "#36414C";
+		// })
+//		console.log(this.page.fields_dict["service_type"].$input.val());
 
-// 		//console.log("In 'prepare_events'");
-// 	},
+		//console.log("In 'prepare_events'");
+	},
 	update_event: function(event, revertFunc) {
 		// var me = this;
 		// frappe.model.remove_from_locals(me.doctype, event.name);

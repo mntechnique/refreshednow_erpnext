@@ -196,3 +196,25 @@ def get_service_item_timings():
 		)
 
 	return out
+
+@frappe.whitelist()
+def get_rn_daily_resources():
+	resources = [] 
+	resources = [
+		{ "id": 'a', "title": 'Team 1' },
+		{ "id": 'b', "title": 'Team 2', "eventColor": 'green' },
+		{ "id": 'c', "title": 'Team 3', "eventColor": 'orange' },
+		{ "id": 'd', "title": 'Team 4', "eventColor": 'red' }
+	]
+	return resources
+
+@frappe.whitelist()
+def get_rn_daily_events(start, end, filters=None):
+	events = [
+		{ "id": '1', "resourceId": 'a', "start": '2016-12-09', "end": '2016-12-08', "title": 'event 1' },
+		{ "id": '2', "resourceId": 'a', "start": '2016-12-21T09:00:00', "end": '2016-12-21T10:00:00', "title": 'event 2' },
+		{ "id": '3', "resourceId": 'b', "start": '2016-12-22T11:30:00', "end": '2016-12-22T12:30:00', "title": 'event 3' },
+		{ "id": '4', "resourceId": 'c', "start": '2016-12-22T11:30:00', "end": '2016-12-22T12:30:00', "title": 'event 4' },
+		{ "id": '5', "resourceId": 'd', "start": '2016-12-09T10:00:00', "end": '2016-12-09T10:00:00', "title": 'event 5' }
+	]
+	return events
