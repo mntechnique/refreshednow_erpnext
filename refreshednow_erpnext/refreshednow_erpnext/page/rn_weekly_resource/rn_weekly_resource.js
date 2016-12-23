@@ -22,7 +22,7 @@ frappe.pages['rn-weekly-resource'].on_page_load = function(wrapper) {
 	page.add_field(
 		{
 			fieldtype: "Link",
-			fieldname: "service_type",
+			fieldname: "w_service_type",
 			options: "Item",
 			label: __("Service Type"),
 			//default: "RN-PLUS",
@@ -39,7 +39,7 @@ frappe.pages['rn-weekly-resource'].on_page_load = function(wrapper) {
 			},
 		}
 	)
-	page.fields_dict["service_type"].get_query = function() {
+	page.fields_dict["w_service_type"].get_query = function() {
 		return {
 			"filters": {
 				"item_group": "Services"
@@ -51,7 +51,7 @@ frappe.pages['rn-weekly-resource'].on_page_load = function(wrapper) {
 	page.add_field(
 		{
 			fieldtype: "Date",
-			fieldname: "scheduled_date",
+			fieldname: "w_scheduled_date",
 			options: "Item",
 			label: __("Scheduled Date"),
 			default: frappe.datetime.get_today(),
@@ -62,7 +62,11 @@ frappe.pages['rn-weekly-resource'].on_page_load = function(wrapper) {
 		}
 	)
 
-	if (page.fields_dict["service_type"].$input.val() && page.fields_dict["scheduled_date"].$input.val()) {;
+}
+
+frappe.pages['rn-weekly-resource'].refresh = function(wrapper) {
+	var page = wrapper.page;
+	if (page.fields_dict["w_service_type"].$input.val() && page.fields_dict["w_scheduled_date"].$input.val()) {;
 		render_calendar(wrapper);
 	}
 }
@@ -74,7 +78,7 @@ function render_calendar(wrapper) {
 		function() {
 
 			//Prepare Service Item filter.			
-			var service_item_name = wrapper.page.fields_dict["service_type"].$input.val();
+			var service_item_name = wrapper.page.fields_dict["w_service_type"].$input.val();
 			var minTime = ""; 
 			var maxTime = "";
 
@@ -86,7 +90,7 @@ function render_calendar(wrapper) {
 			});
 
 			//Prepare Date Filter
-			var scheduled_date = wrapper.page.fields_dict["scheduled_date"].$input.val();
+			var scheduled_date = wrapper.page.fields_dict["w_scheduled_date"].$input.val();
 			if (scheduled_date) {
 				scheduled_date = frappe.datetime.user_to_obj(scheduled_date);
 			} else {
@@ -96,15 +100,15 @@ function render_calendar(wrapper) {
 			var options = prepare_options(minTime, 
 				maxTime, 
 				scheduled_date, 
-				{"service_type": service_item_name, "scheduled_date": scheduled_date});
+				{"w_service_type": service_item_name, "w_scheduled_date": scheduled_date});
 
 			//Remove previous calendar.
-			if (wrapper.rn_calendar) {
-				wrapper.rn_calendar.$cal.remove();
-				wrapper.rn_calendar = null;
+			if (wrapper.page.weekly_calendar) {
+				wrapper.page.weekly_calendar.$cal.fullCalendar('destroy');
+				wrapper.page.weekly_calendar = null;
 			}
 
-			wrapper.rn_calendar = new refreshednow_erpnext.RNCalendar(options, wrapper.page);
+			wrapper.page.weekly_calendar = new refreshednow_erpnext.RNCalendar(options, wrapper.page);
 			
 	});
 }
@@ -128,11 +132,13 @@ function prepare_options(minTime="07:00:00", maxTime="17:00:00", defaultDate, fi
 		eventDurationEditable: false,
 		disableDragging: true,
 		eventClick: function(calEvent, jsEvent, view) {
-			frappe.set_route("rn-daily-allocation", calEvent.start.format("YYYY-MM-DD"), filters["service_type"]);
+			frappe.set_route("rn-daily-allocation", calEvent.start.format("YYYY-MM-DD"), filters["w_service_type"]);
 		}, 
 		defaultDate: defaultDate,
 		/* Fetch events via a callback function*/
 		events: function(start, end, timezone, callback) {
+			console.log("start:", start, ", end: ", end);
+
 			return frappe.call({
 				method: "refreshednow_erpnext.api.rn_events",
 				type: "GET",
@@ -146,3 +152,4 @@ function prepare_options(minTime="07:00:00", maxTime="17:00:00", defaultDate, fi
 		displayEventTime: false
 	}
 }
+
