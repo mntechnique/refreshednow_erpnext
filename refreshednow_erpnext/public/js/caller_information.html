@@ -18,14 +18,16 @@
         {% if caller_info["caller_type"] == "Lead" %}
             <div class="panel-body">
                 <div class="row">
-                        <div class="col-xs-6">
+                    <div class="col-xs-4">
                         <label>Lead Name : </label> <a href="/desk#Form/Lead/{{ caller_info.name }}">{{ caller_info.display_name }}</a>
-                        </div>
-                        <div class="col-xs-6"><label>Mobile : </label> {{ caller_info.mobile_number }}</div>
+                    </div>
+                    <div class="col-xs-8"><label>Type : </label> {{ caller_info.caller_type }}</div>
+
                 </div>
                 <div class="row">
-                        <div class="col-xs-6"><label>Email : </label> {{ caller_info.email_id }}</div>
-                        <div class="col-xs-6"><label>Type : </label> {{ caller_info.caller_type }}</div>
+                    <div class="col-xs-4"><label>Email : </label> {{ caller_info.email_id }}</div>
+                    <div class="col-xs-4"><label>Mobile : </label> {{ caller_info.mobile_number }}</div>
+                    <div class="col-xs-4"><label>Phone : </label> {{ caller_info.phone }}</div>
                 </div>
             </div>
         {% endif %}
@@ -38,11 +40,12 @@
                          <div class="col-xs-4">
                         <label>Customer Name : </label> <a href="/desk#Form/Customer/{{ caller_info.name }}">{{ caller_info.display_name }}</a>
                         </div>
-                        <div class="col-xs-4"><label>Mobile : </label> {{ caller_info.mobile_number }}</div>
+                        <div class="col-xs-4"><label>Type : </label> {{ caller_info.caller_type }}</div>
                 </div>
                 <div class="row">
-                        <div class="col-xs-4"><label>Email : </label> {{ caller_info.email_id }}</div>
-                        <div class="col-xs-8"><label>Type : </label> {{ caller_info.caller_type }}</div>
+                    <div class="col-xs-4"><label>Email : </label> {{ caller_info.email_id }}</div>
+                    <div class="col-xs-4"><label>Mobile : </label> {{ caller_info.mobile_number }}</div>
+                    <div class="col-xs-4"><label>Phone : </label> {{ caller_info.phone }}</div>
                 </div>
             </div>
         {% endif %}

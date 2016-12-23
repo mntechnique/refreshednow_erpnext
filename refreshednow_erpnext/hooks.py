@@ -119,5 +119,8 @@ fixtures = [
 		"Item-cb_rn_sv_item",
 		"Item-rn_end_time_hours",
 		"Item-rn_end_time_minutes",
+        "Customer-rn_customer_vehicles",
+        "Customer-rn_customer_vehicles_table",
+        "Vehicle-rn_customer",
 	]]]}
 ]
