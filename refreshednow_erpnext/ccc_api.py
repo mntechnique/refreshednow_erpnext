@@ -10,7 +10,7 @@ def get_caller_number(caller_number):
 	cname = frappe.db.get_value("Contact",{"mobile_no":caller_number},"customer")
 	if cname:
 		#Create stub lead if lead is not found.
-		c = frappe.get_doc("Customer",cname)
+		c = frappe.get_doc("Customer", cname)
 		out = frappe._dict({"name":c.name,
 								"display_name": c.customer_name,
 								"mobile_number":caller_number,
@@ -20,7 +20,7 @@ def get_caller_number(caller_number):
 		return out
 	lname = frappe.db.get_value("Lead",{"mobile_no":caller_number},"name")
 	if lname:
-		l = frappe.get_doc("Lead",lname)
+		l = frappe.get_doc("Lead", lname)
 		out = frappe._dict({"name":l.name,
 							"display_name": l.lead_name,
 							"mobile_number":caller_number,
@@ -42,9 +42,6 @@ def create_lead(caller_number):
 	ld.lead_name = "New Lead ({m})".format(m=caller_number)
 
 	#Set mandatory custom fields.
-	# ld.lead_owner = agent_id
-	# ld.owner = agent_id
-	# frappe.set_user(agent_id)
 	ld.insert(ignore_permissions=True)
 	frappe.db.commit()
 	return ld.name

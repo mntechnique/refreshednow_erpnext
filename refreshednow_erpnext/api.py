@@ -5,18 +5,6 @@ from datetime import datetime, timedelta
 
 
 @frappe.whitelist()
-def get_cleaner_availability(date, service_item):
-	# events = [
-	#   { "id": '1', "start": '2016-12-20', "end": '2016-12-20', "title": 'event 1'},
-	#   { "id": '2', "start": '2016-12-20T09:00:00', "end": '2016-12-20T14:00:00', "title": 'event 2'},
-	#   { "id": '3', "start": '2016-12-21T11:30:00', "end": '2016-12-21T12:00:00', "title": 'event 3' },
-	#   { "id": '4', "start": '2016-12-22T07:30:00', "end": '2016-12-22T09:30:00', "title": 'event 4' },
-	#   { "id": '5', "start": '2016-12-23T10:00:00', "end": '2016-12-23T15:00:00', "title": 'event 5' }
-	# ]
-	pass
-
-
-@frappe.whitelist()
 def rn_events_test(start, end, filters=None):
 	events = [
 		{ "id": '1', "start": '2016-12-20', "end": '2016-12-20', "title": 'event 1'},
@@ -41,9 +29,8 @@ def rn_events(start, end, filters=None):
 		service_item = frappe.get_doc("Item", filters["service_type"])
 		service_date = frappe.utils.data.get_datetime(filters["scheduled_date"]) or frappe.utils.datetime.datetime.today()
 
-
-		week_start = service_date - timedelta(days=service_date.weekday() + 1)
-		week_end = week_start + timedelta(days=7)
+		week_start = service_date - timedelta(days=(service_date.weekday()))
+		week_end = week_start + timedelta(days=6)
 
 		# week_start = service_date.replace(day=(service_date.day - (service_date.weekday() + 1)))
 		# week_end = service_date.replace(day=(service_date.day + (7 - (service_date.weekday() + 1))))
@@ -52,9 +39,7 @@ def rn_events(start, end, filters=None):
 
 		print "Week Start: ", str(week_start)
 		print "Week End: ",  str(week_end)
-		# print "Days: ",  days
-
-		#service-wise count of teams
+		print "Days: ",  str(days)
 
 		for x in xrange(0, days):
 			start_time = iter_date
@@ -77,31 +62,6 @@ def rn_events(start, end, filters=None):
 			iter_date = iter_date + timedelta(days=1)
 
 	return slots
-
-@frappe.whitelist()
-def get_cleaners(date):
-	resources = [] #resources = cleaners, events = allocations
-
-	resources = [
-		{ "id": 'a', "title": 'Team 1' },
-		{ "id": 'b', "title": 'Team 2', "eventColor": 'green' },
-		{ "id": 'c', "title": 'Team 3', "eventColor": 'orange' },
-		{ "id": 'd', "title": 'Team 4', "eventColor": 'red' }
-	]
-
-	return resources
-
-@frappe.whitelist()
-def get_timeslots(start, end, filters=None):
-	events = [
-		{ "id": '1', "resourceId": 'a', "start": '2016-12-09', "end": '2016-12-08', "title": 'event 1' },
-		{ "id": '2', "resourceId": 'a', "start": '2016-12-09T09:00:00', "end": '2016-12-09T14:00:00', "title": 'event 2' },
-		{ "id": '3', "resourceId": 'b', "start": '2016-12-09T11:30:00', "end": '2016-12-09T12:00:00', "title": 'event 3' },
-		{ "id": '4', "resourceId": 'c', "start": '2016-12-09T07:30:00', "end": '2016-12-09T09:30:00', "title": 'event 4' },
-		{ "id": '5', "resourceId": 'd', "start": '2016-12-09T10:00:00', "end": '2016-12-09T15:00:00', "title": 'event 5' }
-	]
-
-	return events
 
 def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1)):
 	"""
