@@ -29,17 +29,24 @@ def rn_events(start, end, filters=None):
 		service_item = frappe.get_doc("Item", filters["service_type"])
 		service_date = frappe.utils.data.get_datetime(filters["scheduled_date"]) or frappe.utils.datetime.datetime.today()
 
-		week_start = service_date - timedelta(days=(service_date.weekday()))
-		week_end = week_start + timedelta(days=6)
+		week_range = get_week_range(service_date)
 
-		# week_start = service_date.replace(day=(service_date.day - (service_date.weekday() + 1)))
-		# week_end = service_date.replace(day=(service_date.day + (7 - (service_date.weekday() + 1))))
-		iter_date = week_start
-		days = (week_end - week_start).days
+		# print filters
+		# week_start = filters.get("week_start")
+		# week_end = filters.get("week_end")
+		days = (week_range[1] - week_range[0]).days
+		
+		# print "Week Start: ", str(week_start)
+		# print "Week End: ",  str(week_end)
+		# print "Days: ",  str(days)
 
-		print "Week Start: ", str(week_start)
-		print "Week End: ",  str(week_end)
-		print "Days: ",  str(days)
+		# week_start = service_date - timedelta(days=(service_date.weekday()))
+		# week_end = week_start + timedelta(days=6)
+
+		# # week_start = service_date.replace(day=(service_date.day - (service_date.weekday() + 1)))
+		# # week_end = service_date.replace(day=(service_date.day + (7 - (service_date.weekday() + 1))))
+		iter_date = week_range[0]
+
 
 		for x in xrange(0, days):
 			start_time = iter_date
@@ -60,6 +67,7 @@ def rn_events(start, end, filters=None):
 			print iter_date
 
 			iter_date = iter_date + timedelta(days=1)
+
 
 	return slots
 
@@ -153,3 +161,28 @@ def get_service_wise_count_of_teams():
 		out.append(frappe._dict({ "service": item.name, "teams": no_of_teams }))
 
 	return out
+
+
+def get_week_range(date):
+    """Find the first/last day of the week for the given day.
+    Assuming weeks start on Sunday and end on Saturday.
+
+    Returns a tuple of ``(start_date, end_date)``.
+
+    """
+    # isocalendar calculates the year, week of the year, and day of the week.
+    # dow is Mon = 1, Sat = 6, Sun = 7
+    year, week, dow = date.isocalendar()
+
+    # Find the first day of the week.
+    if dow == 7:
+        # Since we want to start with Sunday, let's test for that condition.
+        start_date = date
+    else:
+        # Otherwise, subtract `dow` number days to get the first day
+        start_date = date - timedelta(dow)
+
+    # Now, add 6 for the last day of the week (i.e., count up to Saturday)
+    end_date = start_date + timedelta(6)
+
+    return [start_date, end_date]

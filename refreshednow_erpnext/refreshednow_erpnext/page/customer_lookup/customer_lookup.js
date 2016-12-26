@@ -9,7 +9,7 @@ frappe.pages['customer-lookup'].on_page_load = function(wrapper) {
 	var content = null;
 	content = page.wrapper.find(".page-content");
 	console.log(content);
-	var input_html= '<div class="input-group"> <input id="txt-lookup" type="text" class="form-control" placeholder="Search for caller number..."> <span class="input-group-btn"> <button id="btn-lookup" class="btn btn-secondary" type="button">Search!</button> </span> </div> <div class="clearfix"></div>'
+	var input_html= '<div class="input-group"><input id="txt-lookup" type="text" class="form-control" placeholder="Search for caller number..."> <span class="input-group-btn"> <button id="btn-lookup" class="btn btn-secondary" type="button">Search!</button> </span> </div> <div class="clearfix"></div>'
 	content.append(input_html);
 
 	//Wireup events to search textbox and button
@@ -64,7 +64,6 @@ function lookup_call_lead(content){
 
 	});
 }
-
 
 function lookup_call_customer(content){
 	var txt = content.find('#txt-lookup');
