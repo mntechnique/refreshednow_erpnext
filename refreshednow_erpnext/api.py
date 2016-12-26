@@ -1,6 +1,7 @@
 import frappe
 from frappe import _
 import json
+from datetime import datetime, timedelta
 
 
 @frappe.whitelist()
@@ -40,40 +41,42 @@ def rn_events(start, end, filters=None):
 		service_item = frappe.get_doc("Item", filters["service_type"])
 		service_date = frappe.utils.data.get_datetime(filters["scheduled_date"]) or frappe.utils.datetime.datetime.today()
 
-		week_start = service_date.replace(day=(service_date.day - (service_date.weekday() + 1)))
-		week_end = service_date.replace(day=(service_date.day + (7 - (service_date.weekday() + 1))))
+
+		week_start = service_date - timedelta(days=service_date.weekday() + 1)
+		week_end = week_start + timedelta(days=7)
+
+		# week_start = service_date.replace(day=(service_date.day - (service_date.weekday() + 1)))
+		# week_end = service_date.replace(day=(service_date.day + (7 - (service_date.weekday() + 1))))
 		iter_date = week_start
-		days = (week_end - week_start).days + 1
+		days = (week_end - week_start).days
 
-
-		# print "Week Start: ", str(week_start)
-		# print "Week End: ",  str(week_end)
+		print "Week Start: ", str(week_start)
+		print "Week End: ",  str(week_end)
 		# print "Days: ",  days
 
+		#service-wise count of teams
+
 		for x in xrange(0, days):
-			#print "Week Start: ", str(week_start)
 			start_time = iter_date
 			start_time = start_time.replace(hour=int(service_item.rn_start_time_hours), minute=int(service_item.rn_start_time_minutes), second=0, microsecond=0)
 
 			end_time = iter_date
 			end_time = end_time.replace(hour=int(service_item.rn_end_time_hours), minute=int(service_item.rn_end_time_minutes), second=0, microsecond=0)
 
-			# print "Start Time: ", start_time
-			# print "End Time: ", end_time
-
 			daily_slots = get_slots(hours=[start_time, end_time])
 
 			for slot in daily_slots:
-				slot.update( {"id": frappe.generate_hash(length=5), "title": '10', "className": "rn-team" })
+				daily_available_slots = get_available_slots_daily(iter_date)
+
+				slot.update( {"id": frappe.generate_hash(length=5), "title": daily_available_slots, "className": "rn-team" })
 
 			slots = slots + daily_slots
 
-			iter_date = iter_date.replace(day=(iter_date.day + 1))
+			print iter_date
 
+			iter_date = iter_date + timedelta(days=1)
+			
 	return slots
-
-
-
 
 @frappe.whitelist()
 def get_cleaners(date):
@@ -128,7 +131,6 @@ def get_caller_number(caller_number):
 	return frappe._dict({"name": "", 
 						 "display_name": "New Lead", 
 						 "caller_type":"New Lead"})
-
 
 @frappe.whitelist()
 def create_lead(caller_number):
@@ -223,3 +225,27 @@ def get_rn_daily_events(start, end, filters=None):
 		{ "id": '5', "resourceId": 'd', "start": '2016-12-09T10:00:00', "end": '2016-12-09T10:00:00', "title": 'event 5' }
 	]
 	return events
+
+
+#Datasource for weekly grid. Available people
+@frappe.whitelist()
+def get_available_slots_daily(ref_date):
+	return 10
+	#Get list of scheduled services for week.
+	#scheduled_services_for_date = frappe.get_all("RN Scheduled Service", filters={"service_type": service_type, "scheduled_date": ref_date})
+
+	#Get teams by service.
+
+
+def get_service_wise_count_of_teams():
+	out = []
+
+	service_items = frappe.get_all("Item", 
+		filters={"item_group": get_settings("rn_service_item_group")}, 
+		fields=["name", "item_code"])
+
+	for item in service_items:
+		no_of_teams = int(frappe.db.count("RN Team", filters={"service_type": item.name})) or 0
+		out.append(frappe._dict({ "service": item.name, "teams": no_of_teams }))
+
+	return out
