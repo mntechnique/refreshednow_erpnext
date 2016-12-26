@@ -1,7 +1,8 @@
 import frappe
 from frappe import _
 import json
-from datetime import datetime, timedelta
+import calendar
+#from datetime import date, datetime, timedelta
 
 
 @frappe.whitelist()
@@ -25,28 +26,14 @@ def rn_events(start, end, filters=None):
 	slots = []
 
 	if filters.get("service_type"):
-
 		service_item = frappe.get_doc("Item", filters["service_type"])
 		service_date = frappe.utils.data.get_datetime(filters["scheduled_date"]) or frappe.utils.datetime.datetime.today()
 
-		week_range = get_week_range(service_date)
-
-		# print filters
-		# week_start = filters.get("week_start")
-		# week_end = filters.get("week_end")
-		days = (week_range[1] - week_range[0]).days
+		date_range = get_date_range(service_date)
 		
-		# print "Week Start: ", str(week_start)
-		# print "Week End: ",  str(week_end)
-		# print "Days: ",  str(days)
-
-		# week_start = service_date - timedelta(days=(service_date.weekday()))
-		# week_end = week_start + timedelta(days=6)
-
-		# # week_start = service_date.replace(day=(service_date.day - (service_date.weekday() + 1)))
-		# # week_end = service_date.replace(day=(service_date.day + (7 - (service_date.weekday() + 1))))
-		iter_date = week_range[0]
-
+		days = (date_range[1] - date_range[0]).days
+		
+		iter_date = date_range[0]
 
 		for x in xrange(0, days):
 			start_time = iter_date
@@ -66,7 +53,7 @@ def rn_events(start, end, filters=None):
 
 			print iter_date
 
-			iter_date = iter_date + timedelta(days=1)
+			iter_date = iter_date + frappe.utils.datetime.timedelta(days=1)
 
 
 	return slots
@@ -180,9 +167,22 @@ def get_week_range(date):
         start_date = date
     else:
         # Otherwise, subtract `dow` number days to get the first day
-        start_date = date - timedelta(dow)
+        start_date = date - frappe.utils.datetime.timedelta(dow)
 
     # Now, add 6 for the last day of the week (i.e., count up to Saturday)
-    end_date = start_date + timedelta(6)
+    end_date = start_date + frappe.utils.datetime.timedelta(7)
 
     return [start_date, end_date]
+
+def get_month_range(scheduled_date):	
+   	year = scheduled_date.year
+	month = scheduled_date.month
+
+	num_days = calendar.monthrange(year, month)[1]
+	days = [frappe.utils.datetime.datetime(year, month, day) for day in range(1, num_days+1)]
+
+	out = [min(days),max(days)]
+	return out 
+
+def get_date_range(scheduled_date, days_delta=15):
+	return [scheduled_date - frappe.utils.datetime.timedelta(days=days_delta), scheduled_date + frappe.utils.datetime.timedelta(days=days_delta)]
