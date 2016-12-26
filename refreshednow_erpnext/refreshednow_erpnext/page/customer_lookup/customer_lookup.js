@@ -17,7 +17,7 @@ frappe.pages['customer-lookup'].on_page_load = function(wrapper) {
 	var txt = content.find('#txt-lookup');
 	btn.click(function() {
 		frappe.call({
-			method: "refreshednow_erpnext.api.get_caller_number",
+			method: "refreshednow_erpnext.ccc_api.get_caller_number",
 			args: {
 				caller_number: $(txt).val()
 			},
@@ -46,7 +46,7 @@ function lookup_call_lead(content){
 	var create_btn = content.find('#btn-create-lead');
 	create_btn.click(function(r){
 		frappe.call({
-			method:"refreshednow_erpnext.api.create_lead",
+			method:"refreshednow_erpnext.ccc_api.create_lead",
 			args:{
 				caller_number: $(txt).val()
 			},
@@ -84,7 +84,7 @@ function lookup_call_customer(content){
 
 function create_customer(customer_name, caller_number){
 	frappe.call({
-			method:"refreshednow_erpnext.api.create_contact",
+			method:"refreshednow_erpnext.ccc_api.create_contact",
 			args:{
 				caller_number: caller_number,
 				customer_name: customer_name
