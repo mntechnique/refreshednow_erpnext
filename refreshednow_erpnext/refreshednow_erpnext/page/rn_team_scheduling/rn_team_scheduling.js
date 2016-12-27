@@ -14,7 +14,6 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 		method: "refreshednow_erpnext.api.get_service_item_timings",
 		callback: function(r) {
 			page.service_item_data = r.message;
-			console.log(page.service_item_data);
 		}
 	});
 
@@ -24,7 +23,7 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 			fieldtype: "Link",
 			fieldname: "service_type",
 			options: "Item",
-			default: "RN-PLUS",
+			default: frappe.get_route()[2] || "RN-PLUS",
 			label: __("Service Type"),
 			reqd: 1,
 			input_css: {"z-index": 1},
@@ -55,7 +54,7 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 			fieldname: "scheduled_date",
 			options: "Item",
 			label: __("Scheduled Date"),
-			default: frappe.datetime.get_today(),
+			default: frappe.datetime.user_to_obj(frappe.get_route()[1]) || frappe.datetime.get_today(),
 			input_css: {"z-index": 1},
 			change: function() {
 				var selected = $(this).val();
@@ -74,23 +73,23 @@ frappe.pages['rn-team-scheduling'].on_page_show = function(wrapper) {
 	var scheduled_date = route[1];
 	var service_type = route[2];
 
-	// if (route[3] && route[3] == "daily") {
-	// 	console.log("In daily event:", scheduled_date);
-	// 	render_daily_calendar(wrapper, service_type, scheduled_date);
-	// } else {
-	// 	console.log("In Weekly event");
-	// 	render_weekly_calendar(wrapper, service_type, scheduled_date);
-	// }
 	render_calendars(wrapper, service_type, scheduled_date);
 }
 
 function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultDate, filters, wrapper) {
+
+	// var processed_filters = { "service_type": filters["service_type"], 
+	// "scheduled_date": frappe.datetime.obj_to_str(filters["scheduled_date"]) }
+
+	// console.log("Processed Filters:", processed_filters);
+
 	return	{
 		header:{
 			left: null,
 			center: 'title',
 			right: null
 		},
+		schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
 		allDaySlot: false,
 		selectHelper: true,
 		forceEventDuration: false,
@@ -113,7 +112,6 @@ function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultD
 				type: "GET",
 				args: {"start": minTime, "end": maxTime, "filters": filters},
 				callback: function(r) {
-					console.log("events: ", r);
 					var events = r.message || [];
 					callback(events);
 				}
@@ -124,6 +122,10 @@ function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultD
 }
 
 function prepare_daily_options(minTime="07:00:00", maxTime="17:00:00", defaultDate, filters, wrapper) {
+	
+	// var processed_filters = { "service_type": filters["service_type"], 
+	// "scheduled_date": frappe.datetime.obj_to_str(filters["scheduled_date"]) }
+
 	return	{
 		header:{
 			left: null,
@@ -167,6 +169,7 @@ function prepare_daily_options(minTime="07:00:00", maxTime="17:00:00", defaultDa
 		resources: function(callback) {
 			return frappe.call({
 				method: "refreshednow_erpnext.api.get_rn_daily_resources",
+				args: { "filters": filters },
 				type: "GET",
 				callback: function(r) {
 					var resources = r.message || [];
@@ -234,19 +237,20 @@ function render_calendars(wrapper, service_type, scheduled_date) {
 
 		//Prepare Date Filter
 		if (scheduled_date) {
-			scheduled_date = frappe.datetime.user_to_obj(scheduled_date);
+			//scheduled_date = frappe.datetime.user_to_obj(scheduled_date); One Day Prior in Python anomaly.
+			scheduled_date = frappe.datetime.user_to_str(scheduled_date);
 		} else {
 			scheduled_date = frappe.datetime.get_today();
 		}
 
-		var daily_options = prepare_daily_options(minTime, 
+		var weekly_options = prepare_weekly_options(minTime, 
 			maxTime, 
 			scheduled_date, 
 			{"service_type": service_type, "scheduled_date": scheduled_date},
 			wrapper
 		);
 
-		var weekly_options = prepare_weekly_options(minTime, 
+		var daily_options = prepare_daily_options(minTime, 
 			maxTime, 
 			scheduled_date, 
 			{"service_type": service_type, "scheduled_date": scheduled_date},
@@ -274,11 +278,5 @@ function build_route(wrapper, show_daily=false) {
 	var scheduled_date = wrapper.page.fields_dict['scheduled_date'].$input.val();
 	var service_type = wrapper.page.fields_dict['service_type'].$input.val();
 
-	console.log("Show daily in build_route: ", show_daily);
-
-	if (!show_daily) {
-		frappe.set_route("rn-team-scheduling", scheduled_date, service_type);
-	} else {
-		frappe.set_route("rn-team-scheduling", scheduled_date, service_type, "daily");
-	}
+	frappe.set_route("rn-team-scheduling", scheduled_date, service_type);
 }

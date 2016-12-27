@@ -20,6 +20,8 @@ def rn_events_test(start, end, filters=None):
 @frappe.whitelist()
 def rn_events(start, end, filters=None):
 	service_item = None
+	
+	print "Get Weekly Events: Filters", filters
 
 	filters = json.loads(filters)
 
@@ -45,13 +47,13 @@ def rn_events(start, end, filters=None):
 			daily_slots = get_slots(hours=[start_time, end_time])
 
 			for slot in daily_slots:
-				daily_available_slots = get_available_slots_daily(iter_date)
+				daily_available_slots = get_available_teams_for_slot(service_item, slot["start"])
 
 				slot.update( {"id": frappe.generate_hash(length=5), "title": daily_available_slots, "className": "rn-team" })
 
 			slots = slots + daily_slots
 
-			print iter_date
+			#print iter_date
 
 			iter_date = iter_date + frappe.utils.datetime.timedelta(days=1)
 
@@ -75,7 +77,6 @@ def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1)):
 					start += duration
 	return out
 
-
 @frappe.whitelist()
 def get_settings(fieldname):
 	try:
@@ -84,7 +85,6 @@ def get_settings(fieldname):
 		out = ""
 
 	return out
-
 
 @frappe.whitelist()
 def get_service_item_timings():
@@ -105,38 +105,82 @@ def get_service_item_timings():
 	return out
 
 @frappe.whitelist()
-def get_rn_daily_resources():
-	resources = [] 
-	resources = [
-		{ "id": 'a', "title": 'Team 1' },
-		{ "id": 'b', "title": 'Team 2', "eventColor": 'green' },
-		{ "id": 'c', "title": 'Team 3', "eventColor": 'orange' },
-		{ "id": 'd', "title": 'Team 4', "eventColor": 'red' }
-	]
-	return resources
+def get_rn_daily_resources(filters):
+	# resources = [] 
+	# resources = [
+	# 	{ "id": 'a', "title": 'Team 1' },
+	# 	{ "id": 'b', "title": 'Team 2', "eventColor": 'green' },
+	# 	{ "id": 'c', "title": 'Team 3', "eventColor": 'orange' },
+	# 	{ "id": 'd', "title": 'Team 4', "eventColor": 'red' }
+	# ]
+	# return resources
+	print "Get Daily Resources: Filters", filters
+
+	filters = json.loads(filters)
+
+	# for x in xrange(1,10):
+	# 	print "Filters for resources:", filters
+
+	out_teams = []
+	teams_by_service = frappe.get_all("RN Team", filters={ "service_type": filters["service_type"] }, fields=['name'])
+
+	for team in teams_by_service:
+		out_teams.append({"id":team.name, "title":team.name})
+
+	return out_teams
+
 
 @frappe.whitelist()
 def get_rn_daily_events(start, end, filters=None):
-	events = [
-		{ "id": '1', "resourceId": 'a', "start": '2016-12-09', "end": '2016-12-08', "title": 'event 1' },
-		{ "id": '2', "resourceId": 'a', "start": '2016-12-21T09:00:00', "end": '2016-12-21T10:00:00', "title": 'event 2' },
-		{ "id": '3', "resourceId": 'b', "start": '2016-12-22T11:30:00', "end": '2016-12-22T12:30:00', "title": 'event 3' },
-		{ "id": '4', "resourceId": 'c', "start": '2016-12-22T11:30:00', "end": '2016-12-22T12:30:00', "title": 'event 4' },
-		{ "id": '5', "resourceId": 'd', "start": '2016-12-09T10:00:00', "end": '2016-12-09T10:00:00', "title": 'event 5' }
-	]
-	return events
+	filters = json.loads(filters)
+
+	out_services = []
+
+	scheduled_services = frappe.get_all("RN Scheduled Service", filters={"service_type": filters["service_type"], "scheduled_date": frappe.utils.data.getdate(filters["scheduled_date"])}, fields=['*'])
+
+	print "Get Daily Events: Filters", filters
+
+	for service in scheduled_services:
+		out_services.append({"id": service.name, 
+			"resourceId": service.service_type,
+			"start": service.starts_on,
+			"end": service.ends_on })
+
+	return out_services
+
+	# events = [
+	# 	{ "id": '1', "resourceId": 'a', "start": '2016-12-09', "end": '2016-12-08', "title": 'event 1' },
+	# 	{ "id": '2', "resourceId": 'a', "start": '2016-12-21T09:00:00', "end": '2016-12-21T10:00:00', "title": 'event 2' },
+	# 	{ "id": '3', "resourceId": 'b', "start": '2016-12-22T11:30:00', "end": '2016-12-22T12:30:00', "title": 'event 3' },
+	# 	{ "id": '4', "resourceId": 'c', "start": '2016-12-22T11:30:00', "end": '2016-12-22T12:30:00', "title": 'event 4' },
+	# 	{ "id": '5', "resourceId": 'd', "start": '2016-12-09T10:00:00', "end": '2016-12-09T10:00:00', "title": 'event 5' }
+	# ]
+	# return events
+
 
 #Datasource for weekly grid. Available people
 @frappe.whitelist()
-def get_available_slots_daily(ref_date):
-	return 10
+def get_available_teams_for_slot(service_item, start_time):
 	#Get list of scheduled services for week.
 	#scheduled_services_for_date = frappe.get_all("RN Scheduled Service", filters={"service_type": service_type, "scheduled_date": ref_date})
 
 	#Get teams by service.
+	teams_by_service = frappe.get_all("RN Team", filters={"service_type" : service_item.name })
+	no_of_teams_by_service = len(teams_by_service)
+
+	#Get Scheduled Services for time by team
+	no_of_teams_for_service = int(frappe.db.count("RN Team", filters={"service_type": service_item.name})) or 0
+
+	# team_count_by_service = [t.teams for t in get_service_wise_count_of_teams() if t["service_type"] = service_type]
+	no_of_booked_services = int(frappe.db.count("RN Scheduled Service", 
+							filters={ "service_type": service_item.name, "starts_on": start_time }))
+
+	available_teams_for_slot = (no_of_teams_for_service - no_of_booked_services)
+	
+	return available_teams_for_slot
 
 
-def get_service_wise_count_of_teams():
+def get_service_wise_total_count_of_teams():
 	out = []
 
 	service_items = frappe.get_all("Item", 
@@ -145,10 +189,9 @@ def get_service_wise_count_of_teams():
 
 	for item in service_items:
 		no_of_teams = int(frappe.db.count("RN Team", filters={"service_type": item.name})) or 0
-		out.append(frappe._dict({ "service": item.name, "teams": no_of_teams }))
+		out.append(frappe._dict({ "service_type": item.name, "teams": no_of_teams }))
 
 	return out
-
 
 def get_week_range(date):
     """Find the first/last day of the week for the given day.
@@ -174,7 +217,7 @@ def get_week_range(date):
 
     return [start_date, end_date]
 
-def get_month_range(scheduled_date):	
+def get_month_range(scheduled_date):
    	year = scheduled_date.year
 	month = scheduled_date.month
 
@@ -184,5 +227,7 @@ def get_month_range(scheduled_date):
 	out = [min(days),max(days)]
 	return out 
 
-def get_date_range(scheduled_date, days_delta=15):
+def get_date_range(scheduled_date, days_delta=7):
 	return [scheduled_date - frappe.utils.datetime.timedelta(days=days_delta), scheduled_date + frappe.utils.datetime.timedelta(days=days_delta)]
+
+ 
