@@ -4,12 +4,13 @@ frappe.provide("frappe.views.calendar");
 frappe.provide("frappe.views.calendars");
 
 refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
-	init: function(options, page) {
+	init: function(options, page, cal_id) {
 
 		//console.log({"Init": options});
 
 		//$.extend(this, options);
 		//this.make_page();
+		this.cal_id = cal_id;
 		this.options = options;
 		this.page = page;
 		this.setup_options();
@@ -74,7 +75,8 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 		var me = this;
 		try {
 			this.$wrapper = this.page.main;
-			this.$cal = $("<div id='rnfc'>").appendTo(this.$wrapper);
+			this.$wrapper.find("[id$=" + this.cal_id + "]").remove();
+			this.$cal = $("<div id='" + this.cal_id + "'>").appendTo(this.$wrapper);
 			// footnote = frappe.utils.set_footnote(this, this.$wrapper, __("Select or drag across time slots to create a new event."));
 			// footnote.css({"border-top": "0px"});
 			//
@@ -85,7 +87,7 @@ refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
 			this.$cal.fullCalendar(this.cal_options);
 			this.set_css();
 		} catch(exc) {
-			console.log("Bad filters");
+			console.log("Bad filters (???)", exc);
 			//NOOP;
 		}
 	},

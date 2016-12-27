@@ -23,7 +23,7 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 			fieldtype: "Link",
 			fieldname: "service_type",
 			options: "Item",
-			default: frappe.get_route()[2] || "RN-PLUS",
+			//default: frappe.get_route()[2] || "RN-PLUS",
 			label: __("Service Type"),
 			reqd: 1,
 			input_css: {"z-index": 1},
@@ -54,13 +54,37 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 			fieldname: "scheduled_date",
 			options: "Item",
 			label: __("Scheduled Date"),
-			default: frappe.datetime.user_to_obj(frappe.get_route()[1]) || frappe.datetime.get_today(),
+			//default: frappe.datetime.user_to_obj(frappe.get_route()[1]) || frappe.datetime.get_today(),
 			input_css: {"z-index": 1},
 			change: function() {
 				var selected = $(this).val();
 				if (selected) {
 					build_route(wrapper, false);
 				}
+			},
+		}
+	);
+	page.btn_daily_view = page.add_field(
+		{
+			fieldtype: "Button",
+			fieldname: "daily_view",
+			label: __("Daily View"),
+			input_css: {"z-index": 1},
+			click: function() {
+				page.main.find("#weekly").fadeOut('slow');
+				page.main.find("#daily").fadeIn('slow');
+			},
+		}
+	);
+	page.btn_weekly_view = page.add_field(
+		{
+			fieldtype: "Button",
+			fieldname: "weekly_view",
+			label: __("Weekly View"),
+			input_css: {"z-index": 1},
+			click: function() {
+				page.main.find("#weekly").fadeIn('slow');
+				page.main.find("#daily").fadeOut('slow');
 			},
 		}
 	);
@@ -107,6 +131,7 @@ function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultD
 				callback: function(r) {
 					var events = r.message || [];
 					callback(events);
+					$(wrapper.page.btn_daily_view).click();
 				}
 			})
 		},
@@ -257,15 +282,15 @@ function render_calendars(wrapper, service_type, scheduled_date) {
 			page.weekly_calendar.$cal.fullCalendar('destroy');
 			page.weekly_calendar = null;	
 		}
-		page.weekly_calendar = new refreshednow_erpnext.RNCalendar(weekly_options, page);
+		page.weekly_calendar = new refreshednow_erpnext.RNCalendar(weekly_options, page, "weekly");
 		
 		//Dispose previous instance.
 		if (page.daily_calendar) {
 			page.daily_calendar.$cal.fullCalendar('destroy');
 			page.daily_calendar = null;	
 		}
-		
-		page.daily_calendar = new refreshednow_erpnext.RNCalendar(daily_options, wrapper.page);	
+	
+		page.daily_calendar = new refreshednow_erpnext.RNCalendar(daily_options, page, "daily");
 	});
 }
 

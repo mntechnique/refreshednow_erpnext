@@ -14,9 +14,9 @@ def get_data():
 				},
 				{
 					"type": "page",
-					"name": "rn-weekly-resource",
-					"label": "Weekly Availability of Resources",
-					"description": _("Weekly Availability of Resources."),
+					"name": "rn-team-scheduling",
+					"label": "Team Scheduling",
+					"description": _("Schedule cleaning services based on available teams."),
 				},
 				{
 					"type": "page",
