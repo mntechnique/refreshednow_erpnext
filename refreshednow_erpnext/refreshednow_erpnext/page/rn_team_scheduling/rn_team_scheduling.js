@@ -126,23 +126,29 @@ function prepare_daily_options(minTime="07:00:00", maxTime="17:00:00", defaultDa
 		selectHelper: true,
 		forceEventDuration: true,
 		defaultView: "agendaDay",
-		snapDuration: "01:00:00",
+		snapDuration: "01:00:00", //Replace with service duration
 		minTime: minTime,
 		maxTime: maxTime,
 		eventStartEditable: true,
 		eventDurationEditable: true,
 		defaultDate: defaultDate,
 		selectAllow: function(selectInfo) {
-			console.log(selectInfo);
+			//console.log(selectInfo);
 		},
-		eventClick: function(calEvent, jsEvent, view) {
-
-			alert('Event: ' + calEvent.title);
-			alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
-			alert('View: ' + view.name);
-
-			// change the border color just for fun
-			$(this).css('border-color', 'green');
+		dayClick: function(date, jsEvent, view, resourceObj) {
+			var info = {"date": date, "jsevent": jsEvent, "view": view, "resourceObj": resourceObj};
+			console.log(info);
+			frappe.prompt([
+				{'fieldname': 'customer', 'fieldtype': 'Link', 'options':'Customer','label':'Customer'}
+			],
+			function(values){
+				if (values) {
+					on_day_click(date, filters["service_type"], resourceObj.id, values.customer);
+				}
+			},
+			'Select Customer',
+			'Select'
+			)
 		},
 		events: function(start, end, timezone, callback) {
 			return frappe.call({
@@ -268,4 +274,18 @@ function build_route(wrapper, show_daily=false) {
 	var service_type = wrapper.page.fields_dict['service_type'].$input.val();
 
 	frappe.set_route("rn-team-scheduling", scheduled_date, service_type);
+}
+
+function on_day_click(date, service_type, team, customer) {
+	var rnss = frappe.model.make_new_doc_and_get_name('RN Scheduled Service');
+	rnss = locals["RN Scheduled Service"][rnss];
+	rnss.service_type = service_type;
+	rnss.scheduled_date = frappe.datetime.obj_to_str(date);
+	rnss.scheduled_time = date.format("hh:mm:ss");
+	rnss.team = team;
+	rnss.customer = customer;
+	rnss.starts_on = date.format("Y-M-D hh:mm:ss");
+	rnss.ends_on = date.add(1,'h').format("Y-M-D hh:mm:ss"); //Replace with service duration.
+	
+	frappe.set_route("Form", "RN Scheduled Service", rnss.name);
 }

@@ -138,16 +138,12 @@ def get_rn_daily_events(start, end, filters=None):
 
 	scheduled_services = frappe.get_all("RN Scheduled Service", filters={"service_type": filters["service_type"], "scheduled_date": frappe.utils.data.getdate(filters["scheduled_date"])}, fields=['*'])
 
-	print "Get Daily Events: Filters", filters
-	print "Scheduled Services", scheduled_services
-
 	for service in scheduled_services:
 		out_services.append({"id": service.name, 
 			"resourceId": service.team,
 			"start": service.starts_on.isoformat(),
 			"end": service.ends_on.isoformat() })
-
-	print out_services
+	
 	return out_services
 
 	# events = [
@@ -158,7 +154,6 @@ def get_rn_daily_events(start, end, filters=None):
 	# 	{ "id": '5', "resourceId": 'd', "start": '2016-12-09T10:00:00', "end": '2016-12-09T10:00:00', "title": 'event 5' }
 	# ]
 	# return events
-
 
 #Datasource for weekly grid. Available people
 @frappe.whitelist()
@@ -177,7 +172,7 @@ def get_available_teams_for_slot(service_item, start_time):
 	no_of_booked_services = int(frappe.db.count("RN Scheduled Service", 
 							filters={ "service_type": service_item.name, "starts_on": start_time }))
 
-	available_teams_for_slot = (no_of_teams_for_service - no_of_booked_services)
+	available_teams_for_slot = (no_of_teams_for_service - no_of_booked_services) or 'Nizzle!'
 	
 	return available_teams_for_slot
 
