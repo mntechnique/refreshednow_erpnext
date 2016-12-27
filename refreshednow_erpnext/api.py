@@ -139,13 +139,15 @@ def get_rn_daily_events(start, end, filters=None):
 	scheduled_services = frappe.get_all("RN Scheduled Service", filters={"service_type": filters["service_type"], "scheduled_date": frappe.utils.data.getdate(filters["scheduled_date"])}, fields=['*'])
 
 	print "Get Daily Events: Filters", filters
+	print "Scheduled Services", scheduled_services
 
 	for service in scheduled_services:
 		out_services.append({"id": service.name, 
-			"resourceId": service.service_type,
-			"start": service.starts_on,
-			"end": service.ends_on })
+			"resourceId": service.team,
+			"start": service.starts_on.isoformat(),
+			"end": service.ends_on.isoformat() })
 
+	print out_services
 	return out_services
 
 	# events = [

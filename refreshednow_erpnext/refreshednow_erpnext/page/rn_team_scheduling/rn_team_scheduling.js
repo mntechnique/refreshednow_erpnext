@@ -77,12 +77,6 @@ frappe.pages['rn-team-scheduling'].on_page_show = function(wrapper) {
 }
 
 function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultDate, filters, wrapper) {
-
-	// var processed_filters = { "service_type": filters["service_type"], 
-	// "scheduled_date": frappe.datetime.obj_to_str(filters["scheduled_date"]) }
-
-	// console.log("Processed Filters:", processed_filters);
-
 	return	{
 		header:{
 			left: null,
@@ -100,7 +94,6 @@ function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultD
 		eventDurationEditable: false,
 		disableDragging: true,
 		eventClick: function(calEvent, jsEvent, view) {
-			//frappe.set_route("rn-daily-allocation", calEvent.start.format("YYYY-MM-DD"), filters["w_service_type"]);
 			wrapper.page.fields_dict['scheduled_date'].set_input(calEvent.start.toDate());
 			build_route(wrapper, true);
 		}, 
@@ -122,10 +115,6 @@ function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultD
 }
 
 function prepare_daily_options(minTime="07:00:00", maxTime="17:00:00", defaultDate, filters, wrapper) {
-	
-	// var processed_filters = { "service_type": filters["service_type"], 
-	// "scheduled_date": frappe.datetime.obj_to_str(filters["scheduled_date"]) }
-
 	return	{
 		header:{
 			left: null,
