@@ -32,9 +32,9 @@ def rn_events(start, end, filters=None):
 		service_date = frappe.utils.data.get_datetime(filters["scheduled_date"]) or frappe.utils.datetime.datetime.today()
 
 		date_range = get_date_range(service_date)
-		
+
 		days = (date_range[1] - date_range[0]).days
-		
+
 		iter_date = date_range[0]
 
 		for x in xrange(0, days):
@@ -88,8 +88,8 @@ def get_settings(fieldname):
 
 @frappe.whitelist()
 def get_service_item_timings():
-	service_items = frappe.get_all("Item", 
-		filters={"item_group": get_settings("rn_service_item_group")}, 
+	service_items = frappe.get_all("Item",
+		filters={"item_group": get_settings("rn_service_item_group")},
 		fields=["name", "item_code", "rn_start_time_hours", "rn_start_time_minutes", "rn_end_time_hours", "rn_end_time_minutes"])
 
 	out = []
@@ -185,8 +185,8 @@ def get_available_teams_for_slot(service_item, start_time):
 def get_service_wise_total_count_of_teams():
 	out = []
 
-	service_items = frappe.get_all("Item", 
-		filters={"item_group": get_settings("rn_service_item_group")}, 
+	service_items = frappe.get_all("Item",
+		filters={"item_group": get_settings("rn_service_item_group")},
 		fields=["name", "item_code"])
 
 	for item in service_items:
@@ -227,9 +227,11 @@ def get_month_range(scheduled_date):
 	days = [frappe.utils.datetime.datetime(year, month, day) for day in range(1, num_days+1)]
 
 	out = [min(days),max(days)]
-	return out 
+	return out
 
 def get_date_range(scheduled_date, days_delta=7):
 	return [scheduled_date - frappe.utils.datetime.timedelta(days=days_delta), scheduled_date + frappe.utils.datetime.timedelta(days=days_delta)]
 
- 
+@frappe.whitelist()
+def customer_vehicle_onload(self,method):
+    self.get("__onload").customer_vehicle = self.rn_customer_vehicles_table

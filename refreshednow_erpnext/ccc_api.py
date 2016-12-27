@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 
 @frappe.whitelist()
 def get_caller_number(caller_number):
+	if caller_number == "":
+		frappe.throw(_("Enter contact number"))
 	cname = frappe.db.get_value("Contact",{"mobile_no":caller_number},"customer")
 	if cname:
 		#Create stub lead if lead is not found.
