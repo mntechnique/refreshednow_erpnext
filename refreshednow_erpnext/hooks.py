@@ -78,6 +78,13 @@ app_include_js = "/assets/js/refreshednow.min.js"
 #	}
 # }
 
+doc_events = {
+    "Customer": {
+        "onload": "refreshednow_erpnext.api.customer_vehicle_onload",
+    }
+}
+
+
 # Scheduled Tasks
 # ---------------
 
@@ -111,7 +118,7 @@ app_include_js = "/assets/js/refreshednow.min.js"
 # 	"frappe.desk.doctype.event.event.get_events": "refreshednow_erpnext.event.get_events"
 # }
 
-fixtures = [
+fixtures = [{"dt":"Custom Script", "filters": [["name", "in", ["Customer-Client"]]]},
 	{"dt": "Custom Field", "filters": [["name", "in", [
 		"Item-rn_sb_service_item_info",
 		"Item-rn_start_time_hours",
