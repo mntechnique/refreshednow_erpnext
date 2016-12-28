@@ -172,7 +172,7 @@ def get_available_teams_for_slot(service_item, start_time):
 	no_of_booked_services = int(frappe.db.count("RN Scheduled Service", 
 							filters={ "service_type": service_item.name, "starts_on": start_time }))
 
-	available_teams_for_slot = (no_of_teams_for_service - no_of_booked_services) or 'Nizzle!'
+	available_teams_for_slot = (no_of_teams_for_service - no_of_booked_services) or '-'
 	
 	return available_teams_for_slot
 
