@@ -100,7 +100,7 @@ frappe.pages['rn-team-scheduling'].on_page_show = function(wrapper) {
 	render_calendars(wrapper, service_type, scheduled_date);
 }
 
-function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultDate, filters, wrapper) {
+function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultDate, page_filters, wrapper) {
 	return	{
 		header:{
 			left: null,
@@ -129,7 +129,7 @@ function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultD
 			return frappe.call({
 				method: "refreshednow_erpnext.api.rn_events",
 				type: "GET",
-				args: {"start": minTime, "end": maxTime, "filters": filters},
+				args: {"start": minTime, "end": maxTime, "filters": page_filters},
 				callback: function(r) {
 					var events = r.message || [];
 					callback(events);
@@ -140,7 +140,7 @@ function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultD
 	}
 }
 
-function prepare_daily_options(minTime="07:00:00", maxTime="17:00:00", defaultDate, filters, wrapper) {
+function prepare_daily_options(minTime="07:00:00", maxTime="17:00:00", defaultDate, page_filters, wrapper) {
 	return	{
 		header:{
 			left: null,
@@ -161,12 +161,17 @@ function prepare_daily_options(minTime="07:00:00", maxTime="17:00:00", defaultDa
 		disableDragging: true,
 		editable:false,
 		dayClick: function(date, jsEvent, view, resourceObj) {
-			show_prompt(date, filters["service_type"], resourceObj.id);
+
+			console.log("Filters", page_filters);
+
+			show_prompt(date, page_filters["service_type"], resourceObj.id);
 		},
 		eventClick: function(calEvent, jsEvent, view) {
 			frappe.db.get_value("RN Scheduled Service", filters={"name": calEvent.id.toString()}, fieldname="name", callback=function(r) {
 				if (!r) {
-					show_prompt(calEvent.start.date, filters["service_type"], calEvent.resourceId);
+					console.log("Filters", page_filters);
+
+					show_prompt(calEvent.start, page_filters["service_type"], calEvent.resourceId);
 				}
 			});
 
@@ -176,9 +181,9 @@ function prepare_daily_options(minTime="07:00:00", maxTime="17:00:00", defaultDa
 			return frappe.call({
 				method: "refreshednow_erpnext.api.get_rn_daily_events",
 				type: "GET",
-				args: {"start": minTime, "end": maxTime, "filters": filters},
+				args: {"start": minTime, "end": maxTime, "filters": page_filters},
 				callback: function(r) {
-					var events = render_daily_event_row(r, wrapper, filters);
+					var events = render_daily_event_row(r, wrapper, page_filters);
 					callback(events);
 				}
 			})
@@ -186,7 +191,7 @@ function prepare_daily_options(minTime="07:00:00", maxTime="17:00:00", defaultDa
 		resources: function(callback) {
 			return frappe.call({
 				method: "refreshednow_erpnext.api.get_rn_daily_resources",
-				args: { "filters": filters },
+				args: { "filters": page_filters },
 				type: "GET",
 				callback: function(r) {
 					var resources = r.message || [];
@@ -261,8 +266,6 @@ function build_route(wrapper, show_daily=false) {
 		var timeslot = wrapper.page.selected_event_info.calEvent.start.format("HHmm");
 	}
 
-	console.log(timeslot);
-
 	frappe.set_route("rn-team-scheduling", scheduled_date, service_type, timeslot);
 }
 
@@ -278,12 +281,13 @@ function on_day_click(date, service_type, team, customer) {
 	rnss.ends_on = date.add(1,'h').format("Y-M-D hh:mm:ss"); //Replace with service duration.
 	
 	frappe.set_route("Form", "RN Scheduled Service", rnss.name);
+	//console.log("Service", service_type);
 }
 
-function render_daily_event_row(r, wrapper, filters) {
+function render_daily_event_row(r, wrapper, page_filters) {
 	var events = r.message || [];
 				
-	var service_item = wrapper.page.service_item_data.filter(function(item) { return item.item_code == filters['service_type']})[0];
+	var service_item = wrapper.page.service_item_data.filter(function(item) { return item.item_code == page_filters['service_type']})[0];
 	var teams = service_item.teams;
 
 	if (wrapper.page.selected_event_info) {
