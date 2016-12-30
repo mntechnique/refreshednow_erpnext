@@ -1,34 +1,31 @@
 <div class="clearfix"></div>
 <div class="row">
-    {% if (customer_vehicle.length == 0) { %}
-        <div class="col-md-12 col-xs-12">
-            <h2 class="text-muted text-center">No Vehicle have been linked with this Customer.</h2>
-        </div>
-    {% } %}
+	{% if (customer_vehicle.length == 0) { %}
+		<div class="col-md-12 col-xs-12">
+			<h2 class="text-muted text-center">No Vehicle have been linked with this Customer.</h2>
+		</div>
+	{% } else { %}
+		<div class="col-md-12 col-xs-12">
+			<table class="table table-bordered table-striped table-hover table-condensed table-responsive">
+				<thead>
+					<tr>
+						<th>License Plate</th>
+						<th>Model Number</th>
+						<th>Make</th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for (var i=0, l=customer_vehicle.length; i<=l-1; i++) { %}
 
-    {% for (var i=0, l=customer_vehicle.length; i<l; i++) { %}
-        <div class="col-xs-12" style="margin:5px">
-            {% if(customer_vehicle[i].license_plate!= null) { %}
-                <div class="col-xs-6 col-md-6">
-                    {%= i+1 %}. <label> License Plate: </label>
-                        {{ customer_vehicle[i].license_plate }}
-                    <br>
-                    <span class="small text-muted">
-                    {{ frappe.datetime.global_date_format(customer_vehicle[i].start_date) }}</span>
-                </div>
-                <div class="col-xs-6 col-md-6">
-                    <label> Model Number:  </label>{{ customer_vehicle[i].model }}
-                    <br>
-                    <label> Make:  </label>{{ customer_vehicle[i].make }}
-                </div>
-            {% } %}
-        </div>
-    {% } %}
+					<tr>
+						<td>{{ customer_vehicle[i].license_plate }}</td>
+						<td>{{ customer_vehicle[i].model }}</td>
+						<td>{{ customer_vehicle[i].make }}</td>
+					</tr>
+				
+				{% } %}
+				</tbody>
+			</table>
+		</div>
+	{% } %}
 </div>
-
-
-
-
-<!-- Need to add license plate no field.
-yes
-try frappe.db.dget_v -->
