@@ -19,8 +19,10 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 
 	//Set default route.
 	if (frappe.get_route().length == 1) {
-		frappe.set_route("rn-team-scheduling", frappe.datetime.obj_to_user(frappe.datetime.get_today()), "RN-GO");
+		console.log("Route", route);
+		frappe.set_route("rn-team-scheduling", "weekly", frappe.datetime.obj_to_user(frappe.datetime.get_today()), "RN-GO");
 	}
+
 
 	//Add filter field and restrict to service items.
 	page.add_field(
@@ -28,7 +30,7 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 			fieldtype: "Link",
 			fieldname: "service_type",
 			options: "Item",
-			default: frappe.get_route()[2],
+			default: frappe.get_route()[3],
 			label: __("Service Type"),
 			reqd: 1,
 			input_css: {"z-index": 1},
@@ -40,7 +42,7 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 				});
 
 				if ((selected) || items.includes(selected)) {
-					build_route(wrapper, true);
+					build_route(wrapper); //, frappe.get_route()[1] || "weekly");
 				}
 			},
 		}
@@ -59,12 +61,12 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 			fieldname: "scheduled_date",
 			options: "Item",
 			label: __("Scheduled Date"),
-			default: frappe.datetime.user_to_obj(frappe.get_route()[1]),
+			default: frappe.datetime.user_to_obj(frappe.get_route()[2]),
 			input_css: {"z-index": 1},
 			change: function() {
 				var selected = $(this).val();
 				if (selected) {
-					build_route(wrapper, false);
+					build_route(wrapper);//, frappe.get_route()[1] || "weekly");
 				}
 			},
 		}
@@ -76,8 +78,10 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 			label: __("Daily View"),
 			input_css: {"z-index": 1},
 			click: function() {
-				page.main.find("#weekly").fadeOut('slow');
-				page.main.find("#daily").fadeIn('slow');
+				// page.main.find("#weekly").fadeOut('slow');
+				// page.main.find("#daily").fadeIn('slow');
+				localStorage.setItem("rn_scheduling_view", "daily");
+				build_route(wrapper);//, frappe.get_route()[1] || "daily");
 			},
 		}
 	);
@@ -88,26 +92,30 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 			label: __("Weekly View"),
 			input_css: {"z-index": 1},
 			click: function() {
-				page.main.find("#weekly").fadeIn('slow');
-				page.main.find("#daily").fadeOut('slow');
+				// page.main.find("#weekly").fadeIn('slow');
+				// page.main.find("#daily").fadeOut('slow');
+				localStorage.setItem("rn_scheduling_view", "weekly");
+				build_route(wrapper);//, frappe.get_route()[1] || "weekly");
 			},
 		}
 	);
+
 }
 
 frappe.pages['rn-team-scheduling'].on_page_show = function(wrapper) {
 	//render_weekly_calendar(wrapper);
 	var route = frappe.get_route();
 
-	var scheduled_date = route[1];
-	var service_type = route[2];
-
-	console.log("Scheduled Date", scheduled_date, "Service Type:", service_type);
+	var scheduled_date = route[2];
+	var service_type = route[3];
 
 	render_calendars(wrapper, service_type, scheduled_date);
 }
 
+
 function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultDate, page_filters, wrapper) {
+	console.log("defaultdate:", defaultDate);
+
 	return	{
 		header:{
 			left: null,
@@ -125,10 +133,14 @@ function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultD
 		eventDurationEditable: false,
 		disableDragging: true,
 		editable: false,
+		//firstDay: frappe.datetime.str_to_obj(defaultDate).getDay(), 
 		eventClick: function(calEvent, jsEvent, view) {
 			wrapper.page.selected_event_info = {"calEvent": calEvent, "jsEvent": jsEvent, "view": view};
 			wrapper.page.fields_dict['scheduled_date'].set_input(calEvent.start.toDate());
-			build_route(wrapper, true);
+
+			localStorage.setItem("rn_scheduling_view", "daily");
+
+			build_route(wrapper); //, frappe.get_route()[1] || "daily");
 		}, 
 		defaultDate: defaultDate,
 		/* Fetch events via a callback function*/
@@ -188,7 +200,7 @@ function prepare_daily_options(minTime="07:00:00", maxTime="17:00:00", defaultDa
 					var events = render_daily_event_row(r, wrapper, page_filters);
 					callback(events);
 				}
-			})
+			});
 		},
 		resources: function(callback) {
 			return frappe.call({
@@ -244,23 +256,30 @@ function render_calendars(wrapper, service_type, scheduled_date) {
 		);
 
 		//Dispose previous instance.
+
 		if (page.weekly_calendar) {
 			page.weekly_calendar.$cal.fullCalendar('destroy');
 			page.weekly_calendar = null;	
 		}
-		page.weekly_calendar = new refreshednow_erpnext.RNCalendar(weekly_options, page, "weekly");
+		
+		if (frappe.get_route().indexOf("weekly") != -1) {
+			page.weekly_calendar = new refreshednow_erpnext.RNCalendar(weekly_options, page, "weekly");
+		}
 		
 		//Dispose previous instance.
 		if (page.daily_calendar) {
 			page.daily_calendar.$cal.fullCalendar('destroy');
 			page.daily_calendar = null;	
 		}
+		
+		if (frappe.get_route().indexOf("daily") != -1) {
+			page.daily_calendar = new refreshednow_erpnext.RNCalendar(daily_options, page, "daily");
+		}
 	
-		page.daily_calendar = new refreshednow_erpnext.RNCalendar(daily_options, page, "daily");
 	});
 }
 
-function build_route(wrapper, show_daily=false) {
+function build_route(wrapper) { //, show_daily="daily") {
 	var scheduled_date = wrapper.page.fields_dict['scheduled_date'].$input.val();
 	var service_type = wrapper.page.fields_dict['service_type'].$input.val();
 
@@ -270,10 +289,16 @@ function build_route(wrapper, show_daily=false) {
 
 	var initial_route = frappe.get_route();
 
-	frappe.set_route("rn-team-scheduling", scheduled_date, service_type, timeslot);
+	console.log("Scheduling View:", localStorage.getItem("rn_scheduling_view"));
+
+	if (localStorage.getItem("rn_scheduling_view") == "daily") {
+		frappe.set_route("rn-team-scheduling", "daily", scheduled_date, service_type, timeslot);
+	} else if (localStorage.getItem("rn_scheduling_view") == "weekly") {
+		frappe.set_route("rn-team-scheduling", "weekly", scheduled_date, service_type, timeslot);
+	}
 	
 	if (frappe.get_route() == initial_route) {
-		frappe.set_route(frappe.get_route());	
+		frappe.set_route(frappe.get_route());
 	};
 	//frappe.set_re_route(frappe.get_route());
 }
@@ -294,6 +319,7 @@ function on_day_click(date, service_type, team, customer) {
 }
 
 function render_daily_event_row(r, wrapper, page_filters) {
+
 	var events = r.message || [];
 				
 	var service_item = wrapper.page.service_item_data.filter(function(item) { return item.item_code == page_filters['service_type']})[0];
@@ -371,14 +397,14 @@ function render_daily_event_row(r, wrapper, page_filters) {
 	}
 	//console.log("Selected Events onload", wrapper.page.selected_event_info.calEvent)
 	// console.log("Start: ", start, "End: ", end);
-	//console.log("Events:", 	events);
+	console.log("Events:", 	events);
 	return events;
 }
 
 
 function show_prompt(date, service_type, resource_id) {
 	frappe.prompt([
-		{'fieldname': 'customer', 'fieldtype': 'Link', 'options':'Customer','label':'Customer'}
+		{'fieldname': 'customer', 'fieldtype': 'Link', 'options':'Customer','label':'Customer', 'default': localStorage.getItem("customer_name") || ""}
 	],
 	function(values){
 		if (values) {

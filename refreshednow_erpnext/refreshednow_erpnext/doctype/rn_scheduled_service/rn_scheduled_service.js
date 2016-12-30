@@ -3,6 +3,11 @@
 
 frappe.ui.form.on('RN Scheduled Service', {
 	refresh: function(frm) {
+		frm.add_custom_button(__("Go to Team Scheduling"), function() {
+			frappe.set_route("rn-team-scheduling");
+		});
+
+
 		//Show service items only.
 		frappe.db.get_value("RN Settings", "RN Settings", "rn_service_item_group", function(r) {
 			cur_frm.set_query("service_type", function() {
@@ -60,6 +65,23 @@ function render_vehicles(frm) {
 		});
 	}
 }
+
+// function render_team_members(frm) {
+// 	$(frm.fields_dict['team_details_html'].wrapper)
+// 				.html("<div class='text-muted text-center' style='padding-top:5%;'>Please select a team</div>");
+
+// 	if (frm.doc.team) {
+// 		frappe.model.with_doc("RN Team", frm.doc.team, function(team_name) {
+// 			var vehicle = frappe.model.get_doc("Vehicle", vehicle_name);
+// 			$(frm.fields_dict['vehicle_details_html'].wrapper)
+// 				.html(frappe.render_template("customer_vehicle", {"customer_vehicle": [vehicle]}));
+// 		});
+// 		frappe.call({
+// 			method: "refreshednow_erpnext.api.get_team_members",
+
+// 		});
+// 	}
+// }
 
 function fetch_and_set_addresses(frm) {
 	frappe.db.get_value(

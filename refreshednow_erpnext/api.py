@@ -232,3 +232,6 @@ def get_date_range(scheduled_date, days_delta=7):
 def customer_vehicle_onload(self,method):
     self.get("__onload").customer_vehicle = frappe.get_all("Vehicle", fields=['*'],filters =[["rn_customer", "=", self.name]])
 
+@frappe.whitelist()
+def get_team_members(team_name):
+	pass

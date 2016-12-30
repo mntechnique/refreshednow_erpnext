@@ -1,0 +1,25 @@
+<div class="clearfix"></div>
+<div class="row">
+	{% if (service_team_members.length == 0) { %}
+		<div class="col-md-12 col-xs-12">
+			<h2 class="text-muted text-center">Please add members to this team.</h2>
+		</div>
+	{% } else { %}
+		<div class="col-md-12 col-xs-12">
+			<table class="table table-bordered table-striped table-hover table-condensed table-responsive">
+				<thead>
+					<tr>
+						<th>Members</th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for (var i=0, l=service_team_members.length; i<=l-1; i++) { %}
+					<tr>
+						<td>{{ service_team_members[i].member }}</td>
+					</tr>
+				{% } %}
+				</tbody>
+			</table>
+		</div>
+	{% } %}
+</div>

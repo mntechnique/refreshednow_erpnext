@@ -8,13 +8,15 @@ frappe.pages['customer-lookup'].on_page_load = function(wrapper) {
 	//Append search textbox and button
 	var content = null;
 	content = page.wrapper.find(".page-content");
-	console.log(content);
+	//console.log(content);
 	var input_html= '<div class="input-group"><input id="txt-lookup" type="text" class="form-control" placeholder="Search for caller number..."> <span class="input-group-btn"> <button id="btn-lookup" class="btn btn-secondary" type="button">Search!</button> </span> </div> <div class="clearfix"></div>'
 	content.append(input_html);
 
 	//Wireup events to search textbox and button
 	var btn = content.find('#btn-lookup');
 	var txt = content.find('#txt-lookup');
+	
+
 	btn.click(function() {
 		frappe.call({
 			method: "refreshednow_erpnext.ccc_api.get_caller_number",
@@ -26,9 +28,12 @@ frappe.pages['customer-lookup'].on_page_load = function(wrapper) {
 			callback: function(r) {
 				page.wrapper.find("#rn-ccc").remove();
 				content.append(frappe.render_template("caller_information", {"caller_info": r.message}));
+				
+				localStorage.setItem("customer_name", r.message.name);
 
 				lookup_call_lead(content);
 				lookup_call_customer(content);
+				wireup_scheduling_button(content, wrapper)
 			}
 		});
 	});
@@ -40,6 +45,7 @@ frappe.pages['customer-lookup'].on_page_load = function(wrapper) {
 		}
 	});
 }
+
 
 function lookup_call_lead(content){
 	var txt = content.find('#txt-lookup');
@@ -53,9 +59,9 @@ function lookup_call_lead(content){
 			freeze: true,
 			freeze_message: __("Looking up caller number..."),
 			callback: function(r){
-				console.log(r.message);
+				//console.log(r.message);
 				var raw_url = window.location.origin;
-				console.log(r.message);
+				//console.log(r.message);
 				var str = "/desk#Form/Lead/"+r.message;
 				var url = raw_url + str;
 				window.location = url;
@@ -73,7 +79,7 @@ function lookup_call_customer(content){
 			{'fieldname': 'customer', 'fieldtype': 'Link', 'options':'Customer','label':'Customer'}
 		],
 		function(values){
-			create_customer(values.customer, $(txt).val() )
+			create_customer(values.customer, $(txt).val())
 		},
 		'Select Customer',
 		'Select'
@@ -89,7 +95,7 @@ function create_customer(customer_name, caller_number){
 				customer_name: customer_name
 			},
 			callback: function(r){
-				console.log(r.message);
+				//console.log(r.message);
 				var raw_url = window.location.origin;
 				var str = "/desk#Form/Contact/"+r.message;
 				var url = raw_url + str;
@@ -97,4 +103,15 @@ function create_customer(customer_name, caller_number){
 				window.location = url;
 			}
 		});
+}
+
+function wireup_scheduling_button(content, wrapper) {
+	var btn_allocate = content.find('#btn-open-scheduling');
+	btn_allocate.on("click", function() {
+
+		
+
+		frappe.set_route("rn-team-scheduling");
+
+	});	
 }
