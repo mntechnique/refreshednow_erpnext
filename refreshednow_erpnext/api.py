@@ -20,7 +20,7 @@ def rn_events_test(start, end, filters=None):
 @frappe.whitelist()
 def rn_events(start, end, filters=None):
 	service_item = None
-	
+
 	print "Get Weekly Events: Filters", filters
 
 	filters = json.loads(filters)
@@ -106,7 +106,7 @@ def get_service_item_timings():
 
 @frappe.whitelist()
 def get_rn_daily_resources(filters):
-	# resources = [] 
+	# resources = []
 	# resources = [
 	# 	{ "id": 'a', "title": 'Team 1' },
 	# 	{ "id": 'b', "title": 'Team 2', "eventColor": 'green' },
@@ -139,11 +139,11 @@ def get_rn_daily_events(start, end, filters=None):
 	scheduled_services = frappe.get_all("RN Scheduled Service", filters={"service_type": filters["service_type"], "scheduled_date": frappe.utils.data.getdate(filters["scheduled_date"])}, fields=['*'])
 
 	for service in scheduled_services:
-		out_services.append({"id": service.name, 
+		out_services.append({"id": service.name,
 			"resourceId": service.team,
 			"start": service.starts_on.isoformat(),
 			"end": service.ends_on.isoformat() })
-	
+
 	return out_services
 
 	# events = [
@@ -169,11 +169,11 @@ def get_available_teams_for_slot(service_item, start_time):
 	no_of_teams_for_service = int(frappe.db.count("RN Team", filters={"service_type": service_item.name})) or 0
 
 	# team_count_by_service = [t.teams for t in get_service_wise_count_of_teams() if t["service_type"] = service_type]
-	no_of_booked_services = int(frappe.db.count("RN Scheduled Service", 
+	no_of_booked_services = int(frappe.db.count("RN Scheduled Service",
 							filters={ "service_type": service_item.name, "starts_on": start_time }))
 
 	available_teams_for_slot = (no_of_teams_for_service - no_of_booked_services) or '-'
-	
+
 	return available_teams_for_slot
 
 
@@ -229,4 +229,5 @@ def get_date_range(scheduled_date, days_delta=7):
 
 @frappe.whitelist()
 def customer_vehicle_onload(self,method):
-    self.get("__onload").customer_vehicle = self.rn_customer_vehicles_table
+    self.get("__onload").customer_vehicle = frappe.get_all("Vehicle", fields=['*'],filters =[["rn_customer", "=", self.name]])
+
