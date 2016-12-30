@@ -19,7 +19,6 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 
 	//Set default route.
 	if (frappe.get_route().length == 1) {
-		console.log("Route", route);
 		frappe.set_route("rn-team-scheduling", "weekly", frappe.datetime.obj_to_user(frappe.datetime.get_today()), "RN-GO");
 	}
 
@@ -114,8 +113,6 @@ frappe.pages['rn-team-scheduling'].on_page_show = function(wrapper) {
 
 
 function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultDate, page_filters, wrapper) {
-	console.log("defaultdate:", defaultDate);
-
 	return	{
 		header:{
 			left: null,
@@ -289,8 +286,6 @@ function build_route(wrapper) { //, show_daily="daily") {
 
 	var initial_route = frappe.get_route();
 
-	console.log("Scheduling View:", localStorage.getItem("rn_scheduling_view"));
-
 	if (localStorage.getItem("rn_scheduling_view") == "daily") {
 		frappe.set_route("rn-team-scheduling", "daily", scheduled_date, service_type, timeslot);
 	} else if (localStorage.getItem("rn_scheduling_view") == "weekly") {
@@ -315,7 +310,6 @@ function on_day_click(date, service_type, team, customer) {
 	rnss.ends_on = date.add(1,'h').format("Y-M-D HH:mm:ss"); //Replace with service duration.
 	
 	frappe.set_route("Form", "RN Scheduled Service", rnss.name);
-	//console.log("Service", service_type);
 }
 
 function render_daily_event_row(r, wrapper, page_filters) {
@@ -329,75 +323,29 @@ function render_daily_event_row(r, wrapper, page_filters) {
 		var selected_start_time = wrapper.page.selected_event_info.calEvent.start.toISOString();
 		var selected_end_time =  wrapper.page.selected_event_info.calEvent.end.toISOString();
 
-		console.log("Selected ST:", selected_start_time, "Selected ET:", selected_end_time);
-
-		var event_checklist = events.filter(function(event) { return (event["start"] == selected_start_time) });
-		console.log("Checklist:", event_checklist);
 		
-		// $.each(teams, function(i,v) {
-		// 	console.log("Fill in:", event_checklist);
-
+		//Find an Event under the Resource column which starts at 'selected_start_time'
+		//If such an event is not found, render. 
+		$.each(teams, function(i, v) {
+			//Find event for resource v["name"]
+			var event_in_slot_under_resource = events.filter(function(event) {
+				return (event["resourceId"] == v["name"]) && (event["start"] == selected_start_time)
+			});
 			
-		// 	//if events.
-		// 	// if (events.filter(function(event) {
-		// 	// 		return (event["start"] == selected_start_time)
-		// 	// 	}).length == 0) {
+			console.log("event under resource:", event_in_slot_under_resource);
 
-		// 	// 	console.log("Pushing:", v["name"]);
-
-		// 	// 	events.push({
-		// 	// 		"id": i,
-		// 	// 		"resourceId":v["name"],
-		// 	// 		"start": selected_start_time,
-		// 	// 		"end": selected_end_time,
-		// 	// 		"color":"grey"
-		// 	// 	});
-		// 	// }
-		// });
-
-		if (event_checklist.length == 0) {
-			$.each(teams, function(i,v) {
+			if (event_in_slot_under_resource.length == 0) {
 				events.push({
 					"id": i,
 					"resourceId":v["name"],
 					"start": selected_start_time,
 					"end": selected_end_time,
 					"color":"grey"
-				});				
-			});
-		} else {
-			$.each(teams, function(i,v) {
-				$.each(event_checklist, function(idx, val) {
-					if (v["name"] != val["resourceId"]) {
-						events.push({
-							"id": i,
-							"resourceId":v["name"],
-							"start": selected_start_time,
-							"end": selected_end_time,
-							"color":"grey"
-						});
-					}
 				});
-			});
-
-			// $.each(events, function(i, v) {
-			// 	$.each(event_checklist, function(idx, val) {
-			// 		if (v["start"] == val["start"]) {
-			// 			events.push({
-			// 				"id": i,
-			// 				"resourceId":v["name"],
-			// 				"start": selected_start_time,
-			// 				"end": selected_end_time,
-			// 				"color":"grey"
-			// 			});	
-			// 		}
-			// 	});
-			// });
-		}
+			}
+		});
 	}
-	//console.log("Selected Events onload", wrapper.page.selected_event_info.calEvent)
-	// console.log("Start: ", start, "End: ", end);
-	console.log("Events:", 	events);
+
 	return events;
 }
 
