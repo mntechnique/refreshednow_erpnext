@@ -17,13 +17,18 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 		}
 	});
 
+	//Set default route.
+	if (frappe.get_route().length == 1) {
+		frappe.set_route("rn-team-scheduling", frappe.datetime.obj_to_user(frappe.datetime.get_today()), "RN-GO");
+	}
+
 	//Add filter field and restrict to service items.
 	page.add_field(
 		{
 			fieldtype: "Link",
 			fieldname: "service_type",
 			options: "Item",
-			default: frappe.get_route()[2] || "RN-PLUS",
+			default: frappe.get_route()[2],
 			label: __("Service Type"),
 			reqd: 1,
 			input_css: {"z-index": 1},
@@ -54,7 +59,7 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 			fieldname: "scheduled_date",
 			options: "Item",
 			label: __("Scheduled Date"),
-			default: frappe.datetime.user_to_obj(frappe.get_route()[1]) || frappe.datetime.get_today(),
+			default: frappe.datetime.user_to_obj(frappe.get_route()[1]),
 			input_css: {"z-index": 1},
 			change: function() {
 				var selected = $(this).val();
@@ -97,6 +102,8 @@ frappe.pages['rn-team-scheduling'].on_page_show = function(wrapper) {
 	var scheduled_date = route[1];
 	var service_type = route[2];
 
+	console.log("Scheduled Date", scheduled_date, "Service Type:", service_type);
+
 	render_calendars(wrapper, service_type, scheduled_date);
 }
 
@@ -117,7 +124,7 @@ function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultD
 		eventStartEditable: false,
 		eventDurationEditable: false,
 		disableDragging: true,
-		editable:false,
+		editable: false,
 		eventClick: function(calEvent, jsEvent, view) {
 			wrapper.page.selected_event_info = {"calEvent": calEvent, "jsEvent": jsEvent, "view": view};
 			wrapper.page.fields_dict['scheduled_date'].set_input(calEvent.start.toDate());
@@ -159,23 +166,18 @@ function prepare_daily_options(minTime="07:00:00", maxTime="17:00:00", defaultDa
 		eventDurationEditable: false,
 		defaultDate: defaultDate,
 		disableDragging: true,
-		editable:false,
+		editable: false,
 		dayClick: function(date, jsEvent, view, resourceObj) {
-
-			console.log("Filters", page_filters);
-
 			show_prompt(date, page_filters["service_type"], resourceObj.id);
 		},
 		eventClick: function(calEvent, jsEvent, view) {
 			frappe.db.get_value("RN Scheduled Service", filters={"name": calEvent.id.toString()}, fieldname="name", callback=function(r) {
 				if (!r) {
-					console.log("Filters", page_filters);
-
 					show_prompt(calEvent.start, page_filters["service_type"], calEvent.resourceId);
+				} else {
+					frappe.set_route("Form", "RN Scheduled Service", r.name);
 				}
 			});
-
-
 		},
 		events: function(start, end, timezone, callback) {
 			return frappe.call({
@@ -266,7 +268,14 @@ function build_route(wrapper, show_daily=false) {
 		var timeslot = wrapper.page.selected_event_info.calEvent.start.format("HHmm");
 	}
 
+	var initial_route = frappe.get_route();
+
 	frappe.set_route("rn-team-scheduling", scheduled_date, service_type, timeslot);
+	
+	if (frappe.get_route() == initial_route) {
+		frappe.set_route(frappe.get_route());	
+	};
+	//frappe.set_re_route(frappe.get_route());
 }
 
 function on_day_click(date, service_type, team, customer) {
@@ -274,11 +283,11 @@ function on_day_click(date, service_type, team, customer) {
 	rnss = locals["RN Scheduled Service"][rnss];
 	rnss.service_type = service_type;
 	rnss.scheduled_date = frappe.datetime.obj_to_str(date);
-	rnss.scheduled_time = date.format("hh:mm:ss");
+	rnss.scheduled_time = date.format("HH:mm:ss");
 	rnss.team = team;
 	rnss.customer = customer;
-	rnss.starts_on = date.format("Y-M-D hh:mm:ss");
-	rnss.ends_on = date.add(1,'h').format("Y-M-D hh:mm:ss"); //Replace with service duration.
+	rnss.starts_on = date.format("Y-M-D HH:mm:ss");
+	rnss.ends_on = date.add(1,'h').format("Y-M-D HH:mm:ss"); //Replace with service duration.
 	
 	frappe.set_route("Form", "RN Scheduled Service", rnss.name);
 	//console.log("Service", service_type);
