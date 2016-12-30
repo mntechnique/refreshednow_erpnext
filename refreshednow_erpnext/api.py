@@ -234,4 +234,8 @@ def customer_vehicle_onload(self,method):
 
 @frappe.whitelist()
 def get_team_members(team_name):
-	pass
+	members = frappe.db.get_all("RN Team Member", filters={"parent":team_name}, fields=['*'])
+	for member in members:
+		member.update({"member_name": frappe.db.get_value("Employee", member.member, "employee_name")})
+
+	return members

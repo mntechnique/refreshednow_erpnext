@@ -4,6 +4,10 @@
 frappe.ui.form.on('RN Team Tool', {
 	refresh: function(frm) {
 		frm.disable_save();
+		frm.page.hide_menu();
+		frm.page.hide_icon_group();
+		frm.page.wrapper.find(".timeline").hide();
+
 		reload_members(frm)
 		frm.add_custom_button(__("Update Members"), function() {
 			if (cur_frm.doc.members.length == 0) {

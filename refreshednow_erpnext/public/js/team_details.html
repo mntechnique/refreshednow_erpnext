@@ -1,6 +1,6 @@
 <div class="clearfix"></div>
 <div class="row">
-	{% if (service_team_members.length == 0) { %}
+	{% if (team_members.length == 0) { %}
 		<div class="col-md-12 col-xs-12">
 			<h2 class="text-muted text-center">Please add members to this team.</h2>
 		</div>
@@ -9,13 +9,13 @@
 			<table class="table table-bordered table-striped table-hover table-condensed table-responsive">
 				<thead>
 					<tr>
-						<th>Members</th>
+						<th>{{ team_name }} members</th>
 					</tr>
 				</thead>
 				<tbody>
-				{% for (var i=0, l=service_team_members.length; i<=l-1; i++) { %}
+				{% for (var i=0, l=team_members.length; i<=l-1; i++) { %}
 					<tr>
-						<td>{{ service_team_members[i].member }}</td>
+						<td>{{ team_members[i].member_name }}</td>
 					</tr>
 				{% } %}
 				</tbody>

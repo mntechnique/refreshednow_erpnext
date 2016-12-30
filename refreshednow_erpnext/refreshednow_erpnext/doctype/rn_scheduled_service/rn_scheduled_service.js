@@ -44,12 +44,16 @@ frappe.ui.form.on('RN Scheduled Service', {
 		});
 
 		render_vehicles(frm);
+		render_team_members(frm);
 	},
 	customer: function(frm) {
 		fetch_and_set_addresses(frm);		
 	},
 	vehicle: function(frm) {
 		render_vehicles(frm);		
+	},
+	team: function(frm) {
+		render_team_members(frm);
 	}
 });
 
@@ -66,22 +70,22 @@ function render_vehicles(frm) {
 	}
 }
 
-// function render_team_members(frm) {
-// 	$(frm.fields_dict['team_details_html'].wrapper)
-// 				.html("<div class='text-muted text-center' style='padding-top:5%;'>Please select a team</div>");
+function render_team_members(frm) {
+	$(frm.fields_dict['team_details_html'].wrapper)
+				.html("<div class='text-muted text-center' style='padding-top:5%;'>Please select a team</div>");
 
-// 	if (frm.doc.team) {
-// 		frappe.model.with_doc("RN Team", frm.doc.team, function(team_name) {
-// 			var vehicle = frappe.model.get_doc("Vehicle", vehicle_name);
-// 			$(frm.fields_dict['vehicle_details_html'].wrapper)
-// 				.html(frappe.render_template("customer_vehicle", {"customer_vehicle": [vehicle]}));
-// 		});
-// 		frappe.call({
-// 			method: "refreshednow_erpnext.api.get_team_members",
-
-// 		});
-// 	}
-// }
+	if (frm.doc.team) {
+		frappe.call({
+			method: "refreshednow_erpnext.api.get_team_members",
+			args: {"team_name": frm.doc.team },
+			callback: function(r) {
+				console.log(r);
+				$(frm.fields_dict['team_details_html'].wrapper)
+				 .html(frappe.render_template("team_details", {"team_name": frm.doc.team, "team_members": r.message}));	
+			}
+		});
+	}
+}
 
 function fetch_and_set_addresses(frm) {
 	frappe.db.get_value(

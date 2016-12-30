@@ -11,10 +11,17 @@ class RNTeamTool(Document):
 		team = frappe.get_doc("RN Team", self.team)
 
 		for member in self.members:
-			team.append("members", {"member":member.member})
-		
+			if member.member not in [m.member for m in team.members]:
+				team.append("members", {"member":member.member})
+
+		for team_member in team.members:
+			if team_member.member not in [m.member for m in self.members]:
+				frappe.delete_doc("RN Team Member", filter={"parent": self.team, "member":member})
+
 		team.save()
-		frappe.db.commit()
+		frappe.db.commit() 
+
+		return "Members updated for {0}".format(self.team)
 
 
 	def reload_members(self):
