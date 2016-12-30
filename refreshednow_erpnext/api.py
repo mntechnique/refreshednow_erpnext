@@ -123,7 +123,7 @@ def get_rn_daily_resources(filters):
 	# 	print "Filters for resources:", filters
 
 	out_teams = []
-	teams_by_service = frappe.get_all("RN Team", filters={ "service_type": filters["service_type"] }, fields=['name'])
+	teams_by_service = frappe.get_all("RN Team", filters={ "service_type": filters["service_type"] }, fields=['name'], order_by="name")
 
 	for team in teams_by_service:
 		out_teams.append({"id":team.name, "title":team.name})
