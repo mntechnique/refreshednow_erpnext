@@ -19,7 +19,7 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 
 	//Set default route.
 	if (frappe.get_route().length == 1) {
-		frappe.set_route("rn-team-scheduling", "weekly", frappe.datetime.obj_to_user(frappe.datetime.get_today()), "RN-GO");
+		frappe.set_route("rn-team-scheduling", "weekly", frappe.datetime.obj_to_user(frappe.datetime.get_today()), "Refreshed Go");
 	}
 
 

@@ -1,6 +1,7 @@
 <div class="clearfix"></div>
 <div class="row">
-	{% if (team_members.length == 0) { %}
+
+	{% if ((!team_members) || (team_members.length == 0)) { %}
 		<div class="col-md-12 col-xs-12">
 			<h2 class="text-muted text-center">Please add members to this team.</h2>
 		</div>
