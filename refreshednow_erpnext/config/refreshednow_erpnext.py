@@ -8,9 +8,9 @@ def get_data():
 			"items": [
 				{
 					"type": "doctype",
-					"name": "RN Team Tool",
-					"label": "Team Tool",
-					"description": _("Tool for assigning members to teams."),
+					"name": "RN Team",
+					"label": "Teams",
+					"description": _("List of Teams."),
 				},
 				{
 					"type": "page",

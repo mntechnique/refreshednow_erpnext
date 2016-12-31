@@ -21,5 +21,7 @@ frappe.ui.form.on('RN Team', {
 				}
 			}
 		});
-	}
+	},
 });
+
+cur_frm.add_fetch("member", "employee_name", "member_name");
