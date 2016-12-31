@@ -21,8 +21,8 @@ def get_data():
 				{
 					"type": "page",
 					"name": "customer-lookup",
-					"label": "Lookup Customer",
-					"description": _("Lookup customer from caller number"),
+					"label": "Call Center Console",
+					"description": _("Call Center Console"),
 				},
 			]
 		},
