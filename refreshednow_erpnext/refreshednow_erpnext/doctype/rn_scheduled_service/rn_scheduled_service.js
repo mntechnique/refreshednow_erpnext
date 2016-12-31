@@ -7,6 +7,10 @@ frappe.ui.form.on('RN Scheduled Service', {
 			frappe.set_route("rn-team-scheduling");
 		});
 
+		frm.add_custom_button(__("Sales Order"), function() {
+			msgprint("New Sales Order");
+		},__("Make"));
+
 
 		//Show service items only.
 		frappe.db.get_value("RN Settings", "RN Settings", "rn_service_item_group", function(r) {
