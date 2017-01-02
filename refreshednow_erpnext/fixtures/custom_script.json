@@ -3,9 +3,9 @@
   "docstatus": 0, 
   "doctype": "Custom Script", 
   "dt": "Customer", 
-  "modified": "2016-12-27 09:46:42.831186", 
+  "modified": "2017-01-02 12:41:48.418624", 
   "name": "Customer-Client", 
-  "script": "frappe.ui.form.on(\"Customer\", \"refresh\", function(frm) {\n     if (!cur_frm.doc.__islocal) {\n        $(frm.fields_dict['rn_customer_vehicles'].wrapper)\n            .html(frappe.render_template(\"customer_vehicle\", cur_frm.doc.__onload));\n    }\n});\n", 
+  "script": "frappe.ui.form.on(\"Customer\", \"refresh\", function(frm) {\n     if (!cur_frm.doc.__islocal) {\n        $(frm.fields_dict['rn_customer_vehicles'].wrapper)\n            .html(frappe.render_template(\"customer_vehicle\", cur_frm.doc.__onload))\n\t    .find(\".btn-vehicle\").on(\"click\", function() {\n            \tfrappe.new_doc(\"Vehicle\");\n\t    });\n    \t}\n});", 
   "script_type": "Client"
  }
 ]
