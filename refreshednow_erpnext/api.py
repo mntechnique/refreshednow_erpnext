@@ -192,31 +192,31 @@ def get_service_wise_total_count_of_teams():
 	return out
 
 def get_week_range(date):
-    """Find the first/last day of the week for the given day.
-    Assuming weeks start on Sunday and end on Saturday.
+	"""Find the first/last day of the week for the given day.
+	Assuming weeks start on Sunday and end on Saturday.
 
-    Returns a tuple of ``(start_date, end_date)``.
+	Returns a tuple of ``(start_date, end_date)``.
 
-    """
-    # isocalendar calculates the year, week of the year, and day of the week.
-    # dow is Mon = 1, Sat = 6, Sun = 7
-    year, week, dow = date.isocalendar()
+	"""
+	# isocalendar calculates the year, week of the year, and day of the week.
+	# dow is Mon = 1, Sat = 6, Sun = 7
+	year, week, dow = date.isocalendar()
 
-    # Find the first day of the week.
-    if dow == 7:
-        # Since we want to start with Sunday, let's test for that condition.
-        start_date = date
-    else:
-        # Otherwise, subtract `dow` number days to get the first day
-        start_date = date - frappe.utils.datetime.timedelta(dow)
+	# Find the first day of the week.
+	if dow == 7:
+		# Since we want to start with Sunday, let's test for that condition.
+		start_date = date
+	else:
+		# Otherwise, subtract `dow` number days to get the first day
+		start_date = date - frappe.utils.datetime.timedelta(dow)
 
-    # Now, add 6 for the last day of the week (i.e., count up to Saturday)
-    end_date = start_date + frappe.utils.datetime.timedelta(7)
+	# Now, add 6 for the last day of the week (i.e., count up to Saturday)
+	end_date = start_date + frappe.utils.datetime.timedelta(7)
 
-    return [start_date, end_date]
+	return [start_date, end_date]
 
 def get_month_range(scheduled_date):
-   	year = scheduled_date.year
+	year = scheduled_date.year
 	month = scheduled_date.month
 
 	num_days = calendar.monthrange(year, month)[1]
@@ -230,7 +230,7 @@ def get_date_range(scheduled_date, days_delta=7):
 
 @frappe.whitelist()
 def customer_vehicle_onload(self,method):
-    self.get("__onload").customer_vehicle = frappe.get_all("Vehicle", fields=['*'],filters =[["rn_customer", "=", self.name]])
+	self.get("__onload").customer_vehicle = frappe.get_all("Vehicle", fields=['*'],filters =[["rn_customer", "=", self.name]])
 
 @frappe.whitelist()
 def get_team_members(team_name):
@@ -242,3 +242,13 @@ def get_team_members(team_name):
 
 def vehicle_validate(self, method):
 	self.rn_model_make = self.model + " " + self.make
+
+def sales_order_on_submit(self, method):
+	pass
+	# rnss = frappe.get_doc("RN Scheduled Service", self.rn_scheduled_service)
+	# rnss.sales_order = self.name
+	# rnss.save()
+	# frappe.db.commit()
+
+def sales_order_on_cancel(self, method):
+	pass

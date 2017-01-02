@@ -7,10 +7,29 @@ frappe.ui.form.on('RN Scheduled Service', {
 			frappe.set_route("rn-team-scheduling");
 		});
 
-		frm.add_custom_button(__("Sales Order"), function() {
-			msgprint("New Sales Order");
-		},__("Make"));
+		if (frm.doc.docstatus == 1) {
+			frm.add_custom_button(__("Sales Order"), function() {
+				frappe.call({
+					method: "create_so",
+					doc: cur_frm.doc,
+					callback: function(r){
+						if (r) {
+							frappe.show_alert(r.message, 5);
+							refresh_fields();
+						}
+					}
+				})
+			},__("Make"));
 
+
+			frappe.db.get_value("Sales Order", {"rn_scheduled_service": cur_frm.doc.name}, "name", function(r) {
+			    if (r) {
+			        cur_frm.set_value("sales_order", r.name);
+			    } else {
+			    	cur_frm.set_value("sales_order", "No Sales Order linked with this service.");
+			    }
+			});
+		}
 
 		//Show service items only.
 		frappe.db.get_value("RN Settings", "RN Settings", "rn_service_item_group", function(r) {
