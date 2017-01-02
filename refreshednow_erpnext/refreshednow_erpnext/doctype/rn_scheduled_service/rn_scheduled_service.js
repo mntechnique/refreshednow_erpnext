@@ -49,6 +49,7 @@ frappe.ui.form.on('RN Scheduled Service', {
 
 		render_vehicles(frm);
 		render_team_members(frm);
+		render_timeslot(frm);
 	},
 	customer: function(frm) {
 		fetch_and_set_addresses(frm);		
@@ -103,4 +104,15 @@ function fetch_and_set_addresses(frm) {
 			}
 		}
 	);
+}
+
+function render_timeslot(frm) {
+	var starts_on = moment(frm.doc.starts_on).format("h:mm a");
+	var ends_on = moment(frm.doc.ends_on).format("h:mm a");
+	var timeslot = moment(frm.doc.starts_on).format("DD MMM Y") + ", " + starts_on + " - " + ends_on;
+
+	var timeslot_html = '<div class="form-group"><div class="clearfix"><label class="control-label" style="padding-right: 0px;">Time Slot</label> </div> <div class="control-input-wrapper"> <div class="control-input-static"> <div class="link-field ui-front" style="position: relative;">' + timeslot + '</div> </div> </div> </div>';
+
+	$(frm.fields_dict['timeslot_html'].wrapper)
+				.html(timeslot_html);
 }
