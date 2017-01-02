@@ -142,6 +142,8 @@ fixtures = [{"dt":"Custom Script", "filters": [["name", "in", ["Customer-Client"
 	{"dt": "Property Setter", "filters": [["name", "in", [
 		"Vehicle-model-in_list_view",
 		"Vehicle-read_only_onload",
-		"Vehicle-title_field"
+		"Vehicle-title_field",
+		"Address-address_type-options",
+		"Address-read_only_onload"
 	]]]}
 ]
