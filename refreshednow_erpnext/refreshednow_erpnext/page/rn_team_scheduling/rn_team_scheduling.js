@@ -107,8 +107,9 @@ frappe.pages['rn-team-scheduling'].on_page_show = function(wrapper) {
 
 	var scheduled_date = route[2];
 	var service_type = route[3];
+	var scheduled_time = route[4] ? route[4] : null;
 
-	render_calendars(wrapper, service_type, scheduled_date);
+	render_calendars(wrapper, service_type, scheduled_date, scheduled_time);
 }
 
 
@@ -213,7 +214,7 @@ function prepare_daily_options(minTime="07:00:00", maxTime="17:00:00", defaultDa
 	}
 }
 
-function render_calendars(wrapper, service_type, scheduled_date) {
+function render_calendars(wrapper, service_type, scheduled_date, scheduled_time=null) {
 	frappe.require(["assets/refreshednow_erpnext/js/lib/fullcalendar.min.js", 
 	"assets/refreshednow_erpnext/js/lib/fullcalendar.min.css",
 	"assets/refreshednow_erpnext/js/lib/scheduler.min.js", 
@@ -238,6 +239,10 @@ function render_calendars(wrapper, service_type, scheduled_date) {
 			scheduled_date = frappe.datetime.get_today();
 		}
 
+		if(scheduled_time) {
+			scheduled_time = moment(scheduled_time, "hhmm").format("hh:mm:ss");
+		}
+
 		var weekly_options = prepare_weekly_options(minTime, 
 			maxTime, 
 			scheduled_date, 
@@ -248,7 +253,7 @@ function render_calendars(wrapper, service_type, scheduled_date) {
 		var daily_options = prepare_daily_options(minTime, 
 			maxTime, 
 			scheduled_date, 
-			{"service_type": service_type, "scheduled_date": scheduled_date},
+			{"service_type": service_type, "scheduled_date": scheduled_date, "scheduled_time": scheduled_time},
 			wrapper
 		);
 
@@ -323,6 +328,7 @@ function render_daily_event_row(r, wrapper, page_filters) {
 		var selected_start_time = wrapper.page.selected_event_info.calEvent.start.toISOString();
 		var selected_end_time =  wrapper.page.selected_event_info.calEvent.end.toISOString();
 
+		console.log(events);
 		
 		//Find an Event under the Resource column which starts at 'selected_start_time'
 		//If such an event is not found, render. 

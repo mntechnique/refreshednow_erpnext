@@ -89,7 +89,7 @@ function render_vehicles(frm) {
 		frappe.model.with_doc("Vehicle", frm.doc.vehicle, function(vehicle_name) {
 			var vehicle = frappe.model.get_doc("Vehicle", vehicle_name);
 			$(frm.fields_dict['vehicle_details_html'].wrapper)
-				.html(frappe.render_template("customer_vehicle", {"customer_vehicle": [vehicle]}));
+				.html(frappe.render_template("customer_vehicle", {"customer_vehicle": [vehicle]})).find(".btn-vehicle").addClass("hide");
 		});
 	}
 }
