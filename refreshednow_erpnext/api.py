@@ -239,3 +239,6 @@ def get_team_members(team_name):
 		member.update({"member_name": frappe.db.get_value("Employee", member.member, "employee_name")})
 
 	return members
+
+def vehicle_validate(self, method):
+	self.rn_model_make = self.model + " " + self.make

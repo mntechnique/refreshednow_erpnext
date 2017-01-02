@@ -81,6 +81,9 @@ app_include_js = "/assets/js/refreshednow.min.js"
 doc_events = {
     "Customer": {
         "onload": "refreshednow_erpnext.api.customer_vehicle_onload",
+    },
+    "Vehicle": {
+    	"validate": "refreshednow_erpnext.api.vehicle_validate",
     }
 }
 
@@ -129,5 +132,11 @@ fixtures = [{"dt":"Custom Script", "filters": [["name", "in", ["Customer-Client"
         "Customer-rn_customer_vehicles",
         "Customer-customer_vehicles_",
         "Vehicle-rn_customer",
+        "Vehicle-rn_model_make"
+	]]]},
+	{"dt": "Property Setter", "filters": [["name", "in", [
+		"Vehicle-model-in_list_view",
+		"Vehicle-read_only_onload",
+		"Vehicle-title_field"
 	]]]}
 ]
