@@ -137,7 +137,7 @@ def get_rn_daily_events(start, end, filters=None):
 
 	out_services = []
 
-	scheduled_services = frappe.get_all("RN Scheduled Service", filters={"service_type": filters["service_type"], "starts_on": frappe.utils.data.get_datetime(filters["scheduled_date"] + ' ' + filters["scheduled_time"])}, fields=['*'])
+	scheduled_services = frappe.get_all("RN Scheduled Service", filters={"service_type": filters["service_type"], "starts_on": frappe.utils.data.get_datetime(filters["scheduled_date"] + ' ' + filters["scheduled_time"]), "docstatus":1}, fields=['*'])
 
 	# print "Start:", start, "End:", end, "Filters:", filters
 	# print "Services:", scheduled_services
@@ -174,7 +174,7 @@ def get_available_teams_for_slot(service_item, start_time):
 
 	# team_count_by_service = [t.teams for t in get_service_wise_count_of_teams() if t["service_type"] = service_type]
 	no_of_booked_services = int(frappe.db.count("RN Scheduled Service",
-							filters={ "service_type": service_item.name, "starts_on": start_time }))
+							filters={ "service_type": service_item.name, "starts_on": start_time, "docstatus":1 }))
 
 	available_teams_for_slot = (no_of_teams_for_service - no_of_booked_services) or '-'
 
