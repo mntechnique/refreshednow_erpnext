@@ -36,6 +36,4 @@ class RNScheduledService(Document):
 		except Exception, e:
 			frappe.throw(_("Sales Order was not saved. <br/> %s" % (e)))
 		else:
-			frappe.msgprint(_("Sales Order %s created successfully." % (so.name)))
-
-		return so
+			return so.name

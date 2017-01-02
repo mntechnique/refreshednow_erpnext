@@ -7,29 +7,15 @@ frappe.ui.form.on('RN Scheduled Service', {
 			frappe.set_route("rn-team-scheduling");
 		});
 
-		if (frm.doc.docstatus == 1) {
-			frm.add_custom_button(__("Sales Order"), function() {
-				frappe.call({
-					method: "create_so",
-					doc: cur_frm.doc,
-					callback: function(r){
-						if (r) {
-							frappe.show_alert(r.message, 5);
-							refresh_fields();
-						}
-					}
-				})
-			},__("Make"));
-
-
-			frappe.db.get_value("Sales Order", {"rn_scheduled_service": cur_frm.doc.name}, "name", function(r) {
-			    if (r) {
-			        cur_frm.set_value("sales_order", r.name);
-			    } else {
-			    	cur_frm.set_value("sales_order", "No Sales Order linked with this service.");
-			    }
-			});
-		}
+		
+		//Set sales order if exists.
+		frappe.db.get_value("Sales Order", {"rn_scheduled_service": cur_frm.doc.name}, "name", function(r) {
+		    if (r) {
+		        cur_frm.set_value("sales_order", r.name);
+		    } else {
+		    	add_make_so_button(cur_frm);
+		    }
+		});
 
 		//Show service items only.
 		frappe.db.get_value("RN Settings", "RN Settings", "rn_service_item_group", function(r) {
@@ -134,4 +120,22 @@ function render_timeslot(frm) {
 
 	$(frm.fields_dict['timeslot_html'].wrapper)
 				.html(timeslot_html);
+}
+
+function add_make_so_button(frm) {
+	if ((!frm.doc.sales_order) && (frm.doc.docstatus == 1)) {
+		frm.add_custom_button(__("Sales Order"), function() {
+			frappe.call({
+				method: "create_so",
+				doc: cur_frm.doc,
+				callback: function(r){
+					if (r) {
+						cur_frm.set_value("sales_order", r.message);
+						frappe.show_alert("Sales Order " + r.message + " created successfully.", 5);
+						cur_frm.refresh();
+					}
+				}
+			})
+		},__("Make"));
+	}
 }
