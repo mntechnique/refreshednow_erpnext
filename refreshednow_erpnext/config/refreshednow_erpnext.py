@@ -24,6 +24,12 @@ def get_data():
 					"label": "Call Center Console",
 					"description": _("Call Center Console"),
 				},
+				{
+					"type": "doctyoe",
+					"name": "RN Scheduled Service",
+					"label": "Scheduled Service",
+					"description": _("Scheduled Service"),
+				},	
 			]
 		},
 		{

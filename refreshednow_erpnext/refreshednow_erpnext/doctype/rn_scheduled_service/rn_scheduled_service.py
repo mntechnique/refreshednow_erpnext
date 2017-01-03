@@ -11,6 +11,7 @@ from frappe import _
 class RNScheduledService(Document):
 	def validate(self):
 		self.check_overlap()
+		self.validate_schedule_days()
 
 	def on_update_after_submit(self):
 		if self.workflow_state == "To Bill":
@@ -92,4 +93,15 @@ class RNScheduledService(Document):
 				(ends_on > ss.starts_on and ends_on < ss.ends_on) or \
 				(starts_on <= ss.starts_on and ends_on >= ss.ends_on):
 				frappe.throw("This service overlaps with {0}".format(ss.name))
+
+
+	def validate_schedule_days(self, allow_scheduling_after_days=1, allow_scheduling_after_hours=14):
+		#days=1 => disallow scheduling of a service before tomorrow.
+		allowed_date = frappe.utils.datetime.datetime.today() + frappe.utils.datetime.timedelta(days=allow_scheduling_after_days)
+
+		for x in xrange(1,10):
+			print allowed_date
+
+		if frappe.utils.data.get_datetime(self.starts_on) < allowed_date: #frappe.utils.datetime.datetime.today() + frappe.utils.datetime.timedelta(days=allow_scheduling_after_days):
+			frappe.throw("Services can be scheduled after {0}".format(frappe.utils.data.getdate(allowed_date)))
 
