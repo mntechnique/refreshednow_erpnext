@@ -273,7 +273,7 @@ def get_team_members(team_name):
 	return members
 
 def vehicle_validate(self, method):
-	self.rn_model_make = self.model + " " + self.make
+	self.rn_model_make = self.make + ' ' + self.model
 
 def sales_order_on_submit(self, method):
 	pass
