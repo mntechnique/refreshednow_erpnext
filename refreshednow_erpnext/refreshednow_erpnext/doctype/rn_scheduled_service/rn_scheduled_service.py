@@ -17,11 +17,13 @@ class RNScheduledService(Document):
 			self.create_si()
 
 	def on_cancel(self):
-		linked_si = frappe.get_doc("Sales Invoice", {"rn_scheduled_service", self.name})
+		linked_si = frappe.db.get_value("Sales Invoice", filters={"rn_scheduled_service": self.name}, fieldname="name")
 
-		if linked_si.docstatus == 1:
-			linked_si.cancel()
+		if linked_si:
+			osi = frappe.get_doc("Sales Invoice", linked_si)
+			osi.cancel()
 			frappe.db.commit()
+
 
 	def create_si(self):
 		defaults_temp = frappe.defaults.get_defaults()

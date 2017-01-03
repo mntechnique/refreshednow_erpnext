@@ -21,7 +21,10 @@ frappe.ui.form.on('RN Team', {
 				}
 			}
 		});
+
 	},
 });
 
 cur_frm.add_fetch("member", "employee_name", "member_name");
+cur_frm.add_fetch("member", "designation", "designation");
+cur_frm.add_fetch("structure", "service_type", "service_type");
