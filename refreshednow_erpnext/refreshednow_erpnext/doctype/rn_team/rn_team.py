@@ -40,14 +40,31 @@ class RNTeam(Document):
 		designations_in_structure = [tsi.designation for tsi in ts.team_structure]
 		# designations_in_team = [member.designation for member in self.members]
 		for member in self.members:
-			member_designation = frappe.db.get_value("Employee", member.member, "designation")
-
-			if member_designation not in designations_in_structure:
-				frappe.throw("This team cannot have members with designation {0}.".format(member_designation))
+			if member.designation not in designations_in_structure:
+				frappe.throw("This team cannot have members with designation {0}.".format(member.designation))
 
 		for item in ts.team_structure:
 			#Designation must exist in structure.
-			member_count_by_designation = len([x for x in self.members if frappe.db.get_value("Employee", x.member, "designation") == item.designation])
+			member_count_by_designation = len([x for x in self.members if x.designation == item.designation])
 
 			if member_count_by_designation > item.strength:
 				frappe.throw("Can have a maximum of {0} members with designation {1}.".format(item.strength, item.designation))
+
+
+	# def validate_team_structure(self):
+	# 	ts = frappe.get_doc("RN Team Structure", self.structure)
+
+	# 	designations_in_structure = [tsi.designation for tsi in ts.team_structure]
+	# 	# designations_in_team = [member.designation for member in self.members]
+	# 	for member in self.members:
+	# 		member_designation = frappe.db.get_value("Employee", member.member, "designation")
+
+	# 		if member_designation not in designations_in_structure:
+	# 			frappe.throw("This team cannot have members with designation {0}.".format(member_designation))
+
+	# 	for item in ts.team_structure:
+	# 		#Designation must exist in structure.
+	# 		member_count_by_designation = len([x for x in self.members if frappe.db.get_value("Employee", x.member, "designation") == item.designation])
+
+	# 		if member_count_by_designation > item.strength:
+	# 			frappe.throw("Can have a maximum of {0} members with designation {1}.".format(item.strength, item.designation))
