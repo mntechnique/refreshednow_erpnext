@@ -49,7 +49,10 @@ def rn_events(start, end, filters=None):
 			for slot in daily_slots:
 				daily_available_slots = get_available_teams_for_slot(service_item, slot["start"])
 
-				slot.update( {"id": frappe.generate_hash(length=5), "title": daily_available_slots, "className": "rn-team" })
+				slot_color = "red" if daily_available_slots == 0 else "blue"
+
+
+				slot.update( {"id": frappe.generate_hash(length=5), "title": daily_available_slots or "-", "className": "rn-team", "color": slot_color })
 
 			slots = slots + daily_slots
 
@@ -137,16 +140,36 @@ def get_rn_daily_events(start, end, filters=None):
 
 	out_services = []
 
-	scheduled_services = frappe.get_all("RN Scheduled Service", filters={"service_type": filters["service_type"], "starts_on": frappe.utils.data.get_datetime(filters["scheduled_date"] + ' ' + filters["scheduled_time"]), "docstatus":1}, fields=['*'])
+	scheduled_services = frappe.get_all("RN Scheduled Service", filters={"service_type": filters["service_type"], "starts_on": frappe.utils.data.get_datetime(filters["scheduled_date"] + ' ' + filters["scheduled_time"])}, fields=['*'])
 
 	# print "Start:", start, "End:", end, "Filters:", filters
 	# print "Services:", scheduled_services
 
+
 	for service in scheduled_services:
+		print service
+
+		service_color = "grey"
+		if service.get("workflow_state") == "To Schedule":
+		  	service_color = "blue"
+		
+		if service.get("workflow_state") == "To Dispatch":
+			service_color = "blue"
+		
+		if service.get("workflow_state") == "To Bill":
+			service_color = "blue"
+		
+		if service.get("workflow_state") == "Completed":
+			service_color = "green"
+		
+		if service.get("workflow_state") == "Stopped":
+			service_color = "blue"
+		
 		out_services.append({"id": service.name,
 			"resourceId": service.team,
 			"start": service.starts_on.isoformat(),
-			"end": service.ends_on.isoformat() })
+			"end": service.ends_on.isoformat(), 
+			"color": service_color })
 
 	return out_services
 
@@ -174,9 +197,9 @@ def get_available_teams_for_slot(service_item, start_time):
 
 	# team_count_by_service = [t.teams for t in get_service_wise_count_of_teams() if t["service_type"] = service_type]
 	no_of_booked_services = int(frappe.db.count("RN Scheduled Service",
-							filters={ "service_type": service_item.name, "starts_on": start_time, "docstatus":1 }))
+							filters={ "service_type": service_item.name, "starts_on": start_time}))
 
-	available_teams_for_slot = (no_of_teams_for_service - no_of_booked_services) or '-'
+	available_teams_for_slot = (no_of_teams_for_service - no_of_booked_services) or 0
 
 	return available_teams_for_slot
 

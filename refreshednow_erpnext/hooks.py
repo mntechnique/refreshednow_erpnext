@@ -87,7 +87,7 @@ doc_events = {
     },
     "Sales Order": {
     	"on_submit": "refreshednow_erpnext.api.sales_order_on_submit",
-    	"on_cancel": "refreshednow_erpnext.api.	sales_order_on_cancel"
+    	"on_cancel": "refreshednow_erpnext.api.sales_order_on_cancel"
     }
 }
 

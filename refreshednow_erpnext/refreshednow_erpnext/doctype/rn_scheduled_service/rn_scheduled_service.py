@@ -12,6 +12,45 @@ class RNScheduledService(Document):
 	def validate(self):
 		self.check_overlap()
 
+	def on_update_after_submit(self):
+		if self.workflow_state == "To Bill":
+			self.create_si()
+
+	def on_cancel(self):
+		linked_si = frappe.get_doc("Sales Invoice", {"rn_scheduled_service", self.name})
+
+		if linked_si.docstatus == 1:
+			linked_si.cancel()
+			frappe.db.commit()
+
+	def create_si(self):
+		defaults_temp = frappe.defaults.get_defaults()
+
+		#Create a sales order if customer is selected.
+		si = frappe.new_doc("Sales Invoice")	
+		si.transaction_date = self.starts_on
+
+		si.company = defaults_temp.get("company")
+		si.customer = self.customer
+		si.delivery_date = add_days(si.transaction_date, 10)
+		si.currency = defaults_temp.get("currency")		
+		si.selling_price_list = defaults_temp.get("selling_price_list")
+		si.rn_scheduled_service = self.name
+
+		si.append("items", {
+			"item_code": self.service_type,
+			"qty": 1.0,
+			"rate": frappe.db.get_value("Item Price", filters={"price_list":si.selling_price_list}, fieldname="price_list_rate"),
+			"conversion_factor": 1.0
+		})
+
+		try:
+			si.save()
+		except Exception, e:
+			frappe.throw(_("Sales Invoice was not saved. <br/> %s" % (e)))
+		else:
+			return si.name
+
 	def create_so(self):
 		defaults_temp = frappe.defaults.get_defaults()
 

@@ -3,19 +3,31 @@
 
 frappe.ui.form.on('RN Scheduled Service', {
 	refresh: function(frm) {
+
+		if (frm.doc.workflow_state == "Completed") {
+			frm.set_df_property("remarks", "read_only", 1);
+		}
+
 		frm.add_custom_button(__("Go to Team Scheduling"), function() {
 			frappe.set_route("rn-team-scheduling");
 		});
 
 		
+		// //Set sales order if exists.
+		// frappe.db.get_value("Sales Order", {"rn_scheduled_service": cur_frm.doc.name}, "name", function(r) {
+		//     if (r) {
+		//         cur_frm.set_value("sales_order", r.name);
+		//     } else {
+		//     	add_make_so_button(cur_frm);
+		//     }
+		// });
+
 		//Set sales order if exists.
-		frappe.db.get_value("Sales Order", {"rn_scheduled_service": cur_frm.doc.name}, "name", function(r) {
-		    if (r) {
-		        cur_frm.set_value("sales_order", r.name);
-		    } else {
-		    	add_make_so_button(cur_frm);
-		    }
-		});
+		// frappe.db.get_value("Sales Invoice", {"rn_scheduled_service": cur_frm.doc.name}, "name", function(r) {
+		//     if (r) {
+		//         cur_frm.set_value("sales_invoice", r.name);
+		//     }
+		// });
 
 		//Show service items only.
 		frappe.db.get_value("RN Settings", "RN Settings", "rn_service_item_group", function(r) {
@@ -122,20 +134,20 @@ function render_timeslot(frm) {
 				.html(timeslot_html);
 }
 
-function add_make_so_button(frm) {
-	if ((!frm.doc.sales_order) && (frm.doc.docstatus == 1)) {
-		frm.add_custom_button(__("Sales Order"), function() {
-			frappe.call({
-				method: "create_so",
-				doc: cur_frm.doc,
-				callback: function(r){
-					if (r) {
-						cur_frm.set_value("sales_order", r.message);
-						frappe.show_alert("Sales Order " + r.message + " created successfully.", 5);
-						cur_frm.refresh();
-					}
-				}
-			})
-		},__("Make"));
-	}
-}
+// function add_make_so_button(frm) {
+// 	if ((!frm.doc.sales_order) && (frm.doc.docstatus == 1)) {
+// 		frm.add_custom_button(__("Sales Order"), function() {
+// 			frappe.call({
+// 				method: "create_so",
+// 				doc: cur_frm.doc,
+// 				callback: function(r){
+// 					if (r) {
+// 						cur_frm.set_value("sales_order", r.message);
+// 						frappe.show_alert("Sales Order " + r.message + " created successfully.", 5);
+// 						cur_frm.refresh();
+// 					}
+// 				}
+// 			})
+// 		},__("Make"));
+// 	}
+// }
