@@ -137,7 +137,7 @@ fixtures = [{"dt":"Custom Script", "filters": [["name", "in", ["Customer-Client"
         "Customer-customer_vehicles_",
         "Vehicle-rn_customer",
         "Vehicle-rn_model_make",
-        "Sales Order-rn_scheduled_service"
+        "Sales Invoice-rn_scheduled_service"
 	]]]},
 	{"dt": "Property Setter", "filters": [["name", "in", [
 		"Vehicle-model-in_list_view",
