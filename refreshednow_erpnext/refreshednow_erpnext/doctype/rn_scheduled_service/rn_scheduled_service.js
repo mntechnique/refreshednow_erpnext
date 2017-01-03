@@ -52,7 +52,7 @@ frappe.ui.form.on('RN Scheduled Service', {
 			return {
 				"filters": {
 					"customer": frm.doc.customer,
-					"address_type": "Shipping"
+					"address_type": "Service"
 				}
 			};
 		});
