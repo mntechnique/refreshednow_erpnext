@@ -10,7 +10,7 @@ class RNTeamStructure(Document):
 	def validate(self):
 		self.validate_designations_and_strength()
 
-	def validate_designations_and_strength((self):
+	def validate_designations_and_strength(self):
 		designation_list = []
 		for structure in self.team_structure:
 			designation_list.append(structure.designation)
