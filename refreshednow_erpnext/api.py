@@ -277,10 +277,42 @@ def vehicle_validate(self, method):
 
 def sales_order_on_submit(self, method):
 	pass
-	# rnss = frappe.get_doc("RN Scheduled Service", self.rn_scheduled_service)
-	# rnss.sales_order = self.name
-	# rnss.save()
-	# frappe.db.commit()
 
 def sales_order_on_cancel(self, method):
 	pass
+
+# def si_on_update_after_submit(self, method):
+# 	if self.status == "Paid":
+# 		frappe.msgprint("Si Update on Submit Called")
+# 		rnss = frappe.get_doc("RN Scheduled Service", self.rn_scheduled_service)
+# 		if rnss.workflow_state != "Stopped":
+# 			rnss.workflow_state = "Completed"
+# 			rnss.save()
+# 			frappe.db.commit()
+
+# def si_on_cancel(self, method):
+# 	rnss = frappe.get_doc("RN Scheduled Service", self.rn_scheduled_service)
+# 	if rnss.workflow_state != "Completed":
+# 		rnss.workflow_state = "To Dispatch"
+# 		rnss.save()
+# 		frappe.db.commit()	
+
+def pe_on_submit(self, method):
+	invoices = [inv.reference_name for inv in self.references if inv.reference_doctype == "Sales Invoice"]
+
+	for i in invoices:
+		rnss_id = frappe.db.get_value("Sales Invoice", i, "rn_scheduled_service")
+
+		if rnss_id:
+			frappe.db.set_value("RN Scheduled Service", rnss_id, "workflow_state", "Completed")
+			frappe.db.commit()
+
+def pe_on_cancel(self, method):
+	invoices = [inv.reference_name for inv in self.references if inv.reference_doctype == "Sales Invoice"]
+
+	for i in invoices:
+		rnss_id = frappe.db.get_value("Sales Invoice", i, "rn_scheduled_service")
+
+		if rnss_id:
+			frappe.db.set_value("RN Scheduled Service", rnss_id, "workflow_state", "To Bill")
+			frappe.db.commit()	

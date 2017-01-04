@@ -13,9 +13,9 @@ class RNScheduledService(Document):
 		self.check_overlap()
 		self.validate_schedule_days()
 
-	def on_update_after_submit(self):
-		if self.workflow_state == "To Bill":
-			self.create_si()
+	def on_submit(self):
+		if self.workflow_state == "To Dispatch":
+			self.sales_invoice = self.create_si()
 
 	def on_cancel(self):
 		linked_si = frappe.db.get_value("Sales Invoice", filters={"rn_scheduled_service": self.name}, fieldname="name")
@@ -24,7 +24,6 @@ class RNScheduledService(Document):
 			osi = frappe.get_doc("Sales Invoice", linked_si)
 			osi.cancel()
 			frappe.db.commit()
-
 
 	def create_si(self):
 		defaults_temp = frappe.defaults.get_defaults()
@@ -49,6 +48,7 @@ class RNScheduledService(Document):
 
 		try:
 			si.save()
+			si.submit()
 		except Exception, e:
 			frappe.throw(_("Sales Invoice was not saved. <br/> %s" % (e)))
 		else:

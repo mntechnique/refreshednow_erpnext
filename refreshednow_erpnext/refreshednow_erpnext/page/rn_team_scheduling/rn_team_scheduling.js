@@ -133,6 +133,7 @@ function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultD
 		editable: false,
 		//firstDay: frappe.datetime.str_to_obj(defaultDate).getDay(), 
 		eventClick: function(calEvent, jsEvent, view) {
+			
 			wrapper.page.selected_event_info = {"calEvent": calEvent, "jsEvent": jsEvent, "view": view};
 			wrapper.page.fields_dict['scheduled_date'].set_input(calEvent.start.toDate());
 

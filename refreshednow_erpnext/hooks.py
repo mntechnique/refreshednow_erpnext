@@ -85,9 +85,9 @@ doc_events = {
     "Vehicle": {
     	"validate": "refreshednow_erpnext.api.vehicle_validate",
     },
-    "Sales Order": {
-    	"on_submit": "refreshednow_erpnext.api.sales_order_on_submit",
-    	"on_cancel": "refreshednow_erpnext.api.sales_order_on_cancel"
+    "Payment Entry": {
+        "on_submit": "refreshednow_erpnext.api.pe_on_submit",
+        "on_cancel": "refreshednow_erpnext.api.pe_on_cancel",
     }
 }
 

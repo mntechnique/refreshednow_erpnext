@@ -22,12 +22,12 @@ frappe.ui.form.on('RN Scheduled Service', {
 		//     }
 		// });
 
-		//Set sales order if exists.
-		frappe.db.get_value("Sales Invoice", {"rn_scheduled_service": cur_frm.doc.name}, "name", function(r) {
-		    if (r) {
-		        cur_frm.set_value("sales_invoice", r.name);
-		    }
-		});
+		// //Set sales order if exists.
+		// frappe.db.get_value("Sales Invoice", {"rn_scheduled_service": cur_frm.doc.name}, "name", function(r) {
+		//     if (r) {
+		//         cur_frm.set_value("sales_invoice", r.name);
+		//     }
+		// });
 
 		//Show service items only.
 		frappe.db.get_value("RN Settings", "RN Settings", "rn_service_item_group", function(r) {

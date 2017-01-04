@@ -4,7 +4,7 @@
   "doctype": "Workflow", 
   "document_type": "RN Scheduled Service", 
   "is_active": 1, 
-  "modified": "2017-01-02 23:48:51.221207", 
+  "modified": "2017-01-04 18:29:23.837586", 
   "name": "RN Scheduled Service", 
   "override_status": 0, 
   "states": [
@@ -63,22 +63,10 @@
     "state": "To Dispatch"
    }, 
    {
-    "action": "Bill", 
-    "allowed": "Support Team", 
-    "next_state": "Completed", 
-    "state": "To Bill"
-   }, 
-   {
     "action": "Stop", 
     "allowed": "Support Team", 
     "next_state": "Stopped", 
     "state": "To Dispatch"
-   }, 
-   {
-    "action": "Stop", 
-    "allowed": "Support Team", 
-    "next_state": "Stopped", 
-    "state": "To Bill"
    }
   ], 
   "workflow_name": "RN Scheduled Service", 
