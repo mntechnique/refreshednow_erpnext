@@ -59,6 +59,15 @@ frappe.pages['rn-team-tool'].on_page_show = function(wrapper) {
 	render_allocations(wrapper, service_type, day_of_week);
 }
 
+// frappe.pages['rn-team-tool'].refresh = function(wrapper) {
+// 	var content = frappe.team_tool_page.wrapper.find(".page-content");
+
+// 	cb = frappe.team_tool_page.wrapper.find("input[type='checkbox']");
+
+// 	if (cb) {
+// 		console.log("checkboxes", cb);
+// 	}
+// }
 
 function build_route(wrapper) { //, show_daily="daily") {
 	var service_type = wrapper.page.fields_dict['service_type'].$input.val();
@@ -86,7 +95,30 @@ function render_allocations(wrapper, service_type, day_of_week) {
 			var content = frappe.team_tool_page.wrapper.find(".page-content");
 			frappe.team_tool_page.wrapper.find(".team-allocation").remove();
 
+			console.log("allocations", r.message.data.allocations);
+
 			content.append(frappe.render_template("team_allocation_view", r.message));
+		}
+	});
+}
+
+// function checkboxes_rendered() {
+// 	var cb = frappe.team_tool_page.wrapper.find("input[type='checkbox']");
+// 	if (cb) {
+// 		console.log("checkboxes", cb);
+// 	}
+// }
+
+function checkbox_clicked(cb) {
+	frappe.call({
+		method: "refreshednow_erpnext.api.update_team_allocation",
+		args: {
+			"employee": $(cb).attr("data-employee"),
+			"team": $(cb).attr("data-team"),
+			"day_of_week": $(cb).attr("data-dow"), //frappe.team_tool_page.fields_dict["day_of_week"],
+		},
+		callback: function(r) {
+
 		}
 	});
 }
