@@ -93,7 +93,9 @@ function render_allocations(wrapper, service_type, day_of_week) {
 		freeze_message: __("Retrieving..."),
 		callback: function(r) {
 			var content = frappe.team_tool_page.wrapper.find(".page-content");
-			frappe.team_tool_page.wrapper.find(".team-allocation").remove();
+			frappe.team_tool_page.wrapper.find("#team-allocation").remove();
+
+			console.log("allocations div", frappe.team_tool_page.wrapper.find("#team-allocation"))
 
 			console.log("allocations", r.message.data.allocations);
 
@@ -111,14 +113,14 @@ function render_allocations(wrapper, service_type, day_of_week) {
 
 function checkbox_clicked(cb) {
 	frappe.call({
-		method: "refreshednow_erpnext.api.update_team_allocation",
+		method: "refreshednow_erpnext.api.update_team_day_employee"
 		args: {
 			"employee": $(cb).attr("data-employee"),
 			"team": $(cb).attr("data-team"),
 			"day_of_week": $(cb).attr("data-dow"), //frappe.team_tool_page.fields_dict["day_of_week"],
 		},
 		callback: function(r) {
-
+						
 		}
 	});
 }

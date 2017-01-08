@@ -333,3 +333,28 @@ def get_team_tool_data(service_type, day_of_week):
 	out = {"data": { "teams": teams, "employees" : employees, "allocations": allocations, "day_of_week": day_of_week } }
 
 	return out
+
+@frappe.whitelist()
+def update_team_day_employee(employee, team, day_of_week):
+	#Get existing allocation for this combo
+	allocations = frappe.get_all("RN Team Day Employee", filters={"employee": employee, "day_of_week": day_of_week}, fields=["name"])
+
+	for a in allocations:
+		frappe.delete_doc("RN Team Day Employee", a.name)
+
+	if allocations.length == 1:
+		allocations[1].team = team
+		allocations[1].save()
+		frappe.db.commit()
+	else:
+		a = frappe.new_doc("RN Team Day Employee")
+		a.employee = employee
+		a.team = team
+
+	
+
+
+
+
+
+	
