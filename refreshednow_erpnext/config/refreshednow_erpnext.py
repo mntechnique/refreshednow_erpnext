@@ -34,7 +34,13 @@ def get_data():
 					"type": "doctype",
 					"name": "RN Team Structure",
 					"label": "Team Structure",
-					"description": _("Determine the type"),
+					"description": _(""),
+				},
+				{
+					"type": "page",
+					"name": "rn-team-tool",
+					"label": "Team Tool",
+					"description": _("Assign members to teams for each day of the week."),
 				},	
 			]
 		},

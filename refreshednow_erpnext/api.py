@@ -316,3 +316,16 @@ def pe_on_cancel(self, method):
 		if rnss_id:
 			frappe.db.set_value("RN Scheduled Service", rnss_id, "workflow_state", "To Bill")
 			frappe.db.commit()	
+
+#Team Tool
+@frappe.whitelist()
+def get_team_tool_data(service_type, day_of_week):
+	teams =  frappe.get_all("RN Team", filters={"service_type":service_type})
+	
+	employees = frappe.get_all("Employee") #TODO: Filter for On-Field employees.
+
+	#allocations = frappe.get_all("RN Team Daily Allocation", filters=[["team", "in", teams], [""]])
+
+	out = {"data": { "teams": teams, "employees" : employees } }
+
+	return out
