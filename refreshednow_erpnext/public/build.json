@@ -6,7 +6,8 @@
         "public/js/customer_vehicle.html",
 		"public/js/caller_information.html",
         "public/js/customer_vehicle.html",
-        "public/js/team_details.html"
+        "public/js/team_details.html",
+        "public/js/rn_utils.js"
 	],
 	"css/refreshednow.min.css": [
 		"public/css/rn_event.css"

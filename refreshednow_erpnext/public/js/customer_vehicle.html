@@ -23,7 +23,7 @@
 				{% for (var i=0, l=customer_vehicle.length; i<=l-1; i++) { %}
 
 					<tr>
-						<td>{{ customer_vehicle[i].license_plate }}</td>
+						<td><a href="/desk#Form/Vehicle/{{ customer_vehicle[i].license_plate }}">{{ customer_vehicle[i].license_plate }}</a></td>
 						<td>{{ customer_vehicle[i].make }}</td>
 						<td>{{ customer_vehicle[i].model }}</td>
 					</tr>

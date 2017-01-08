@@ -179,12 +179,12 @@ function prepare_daily_options(minTime="07:00:00", maxTime="17:00:00", defaultDa
 		disableDragging: true,
 		editable: false,
 		dayClick: function(date, jsEvent, view, resourceObj) {
-			show_prompt(date, page_filters["service_type"], resourceObj.id);
+			on_day_click(date, page_filters["service_type"], resourceObj.id);
 		},
 		eventClick: function(calEvent, jsEvent, view) {
 			frappe.db.get_value("RN Scheduled Service", filters={"name": calEvent.id.toString()}, fieldname="name", callback=function(r) {
 				if (!r) {
-					show_prompt(calEvent.start, page_filters["service_type"], calEvent.resourceId);
+					on_day_click(calEvent.start, page_filters["service_type"], calEvent.resourceId);
 				} else {
 					frappe.set_route("Form", "RN Scheduled Service", r.name);
 				}
@@ -304,14 +304,13 @@ function build_route(wrapper) { //, show_daily="daily") {
 	//frappe.set_re_route(frappe.get_route());
 }
 
-function on_day_click(date, service_type, team, customer) {
+function on_day_click(date, service_type, team) {
 	var rnss = frappe.model.make_new_doc_and_get_name('RN Scheduled Service');
 	rnss = locals["RN Scheduled Service"][rnss];
 	rnss.service_type = service_type;
 	rnss.scheduled_date = frappe.datetime.obj_to_str(date);
 	rnss.scheduled_time = date.format("HH:mm:ss");
 	rnss.team = team;
-	rnss.customer = customer;
 	rnss.starts_on = date.format("Y-M-D HH:mm:ss");
 	rnss.ends_on = date.add(1,'h').format("Y-M-D HH:mm:ss"); //Replace with service duration.
 	
@@ -357,16 +356,17 @@ function render_daily_event_row(r, wrapper, page_filters) {
 }
 
 
-function show_prompt(date, service_type, resource_id) {
-	frappe.prompt([
-		{'fieldname': 'customer', 'fieldtype': 'Link', 'options':'Customer','label':'Customer', 'default': localStorage.getItem("customer_name") || ""}
-	],
-	function(values){
-		if (values) {
-			on_day_click(date, service_type, resource_id, values.customer);
-		}
-	},
-	'Select Customer',
-	'Select'
-	)
-}
+// function show_service_form(date, service_type, resource_id) {
+// 	// frappe.prompt([
+// 	// 	{'fieldname': 'customer', 'fieldtype': 'Link', 'options':'Customer','label':'Customer', 'default': localStorage.getItem("customer_name") || ""}
+// 	// ],
+// 	// function(values){
+// 	// 	if (values) {
+// 	// 		on_day_click(date, service_type, resource_id, values.customer);
+// 	// 		on_day_click(date, service_type, resource_id, values.customer);
+// 	// 	}
+// 	// },
+// 	// 'Select Customer',
+// 	// 'Select'
+// 	// )
+// }

@@ -63,19 +63,46 @@ frappe.ui.form.on('RN Scheduled Service', {
 				}
 			};
 		});
+		// //Set sales order if exists.
+		// frappe.db.get_value("Sales Order", {"rn_scheduled_service": cur_frm.doc.name}, "name", function(r) {
+		//     if (r) {
+		//         cur_frm.set_value("sales_order", r.name);
+		//     } else {
+		//     	add_make_so_button(cur_frm);
+		//     }
+		// });
+
+		// //Set sales order if exists.
+		// frappe.db.get_value("Sales Invoice", {"rn_scheduled_service": cur_frm.doc.name}, "name", function(r) {
+		//     if (r) {
+		//         cur_frm.set_value("sales_invoice", r.name);
+		//     }
+		// });
 
 		render_vehicles(frm);
 		render_team_members(frm);
 		render_timeslot(frm);
+
+		frm.fields_dict.customer.new_doc = quick_entry_customer;
+		frm.fields_dict.service_address.new_doc = quick_entry_service_address;
+		frm.fields_dict.billing_address.new_doc = quick_entry_billing_address;
+		frm.fields_dict.vehicle.new_doc = quick_entry_vehicle;
+		
 	},
 	customer: function(frm) {
-		fetch_and_set_addresses(frm);		
+		fetch_and_set_linked_fields(frm);
 	},
 	vehicle: function(frm) {
 		render_vehicles(frm);		
 	},
 	team: function(frm) {
 		render_team_members(frm);
+	},
+	billing_address: function(frm) {
+		erpnext.utils.get_address_display(frm, "billing_address", "billing_address_display");
+	}, 
+	service_address: function(frm) {
+		erpnext.utils.get_address_display(frm, "service_address", "service_address_display");
 	}
 });
 
@@ -109,7 +136,7 @@ function render_team_members(frm) {
 	}
 }
 
-function fetch_and_set_addresses(frm) {
+function fetch_and_set_linked_fields(frm) {
 	frappe.db.get_value(
 		"Address",
 		{ "customer":frm.doc.customer, "address_type":"Billing", "is_primary_address":true }, 
@@ -118,6 +145,16 @@ function fetch_and_set_addresses(frm) {
 			if (r) {
 				//console.log(r);
 				frm.set_value("billing_address", r.name);	
+			}
+		}
+	);
+	frappe.db.get_value(
+		"Address",
+		{ "customer":frm.doc.customer, "address_type":"Service" }, 
+		"name", 
+		function(r) {
+			if (r) {
+				frm.set_value("service_address", r.name);	
 			}
 		}
 	);
@@ -151,3 +188,56 @@ function render_timeslot(frm) {
 // 		},__("Make"));
 // 	}
 // }
+
+function quick_entry_customer() {
+	frappe._from_link = this;
+
+	mnt.quick_entry("Customer", 
+	function(){}, 
+	{ 
+		"customer_name": this.$input.val(),
+		"customer_group": "All Customer Groups",
+		"customer_type": "Individual",
+		"territory": "All Territories"
+	});
+}
+
+function quick_entry_service_address() {
+	frappe._from_link = this;
+
+	mnt.quick_entry("Address", 
+	function(){}, 
+	{ 
+		"address_title":  this.$input.val() || (cur_frm.doc.customer + "-Service"),
+		"address_type": "Service",
+		"customer": cur_frm.doc.customer
+	});
+}
+
+function quick_entry_billing_address() {
+	frappe._from_link = this;
+
+	mnt.quick_entry("Address", 
+	function(){}, 
+	{ 
+		"address_title": this.$input.val() || (cur_frm.doc.customer + "-Billing"),
+		"address_type": "Billing",
+		"customer": cur_frm.doc.customer
+	});
+}
+
+function quick_entry_vehicle() {
+	frappe._from_link = this;
+
+	console.log(cur_frm.doc.customer);
+
+	mnt.quick_entry("Vehicle", 
+	function(){}, 
+	{ 
+		"make": this.$input.val().split(" ")[0],
+		"model": this.$input.val().split(" ")[1],
+		"rn_customer": cur_frm.doc.customer,
+		"fuel_type": "Petrol",
+		"uom": "Litre"
+	});
+}
