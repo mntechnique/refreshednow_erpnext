@@ -117,6 +117,7 @@ def get_settings(fieldname):
 
 	return out
 
+#TODO: Refactor. Use nested dict instead of list of dict {"item_code": "RefGO", "data" : {"start_time" ...}}
 @frappe.whitelist()
 def get_service_item_data():
 	service_items = frappe.get_all("Item",
@@ -132,7 +133,8 @@ def get_service_item_data():
 				"item_code": item.get("item_code"),
 				"start_time": "{0}:{1}:00".format(item.get("rn_start_time_hours"), item.get("rn_start_time_minutes")),
 				"end_time": "{0}:{1}:00".format(item.get("rn_end_time_hours"), item.get("rn_end_time_minutes")),
-				"teams": frappe.get_all("RN Team", filters={"service_type": item.get("item_code")})
+				"teams": frappe.get_all("RN Team", filters={"service_type": item.get("item_code")}),
+				"service_duration": item.get("rn_service_duration")
 			})
 		)
 

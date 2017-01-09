@@ -181,12 +181,12 @@ function prepare_daily_options(minTime="07:00:00", maxTime="17:00:00", defaultDa
 		disableDragging: true,
 		editable: false,
 		dayClick: function(date, jsEvent, view, resourceObj) {
-			on_day_click(date, page_filters["service_type"], resourceObj.id);
+			on_day_click(date, page_filters["service_type"], resourceObj.id, wrapper);
 		},
 		eventClick: function(calEvent, jsEvent, view) {
 			frappe.db.get_value("RN Scheduled Service", filters={"name": calEvent.id.toString()}, fieldname="name", callback=function(r) {
 				if (!r) {
-					on_day_click(calEvent.start, page_filters["service_type"], calEvent.resourceId);
+					on_day_click(calEvent.start, page_filters["service_type"], calEvent.resourceId, wrapper);
 				} else {
 					frappe.set_route("Form", "RN Scheduled Service", r.name);
 				}
@@ -306,7 +306,9 @@ function build_route(wrapper) { //, show_daily="daily") {
 	//frappe.set_re_route(frappe.get_route());
 }
 
-function on_day_click(date, service_type, team) {
+function on_day_click(date, service_type, team, wrapper) {
+	var service_item = wrapper.page.service_item_data.filter(function(item) { return item.item_code == service_type})[0]
+
 	var rnss = frappe.model.make_new_doc_and_get_name('RN Scheduled Service');
 	rnss = locals["RN Scheduled Service"][rnss];
 	rnss.service_type = service_type;
@@ -314,7 +316,7 @@ function on_day_click(date, service_type, team) {
 	rnss.scheduled_time = date.format("HH:mm:ss");
 	rnss.team = team;
 	rnss.starts_on = date.format("Y-M-D HH:mm:ss");
-	rnss.ends_on = date.add(1,'h').format("Y-M-D HH:mm:ss"); //Replace with service duration.
+	rnss.ends_on = date.add(service_item.service_duration,'m').format("Y-M-D HH:mm:ss"); //Replace with service duration.
 	
 	frappe.set_route("Form", "RN Scheduled Service", rnss.name);
 }
@@ -329,8 +331,6 @@ function render_daily_event_row(r, wrapper, page_filters) {
 	if (wrapper.page.selected_event_info) {
 		var selected_start_time = wrapper.page.selected_event_info.calEvent.start.toISOString();
 		var selected_end_time =  wrapper.page.selected_event_info.calEvent.end.toISOString();
-
-		console.log(events);
 		
 		//Find an Event under the Resource column which starts at 'selected_start_time'
 		//If such an event is not found, render. 
@@ -340,7 +340,6 @@ function render_daily_event_row(r, wrapper, page_filters) {
 				return (event["resourceId"] == v["name"]) && (event["start"] == selected_start_time)
 			});
 			
-			console.log("event under resource:", event_in_slot_under_resource);
 
 			if (event_in_slot_under_resource.length == 0) {
 				events.push({
