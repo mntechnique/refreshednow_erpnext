@@ -88,6 +88,9 @@ doc_events = {
     "Payment Entry": {
         "on_submit": "refreshednow_erpnext.api.pe_on_submit",
         "on_cancel": "refreshednow_erpnext.api.pe_on_cancel",
+    },
+    "Item": {
+        "validate": "refreshednow_erpnext.api.item_validate"
     }
 }
 
@@ -137,7 +140,11 @@ fixtures = [{"dt":"Custom Script", "filters": [["name", "in", ["Customer-Client"
         "Customer-customer_vehicles_",
         "Vehicle-rn_customer",
         "Vehicle-rn_model_make",
-        "Sales Invoice-rn_scheduled_service"
+        "Sales Invoice-rn_scheduled_service",
+        "Item-rn_break_duration",
+        "Item-rn_service_duration",
+        "Item-rn_break_start_time_minutes",
+        "Item-rn_break_start_time_hours"
 	]]]},
 	{"dt": "Property Setter", "filters": [["name", "in", [
 		"Vehicle-model-in_list_view",

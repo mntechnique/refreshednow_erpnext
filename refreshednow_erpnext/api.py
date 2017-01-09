@@ -351,10 +351,11 @@ def update_team_day_employee(employee, team, day_of_week):
 		a.employee = employee
 		a.team = team
 
-	
 
+def item_validate(self, method):
+	if (self.rn_break_duration % 15 != 0):
+		frappe.throw("Break duration must be in intervals of 15 minutes.")
 
+	if (self.rn_service_duration % 15 != 0):
+		frappe.throw("Service duration must be in intervals of 15 minutes.")
 
-
-
-	

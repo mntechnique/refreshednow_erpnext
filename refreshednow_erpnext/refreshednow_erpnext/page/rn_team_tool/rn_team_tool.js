@@ -93,12 +93,7 @@ function render_allocations(wrapper, service_type, day_of_week) {
 		freeze_message: __("Retrieving..."),
 		callback: function(r) {
 			var content = frappe.team_tool_page.wrapper.find(".page-content");
-			frappe.team_tool_page.wrapper.find("#team-allocation").remove();
-
-			console.log("allocations div", frappe.team_tool_page.wrapper.find("#team-allocation"))
-
-			console.log("allocations", r.message.data.allocations);
-
+			frappe.team_tool_page.wrapper.find("#team-daily-allocation").remove();
 			content.append(frappe.render_template("team_allocation_view", r.message));
 		}
 	});
@@ -113,7 +108,7 @@ function render_allocations(wrapper, service_type, day_of_week) {
 
 function checkbox_clicked(cb) {
 	frappe.call({
-		method: "refreshednow_erpnext.api.update_team_day_employee"
+		method: "refreshednow_erpnext.api.update_team_day_employee",
 		args: {
 			"employee": $(cb).attr("data-employee"),
 			"team": $(cb).attr("data-team"),
