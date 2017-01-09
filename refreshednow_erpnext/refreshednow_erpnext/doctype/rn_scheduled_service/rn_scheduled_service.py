@@ -99,6 +99,8 @@ class RNScheduledService(Document):
 		#days=1 => disallow scheduling of a service before tomorrow.
 		allowed_date = frappe.utils.datetime.datetime.today() + frappe.utils.datetime.timedelta(days=allow_scheduling_after_days)
 
-		if frappe.utils.getdate(self.starts_on) >= allowed_date.date():
+ 		print "Starts On", frappe.utils.getdate(self.starts_on), "allowed_date", allowed_date.date()
+
+		if frappe.utils.getdate(self.starts_on) > allowed_date.date():
 			frappe.throw("Services can be scheduled after {0}".format(frappe.utils.data.getdate(allowed_date)))
 
