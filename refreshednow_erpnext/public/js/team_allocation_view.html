@@ -29,9 +29,9 @@
 						%}
 
 						{% if (found_alloc.length > 0) { %}
-							<input type="checkbox" data-team="{%= team_name %}" data-employee="{%= emp_name %}" data-dow="{%= data.dow %}" onclick="checkbox_clicked(this)" checked/>
+							<input type="checkbox" data-team="{%= team_name %}" data-employee="{%= emp_name %}" data-dow="{%= dow %}" onclick="checkbox_clicked(this)" checked/>
 						{% } else { %}
-							<input type="checkbox" data-team="{%= team_name %}" data-employee="{%= emp_name %}" data-dow="{%= data.dow %}" onclick="checkbox_clicked(this)"/>
+							<input type="checkbox" data-team="{%= team_name %}" data-employee="{%= emp_name %}" data-dow="{%= dow %}" onclick="checkbox_clicked(this)"/>
 						{% } %}
 					</td>
 				{% } %}

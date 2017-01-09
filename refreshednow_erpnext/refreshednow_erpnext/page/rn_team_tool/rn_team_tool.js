@@ -14,6 +14,7 @@ frappe.pages['rn-team-tool'].on_page_load = function(wrapper) {
 			fieldname: "service_type",
 			options: "Item",
 			label: __("Service Type"),
+			default: frappe.get_route()[2] || "Refreshed Go",
 			reqd: 1,
 			input_css: {"z-index": 1},
 			change: function(event) {
@@ -56,7 +57,7 @@ frappe.pages['rn-team-tool'].on_page_show = function(wrapper) {
 	var day_of_week = route[1];
 	var service_type = route[2];
 
-	render_allocations(wrapper, service_type, day_of_week);
+	render_allocations(service_type, day_of_week);
 }
 
 // frappe.pages['rn-team-tool'].refresh = function(wrapper) {
@@ -82,7 +83,7 @@ function build_route(wrapper) { //, show_daily="daily") {
 	};
 }
 
-function render_allocations(wrapper, service_type, day_of_week) {
+function render_allocations(service_type, day_of_week) {
 	frappe.call({
 		method: "refreshednow_erpnext.api.get_team_tool_data",
 		args: {
@@ -114,8 +115,10 @@ function checkbox_clicked(cb) {
 			"team": $(cb).attr("data-team"),
 			"day_of_week": $(cb).attr("data-dow"), //frappe.team_tool_page.fields_dict["day_of_week"],
 		},
+		freeze: true,
+		freeze_message: __("Updating allocation..."),
 		callback: function(r) {
-						
+			frappe.pages['rn-team-tool'].on_page_show();
 		}
 	});
 }

@@ -44,14 +44,25 @@ def rn_events(start, end, filters=None):
 			end_time = iter_date
 			end_time = end_time.replace(hour=int(service_item.rn_end_time_hours), minute=int(service_item.rn_end_time_minutes), second=0, microsecond=0)
 
-			daily_slots = get_slots(hours=[start_time, end_time])
+			daily_slots = get_slots(hours=[start_time, end_time], 
+				duration=frappe.utils.datetime.timedelta(minutes=int(service_item.rn_service_duration)),
+				break_time=service_item.rn_break_start_time_hours + ":" + service_item.rn_break_start_time_minutes + ":00",
+				break_duration=frappe.utils.datetime.timedelta(minutes=int(service_item.rn_break_duration)))
 
 			for slot in daily_slots:
 				daily_available_slots = get_available_teams_for_slot(service_item, slot["start"])
 
-				slot_color = "#ff5c5c" if daily_available_slots == 0 else "#5cbbff"
+				if daily_available_slots == 0:
+					event_title = "-"
+					slot_color = "#ff5c5c"
+				elif slot.get("type") == "break":
+					event_title = "Break"
+					slot_color = "grey"
+				else:
+					event_title = daily_available_slots
+					slot_color = "#5cbbff"
 
-				slot.update( {"id": frappe.generate_hash(length=5), "title": daily_available_slots or "-", "className": "rn-team", "color": slot_color })
+				slot.update( {"id": frappe.generate_hash(length=5), "title": event_title, "className": "rn-team", "color": slot_color })
 
 			slots = slots + daily_slots
 
@@ -62,7 +73,7 @@ def rn_events(start, end, filters=None):
 
 	return slots
 
-def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1)):
+def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1), break_time="12:00:00", break_duration=frappe.utils.datetime.timedelta(minutes=30)):
 	"""
 	Generate Timeslots based on list of hours and duration
 
@@ -77,6 +88,24 @@ def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1)):
 			while start + duration <= end:
 					out.append(frappe._dict({"start":start.isoformat(), "end":(start + duration).isoformat()}))
 					start += duration
+
+	break_start = frappe.utils.datetime.datetime.combine(hours[0].date(), frappe.utils.get_time(break_time))
+	break_end = break_start + break_duration
+	
+	print "Break Start:", break_start, "Break duration", break_duration, "Break end", break_end
+
+	# for o in out:
+	# 	if (frappe.utils.get_datetime(o.get("start")) > break_start) or break_start > frappe.utils.get_datetime(o.get("start")):
+	# 		out.remove(o)
+
+	for o in out:
+		if (frappe.utils.get_datetime(o.get("start")) > break_start and frappe.utils.get_datetime(o.get("start")) < break_end) or \
+			(frappe.utils.get_datetime(o.get("end")) > break_start and frappe.utils.get_datetime(o.get("end")) < break_end) or \
+			(frappe.utils.get_datetime(o.get("start")) <= break_start and frappe.utils.get_datetime(o.get("end")) >= break_end):
+			out.remove(o)
+
+	out.append(frappe._dict({"start":break_start.isoformat(), "end":break_end.isoformat(), "type": "break"}))
+
 	return out
 
 @frappe.whitelist()
@@ -92,7 +121,9 @@ def get_settings(fieldname):
 def get_service_item_data():
 	service_items = frappe.get_all("Item",
 		filters={"item_group": get_settings("rn_service_item_group")},
-		fields=["name", "item_code", "rn_start_time_hours", "rn_start_time_minutes", "rn_end_time_hours", "rn_end_time_minutes"])
+		fields=["name", "item_code", 
+				"rn_start_time_hours", "rn_start_time_minutes", "rn_end_time_hours", "rn_end_time_minutes", "rn_service_duration", 
+				"rn_break_duration", "rn_break_start_time_hours", "rn_break_start_time_minutes"])
 
 	out = []
 	for item in service_items:
@@ -341,16 +372,16 @@ def update_team_day_employee(employee, team, day_of_week):
 
 	for a in allocations:
 		frappe.delete_doc("RN Team Day Employee", a.name)
-
-	if allocations.length == 1:
-		allocations[1].team = team
-		allocations[1].save()
 		frappe.db.commit()
-	else:
-		a = frappe.new_doc("RN Team Day Employee")
-		a.employee = employee
-		a.team = team
 
+	#print "Employee", employee, ", Team", team, ", DOW", day_of_week 
+
+	newallocation = frappe.new_doc("RN Team Day Employee")
+	newallocation.employee = employee
+	newallocation.team = team
+	newallocation.day_of_week = day_of_week
+	newallocation.save()
+	frappe.db.commit()
 
 def item_validate(self, method):
 	if (self.rn_break_duration % 15 != 0):
@@ -358,4 +389,3 @@ def item_validate(self, method):
 
 	if (self.rn_service_duration % 15 != 0):
 		frappe.throw("Service duration must be in intervals of 15 minutes.")
-

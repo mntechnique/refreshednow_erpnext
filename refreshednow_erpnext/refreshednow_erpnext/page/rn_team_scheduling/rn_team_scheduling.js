@@ -137,9 +137,12 @@ function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultD
 			wrapper.page.selected_event_info = {"calEvent": calEvent, "jsEvent": jsEvent, "view": view};
 			wrapper.page.fields_dict['scheduled_date'].set_input(calEvent.start.toDate());
 
-			localStorage.setItem("rn_scheduling_view", "daily");
-
-			build_route(wrapper); //, frappe.get_route()[1] || "daily");
+			if (calEvent.title == "Break") {
+				frappe.msgprint("Cannot schedule a service during break time.")
+			} else {
+				localStorage.setItem("rn_scheduling_view", "daily");
+				build_route(wrapper); //, frappe.get_route()[1] || "daily");
+			}
 		}, 
 		defaultDate: defaultDate,
 		/* Fetch events via a callback function*/
@@ -170,7 +173,6 @@ function prepare_daily_options(minTime="07:00:00", maxTime="17:00:00", defaultDa
 		selectHelper: false,
 		forceEventDuration: true,
 		defaultView: "agendaDay",
-		snapDuration: "01:00:00", //Replace with service duration
 		minTime: minTime,
 		maxTime: maxTime,
 		eventStartEditable: false,
