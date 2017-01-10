@@ -9,6 +9,6 @@ def get_data():
 			"color": "#53baed",
 			"icon": "fa fa-car",
 			"type": "module",
-			"label": _("RefreshedNow ERPNext")
+			"label": _("RefreshedNow")
 		}
 	]
