@@ -480,20 +480,27 @@ def get_team_tool_data(service_type, day_of_week):
 
 @frappe.whitelist()
 def update_team_day_employee(employee, team, day_of_week):
-	#Get existing allocation for this combo
-	allocations = frappe.get_all("RN Team Day Employee", filters={"employee": employee, "day_of_week": day_of_week}, fields=["name"])
+	allocations = frappe.get_all("RN Team Day Employee", filters={"employee": employee, "day_of_week": day_of_week}, fields=["*"])
+
+	if len(allocations) == 1:
+		allocation = frappe.get_doc("RN Team Day Employee", allocations[0].get("name"))
+	else:		
+		allocation = frappe.new_doc("RN Team Day Employee")
+	
+	allocation.employee = employee
+	allocation.team = team
+	allocation.day_of_week = day_of_week
+	allocation.save()
+
+	frappe.db.commit()
+
+@frappe.whitelist()
+def cancel_all_allocations(employee, day_of_week):
+	allocations = frappe.get_all("RN Team Day Employee", filters={"employee": employee, "day_of_week": day_of_week}, fields=["*"])
 
 	for a in allocations:
 		frappe.delete_doc("RN Team Day Employee", a.name)
-		frappe.db.commit()
 
-	#print "Employee", employee, ", Team", team, ", DOW", day_of_week 
-
-	newallocation = frappe.new_doc("RN Team Day Employee")
-	newallocation.employee = employee
-	newallocation.team = team
-	newallocation.day_of_week = day_of_week
-	newallocation.save()
 	frappe.db.commit()
 
 def item_validate(self, method):

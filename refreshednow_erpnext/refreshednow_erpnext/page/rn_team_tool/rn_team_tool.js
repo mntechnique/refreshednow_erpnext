@@ -7,6 +7,7 @@ frappe.pages['rn-team-tool'].on_page_load = function(wrapper) {
 	});
 
 	frappe.team_tool_page = page;
+
 	
 	page.add_field(
 		{
@@ -46,7 +47,7 @@ frappe.pages['rn-team-tool'].on_page_load = function(wrapper) {
 
 	//Set default route
 	if (frappe.get_route().length == 1) {
-		frappe.set_route("rn-team-tool", page.fields_dict["day_of_week"].get_value());
+		frappe.set_route("rn-team-tool", page.fields_dict["day_of_week"].get_value(), "Refreshed Go");
 	}
 }
 
@@ -121,4 +122,19 @@ function checkbox_clicked(cb) {
 			frappe.pages['rn-team-tool'].on_page_show();
 		}
 	});
+}
+
+function cancel_all_allocations(cross) {
+	frappe.call({
+		method: "refreshednow_erpnext.api.cancel_all_allocations",
+		args: {
+			"employee": $(cross).attr("data-employee"),			
+			"day_of_week": $(cross).attr("data-dow"),
+		},
+		freeze: true,
+		freeze_message: __("Cancelling allocations for " + $(cross).attr("data-dow")),
+		callback: function(r) {
+			frappe.pages['rn-team-tool'].on_page_show();
+		}
+	});	
 }
