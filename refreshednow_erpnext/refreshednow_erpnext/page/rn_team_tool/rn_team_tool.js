@@ -119,7 +119,13 @@ function checkbox_clicked(cb) {
 		freeze: true,
 		freeze_message: __("Updating allocation..."),
 		callback: function(r) {
-			frappe.pages['rn-team-tool'].on_page_show();
+			console.log(r);
+			if (r.message && r.message.exc) {
+				frappe.msgprint(r.message.exc);
+				$(cb).removeAttr("checked");
+			} else {
+				frappe.pages['rn-team-tool'].on_page_show();
+			}	
 		}
 	});
 }

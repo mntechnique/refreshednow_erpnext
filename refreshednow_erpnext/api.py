@@ -492,6 +492,10 @@ def get_team_tool_data(service_type, day_of_week):
 def update_team_day_employee(employee, team, day_of_week):
 	allocations = frappe.get_all("RN Team Day Employee", filters={"employee": employee, "day_of_week": day_of_week}, fields=["*"])
 
+	weekly_off = frappe.db.get_value("Employee", employee, "rn_weekly_off")
+	if weekly_off == day_of_week:
+		return {"exc": "Cannot schedule on this day. Weekly off."}
+
 	if len(allocations) == 1:
 		allocation = frappe.get_doc("RN Team Day Employee", allocations[0].get("name"))
 	else:		
