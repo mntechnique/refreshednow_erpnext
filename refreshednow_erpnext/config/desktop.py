@@ -7,7 +7,7 @@ def get_data():
 		{
 			"module_name": "RefreshedNow ERPNext",
 			"color": "#53baed",
-			"icon": "fa fa-refresh",
+			"icon": "fa fa-car",
 			"type": "module",
 			"label": _("RefreshedNow ERPNext")
 		}
