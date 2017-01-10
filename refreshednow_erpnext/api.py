@@ -359,11 +359,17 @@ def get_available_teams_for_slot(service_item, start_time):
 	#scheduled_services_for_date = frappe.get_all("RN Scheduled Service", filters={"service_type": service_type, "scheduled_date": ref_date})
 
 	#Get teams by service.
-	teams_by_service = frappe.get_all("RN Team", filters={"service_type" : service_item.name })
-	no_of_teams_by_service = len(teams_by_service)
+	teams_for_service = frappe.get_all("RN Team", filters={"service_type" : service_item.name })
+	
+	no_of_teams_for_service = 0
+
+	for team in teams_for_service:
+		allocations = frappe.get_all("RN Team Day Employee", filters={"team":team.name, "day_of_week": frappe.utils.get_datetime(start_time).strftime("%A") })
+		if len(allocations) > 0:
+			no_of_teams_for_service += 1
 
 	#Get Scheduled Services for time by team
-	no_of_teams_for_service = int(frappe.db.count("RN Team", filters={"service_type": service_item.name})) or 0
+	#no_of_teams_for_service = int(frappe.db.count("RN Team", filters={"service_type": service_item.name})) or 0
 
 	# team_count_by_service = [t.teams for t in get_service_wise_count_of_teams() if t["service_type"] = service_type]
 	# no_of_booked_services = int(frappe.db.count("RN Scheduled Service",
@@ -491,7 +497,7 @@ def pe_on_cancel(self, method):
 def get_team_tool_data(service_type, day_of_week):
 	teams =  frappe.get_all("RN Team", filters={"service_type":service_type})
 	
-	employees = frappe.get_all("Employee", fields=["name", "employee_name", "designation"]) #TODO: Filter for On-Field employees.
+	employees = frappe.get_all("Employee", filters=[["designation", "in", ["Supervisor", "Junior Cleaner", "Senior Cleaner"]]], fields=["name", "employee_name", "designation"]) #TODO: Filter for On-Field employees.
 
 	team_names = [t.name for t in teams]
 

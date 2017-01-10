@@ -33,6 +33,9 @@ class RNScheduledService(Document):
 		si = frappe.new_doc("Sales Invoice")	
 		si.transaction_date = self.starts_on
 
+		if self.bill_to:
+			si.rn_bill_to = self.bill_to 
+			
 		si.company = defaults_temp.get("company")
 		si.customer = self.customer
 		si.delivery_date = add_days(si.transaction_date, 10)

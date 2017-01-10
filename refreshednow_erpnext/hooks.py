@@ -145,7 +145,8 @@ fixtures = [{"dt":"Custom Script", "filters": [["name", "in", ["Customer-Client"
         "Item-rn_service_duration",
         "Item-rn_break_start_time_minutes",
         "Item-rn_break_start_time_hours",
-        "Employee-rn_weekly_off"
+        "Employee-rn_weekly_off",
+        "Sales Invoice-rn_bill_to"
 	]]]},
 	{"dt": "Property Setter", "filters": [["name", "in", [
 		"Vehicle-model-in_list_view",

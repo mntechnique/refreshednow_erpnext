@@ -39,6 +39,13 @@ frappe.ui.form.on('RN Scheduled Service', {
 				};
 			});	
 		})
+		cur_frm.set_query("contact", function() {
+			return {
+				"filters": {
+					"customer": cur_frm.doc.customer
+				}
+			};
+		});
 		cur_frm.set_query("team", function() {
 			return {
 				"filters": {
@@ -94,6 +101,7 @@ frappe.ui.form.on('RN Scheduled Service', {
 		frm.fields_dict.service_address.new_doc = quick_entry_service_address;
 		frm.fields_dict.billing_address.new_doc = quick_entry_billing_address;
 		frm.fields_dict.vehicle.new_doc = quick_entry_vehicle;
+		frm.fields_dict.contact.new_doc = quick_entry_contact;
 		
 	},
 	customer: function(frm) {
@@ -162,6 +170,16 @@ function fetch_and_set_linked_fields(frm) {
 		function(r) {
 			if (r) {
 				frm.set_value("service_address", r.name);	
+			}
+		}
+	);
+	frappe.db.get_value(
+		"Contact",
+		{ "customer":frm.doc.customer, "is_primary_contact": 1 }, 
+		"name", 
+		function(r) {
+			if (r) {
+				frm.set_value("contact", r.name);	
 			}
 		}
 	);
@@ -246,5 +264,19 @@ function quick_entry_vehicle() {
 		"rn_customer": cur_frm.doc.customer,
 		"fuel_type": "Petrol",
 		"uom": "Litre"
+	});
+}
+
+function quick_entry_contact() {
+	frappe._from_link = this;
+
+	//console.log(cur_frm.doc.customer);
+
+	mnt.quick_entry("Contact", 
+	function(){}, 
+	{ 
+		"first_name": this.$input.val().split(" ")[0],
+		"last_name": this.$input.val().split(" ")[1] || "",
+		"customer": cur_frm.doc.customer,
 	});
 }
