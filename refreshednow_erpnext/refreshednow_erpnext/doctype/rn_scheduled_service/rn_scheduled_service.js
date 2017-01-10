@@ -128,7 +128,7 @@ function render_team_members(frm) {
 			method: "refreshednow_erpnext.api.get_team_members",
 			args: {"team_name": frm.doc.team },
 			callback: function(r) {
-				console.log(r);
+				//console.log(r);
 				$(frm.fields_dict['team_details_html'].wrapper)
 				 .html(frappe.render_template("team_details", {"team_name": frm.doc.team, "team_members": r.message}));	
 			}
@@ -229,7 +229,7 @@ function quick_entry_billing_address() {
 function quick_entry_vehicle() {
 	frappe._from_link = this;
 
-	console.log(cur_frm.doc.customer);
+	//console.log(cur_frm.doc.customer);
 
 	mnt.quick_entry("Vehicle", 
 	function(){}, 

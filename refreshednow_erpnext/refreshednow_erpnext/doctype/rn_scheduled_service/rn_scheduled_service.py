@@ -12,10 +12,10 @@ class RNScheduledService(Document):
 	def validate(self):
 		self.check_overlap()
 		self.validate_schedule_days()
+		self.check_no_of_vehicles()
 
 	def on_submit(self):
-		if self.workflow_state == "To Dispatch":
-			self.sales_invoice = self.create_si()
+		self.sales_invoice = self.create_si()
 
 	def on_cancel(self):
 		linked_si = frappe.db.get_value("Sales Invoice", filters={"rn_scheduled_service": self.name}, fieldname="name")
@@ -41,7 +41,7 @@ class RNScheduledService(Document):
 
 		si.append("items", {
 			"item_code": self.service_type,
-			"qty": 1.0,
+			"qty": float(self.vehicle_count),
 			"rate": frappe.db.get_value("Item Price", filters={"price_list":si.selling_price_list}, fieldname="price_list_rate"),
 			"conversion_factor": 1.0
 		})
@@ -103,4 +103,9 @@ class RNScheduledService(Document):
 
 		if frappe.utils.getdate(self.starts_on) > allowed_date.date():
 			frappe.throw("Services can be scheduled after {0}".format(frappe.utils.data.getdate(allowed_date)))
+
+	def check_no_of_vehicles(self):
+		if self.vehicle_count <= 0:
+			frappe.throw("Must have at least one vehicle for a service.")
+
 
