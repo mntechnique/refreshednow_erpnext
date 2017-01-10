@@ -13,6 +13,7 @@ class RNScheduledService(Document):
 		self.check_overlap()
 		self.validate_schedule_days()
 		self.check_no_of_vehicles()
+		#self.validate_team_availability()
 
 	def on_submit(self):
 		self.sales_invoice = self.create_si()
@@ -84,16 +85,18 @@ class RNScheduledService(Document):
 			return so.name
 
 	def check_overlap(self):
-		existing_services = frappe.get_all("RN Scheduled Service", filters={"team": self.team, "docstatus":1}, fields=["name", "starts_on", "ends_on"])
+		existing_services = frappe.get_all("RN Scheduled Service", filters={"team": self.team, "docstatus" : 1}, fields=["name", "starts_on", "ends_on", "team"])
 		for ss in existing_services:
 			starts_on = frappe.utils.data.get_datetime(self.starts_on)
 			ends_on = frappe.utils.data.get_datetime(self.ends_on)
+
+			if ss.team == self.team:
+				frappe.throw("Team {0} is already scheduled for <a href='/desk#Form/{1}/{2}'>{2}</a>. Please select another team.".format(self.team, self.doctype, ss.name))
 
 			if (starts_on > ss.starts_on and starts_on < ss.ends_on) or \
 				(ends_on > ss.starts_on and ends_on < ss.ends_on) or \
 				(starts_on <= ss.starts_on and ends_on >= ss.ends_on):
 				frappe.throw("This service overlaps with {0}".format(ss.name))
-
 
 	def validate_schedule_days(self, allow_scheduling_after_days=1, allow_scheduling_after_hours=14):
 		#days=1 => disallow scheduling of a service before tomorrow.
@@ -108,4 +111,11 @@ class RNScheduledService(Document):
 		if self.vehicle_count <= 0:
 			frappe.throw("Must have at least one vehicle for a service.")
 
+	
+	# def validate_team_availability(self):
+	# 	scheduled_services = frappe.get_all("RN Scheduled Service", filters=[["service_type", "=", self.service_type], 
+	# 		["starts_on", "=", self.starts_on], ["name", "!=", self.name]], fields=["*"])
 
+	# 	for service in scheduled_services:
+	# 		if service.team == self.team:
+	# 			frappe.throw("Team {0} is already scheduled for <a href='/desk#Form/{1}/{2}'>{2}</a>. Please select another team.".format(self.team, self.doctype, service.name))	

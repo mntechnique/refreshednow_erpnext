@@ -39,6 +39,13 @@ frappe.ui.form.on('RN Scheduled Service', {
 				};
 			});	
 		})
+		cur_frm.set_query("team", function() {
+			return {
+				"filters": {
+					"service_type": cur_frm.doc.service_type
+				}
+			};
+		});
 		//Filter dropdowns by Customer and pertinent criteria.
 		cur_frm.set_query("billing_address", function() {
 			return {
