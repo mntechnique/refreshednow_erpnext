@@ -44,7 +44,7 @@ def rn_events(start, end, filters=None):
 			end_time = iter_date
 			end_time = end_time.replace(hour=int(service_item.rn_end_time_hours), minute=int(service_item.rn_end_time_minutes), second=0, microsecond=0)
 
-			daily_slots = get_slots(hours=[start_time, end_time], 
+			daily_slots = get_slots_with_break(hours=[start_time, end_time], 
 				duration=frappe.utils.datetime.timedelta(minutes=int(service_item.rn_service_duration)),
 				break_time=service_item.rn_break_start_time_hours + ":" + service_item.rn_break_start_time_minutes + ":00",
 				break_duration=frappe.utils.datetime.timedelta(minutes=int(service_item.rn_break_duration)))
@@ -73,7 +73,17 @@ def rn_events(start, end, filters=None):
 
 	return slots
 
-def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1), break_time="12:00:00", break_duration=frappe.utils.datetime.timedelta(minutes=30)):
+
+def get_slots_with_break(hours,duration=frappe.utils.datetime.timedelta(hours=1), break_time="12:00:00", break_duration=frappe.utils.datetime.timedelta(minutes=30)):
+	break_start = frappe.utils.datetime.datetime.combine(hours[0].date(), frappe.utils.get_time(break_time))
+
+	pre_break_slots = get_slots([hours[0], break_start - duration], duration)
+	break_slot = [frappe._dict({"start":break_start.isoformat(), "end":(break_start + break_duration).isoformat(), "type":"break"})]
+	post_break_slots = get_slots([break_start + break_duration, hours[1]], duration)
+
+	return pre_break_slots + break_slot + post_break_slots
+
+def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1)): #, break_time="12:00:00", break_duration=frappe.utils.datetime.timedelta(minutes=30)):
 	"""
 	Generate Timeslots based on list of hours and duration
 
@@ -82,11 +92,11 @@ def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1), break_ti
 	:param duration: default duration of one hour.
 	"""
 	out = []
-	break_start = frappe.utils.datetime.datetime.combine(hours[0].date(), frappe.utils.get_time(break_time))
+	# break_start = frappe.utils.datetime.datetime.combine(hours[0].date(), frappe.utils.get_time(break_time))
 
-	print "Break start", break_start
+	# print "Break start", break_start
 
-	# cutoff = 10
+	actual_slot_count = 0
 
 	slots = sorted([(hours[0], hours[0])] + [(hours[1], hours[1])])
 	for start, end in ((slots[i][1], slots[i+1][0]) for i in range(len(slots)-1)):
@@ -95,15 +105,19 @@ def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1), break_ti
 			while True:
 				print "Start", start
 
-				if start == break_start:
-					context_duration = break_duration
-					slot = frappe._dict({"start":start.isoformat(), "end":(start + context_duration).isoformat(), "type":"break"})
-				else:
-					context_duration = duration
-					slot = frappe._dict({"start":start.isoformat(), "end":(start + context_duration).isoformat()})
-
+				#if start >= break_start and start <= break_start + break_duration:
+				
+				# if start >= break_start:
+				# 	context_duration = break_duration
+				# 	slot = frappe._dict({"start":start.isoformat(), "end":(start + context_duration).isoformat(), "type":"break"})
+				# else:
+				#context_duration = duration
+				slot = frappe._dict({"start":start.isoformat(), "end":(start +  duration).isoformat()})
+				
+				actual_slot_count += 1
+					
 				out.append(slot)
-				start += context_duration
+				start +=  duration
 				
 				# print "Start at End of Loop", start, end
 				# print "End condition", start >= end
@@ -111,28 +125,30 @@ def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1), break_ti
 				if start > end:
 					break
 
-				# cutoff -= 1
-				# if cutoff == 0:
-				# 	break
 
-	# break_start = frappe.utils.datetime.datetime.combine(hours[0].date(), frappe.utils.get_time(break_time))
-	# break_end = break_start + break_duration
+	print "Actual slot count", actual_slot_count 
+# 				# cutoff -= 1
+# 				# if cutoff == 0:
+# 				# 	break
+
+# 	# break_start = frappe.utils.datetime.datetime.combine(hours[0].date(), frappe.utils.get_time(break_time))
+# 	# break_end = break_start + break_duration
 	
-	# print "Break Start:", break_start, "Break duration", break_duration, "Break end", break_end
+# 	# print "Break Start:", break_start, "Break duration", break_duration, "Break end", break_end
 
-	# # for o in out:
-	# # 	if (frappe.utils.get_datetime(o.get("start")) > break_start) or break_start > frappe.utils.get_datetime(o.get("start")):
-	# # 		out.remove(o)
+# 	# # for o in out:
+# 	# # 	if (frappe.utils.get_datetime(o.get("start")) > break_start) or break_start > frappe.utils.get_datetime(o.get("start")):
+# 	# # 		out.remove(o)
 
-	# for o in out:
-	# 	if (frappe.utils.get_datetime(o.get("start")) > break_start and frappe.utils.get_datetime(o.get("start")) < break_end) or \
-	# 		(frappe.utils.get_datetime(o.get("end")) > break_start and frappe.utils.get_datetime(o.get("end")) < break_end) or \
-	# 		(frappe.utils.get_datetime(o.get("start")) <= break_start and frappe.utils.get_datetime(o.get("end")) >= break_end):
-	# 		out.remove(o)
+# 	# for o in out:
+# 	# 	if (frappe.utils.get_datetime(o.get("start")) > break_start and frappe.utils.get_datetime(o.get("start")) < break_end) or \
+# 	# 		(frappe.utils.get_datetime(o.get("end")) > break_start and frappe.utils.get_datetime(o.get("end")) < break_end) or \
+# 	# 		(frappe.utils.get_datetime(o.get("start")) <= break_start and frappe.utils.get_datetime(o.get("end")) >= break_end):
+# 	# 		out.remove(o)
 
-	# out.append(frappe._dict({"start":break_start.isoformat(), "end":break_end.isoformat(), "type": "break"}))
+# 	# out.append(frappe._dict({"start":break_start.isoformat(), "end":break_end.isoformat(), "type": "break"}))
 
-	return out
+ 	return out
 
 
 # def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1), break_time="12:00:00", break_duration=frappe.utils.datetime.timedelta(minutes=30)):
@@ -202,23 +218,22 @@ def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1), break_ti
 # 																frappe.utils.datetime.datetime(2016, 12, 14, 18)]
 # 	:param duration: default duration of one hour.
 # 	"""
+# 	actual_slot_count = 0
+
 # 	out = []
 # 	slots = sorted([(hours[0], hours[0])] + [(hours[1], hours[1])])
 # 	for start, end in ((slots[i][1], slots[i+1][0]) for i in range(len(slots)-1)):
 # 			assert start <= end, "Start time should be before end time"
-# 			while start + duration <= end:
+# 			while start <= end:
 # 					out.append(frappe._dict({"start":start.isoformat(), "end":(start + duration).isoformat()}))
+# 					actual_slot_count += 1
 # 					start += duration
 
 # 	break_start = frappe.utils.datetime.datetime.combine(hours[0].date(), frappe.utils.get_time(break_time))
 # 	break_end = break_start + break_duration
 	
-# 	print "Break Start:", break_start, "Break duration", break_duration, "Break end", break_end
-
-# 	# for o in out:
-# 	# 	if (frappe.utils.get_datetime(o.get("start")) > break_start) or break_start > frappe.utils.get_datetime(o.get("start")):
-# 	# 		out.remove(o)
-
+# 	#print "Break Start:", break_start, "Break duration", break_duration, "Break end", break_end
+# 	print actual_slot_count
 # 	for o in out:
 # 		if (frappe.utils.get_datetime(o.get("start")) > break_start and frappe.utils.get_datetime(o.get("start")) < break_end) or \
 # 			(frappe.utils.get_datetime(o.get("end")) > break_start and frappe.utils.get_datetime(o.get("end")) < break_end) or \
@@ -523,3 +538,9 @@ def item_validate(self, method):
 
 	if (self.rn_service_duration % 15 != 0):
 		frappe.throw("Service duration must be in intervals of 15 minutes.")
+
+@frappe.whitelist()
+def get_availability_for_team_dow(team, day_of_week):
+	allocations = frappe.get_all("RN Team Day Employee", filters={"team":team, "day_of_week":day_of_week})
+	if len(allocations) == 0:
+		return {"exc": "No available team members for this slot."}

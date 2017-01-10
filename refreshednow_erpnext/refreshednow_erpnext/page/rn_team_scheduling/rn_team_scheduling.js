@@ -184,11 +184,19 @@ function prepare_daily_options(minTime="07:00:00", maxTime="17:00:00", defaultDa
 			on_day_click(date, page_filters["service_type"], resourceObj.id, wrapper);
 		},
 		eventClick: function(calEvent, jsEvent, view) {
-			frappe.db.get_value("RN Scheduled Service", filters={"name": calEvent.id.toString()}, fieldname="name", callback=function(r) {
-				if (!r) {
-					on_day_click(calEvent.start, page_filters["service_type"], calEvent.resourceId, wrapper);
-				} else {
-					frappe.set_route("Form", "RN Scheduled Service", r.name);
+			frappe.call({
+				method: "refreshednow_erpnext.api.get_availability_for_team_dow",
+				args: {
+					"team": calEvent.resourceId,
+					"day_of_week": calEvent.start.format("dddd")
+				},
+				callback: function(r) {
+					console.log(r);
+					if (r.message && r.message.exc) {
+						frappe.msgprint(r.message.exc)
+					} else {
+						on_event_click(calEvent, page_filters, wrapper);	
+					}
 				}
 			});
 		},
@@ -319,6 +327,16 @@ function on_day_click(date, service_type, team, wrapper) {
 	rnss.ends_on = date.add(service_item.service_duration,'m').format("Y-M-D HH:mm:ss"); //Replace with service duration.
 	
 	frappe.set_route("Form", "RN Scheduled Service", rnss.name);
+}
+
+function on_event_click(calEvent, page_filters, wrapper) {
+	frappe.db.get_value("RN Scheduled Service", filters={"name": calEvent.id.toString()}, fieldname="name", callback=function(r) {
+		if (!r) {
+			on_day_click(calEvent.start, page_filters["service_type"], calEvent.resourceId, wrapper);
+		} else {
+			frappe.set_route("Form", "RN Scheduled Service", r.name);
+		}
+	});
 }
 
 function render_daily_event_row(r, wrapper, page_filters) {
