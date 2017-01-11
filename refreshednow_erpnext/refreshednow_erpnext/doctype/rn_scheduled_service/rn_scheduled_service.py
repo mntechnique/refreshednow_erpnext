@@ -10,6 +10,7 @@ from frappe import _
 
 class RNScheduledService(Document):
 	def validate(self):
+		self.validate_address()
 		self.check_overlap()
 		self.validate_schedule_days()
 		self.check_no_of_vehicles()
@@ -125,3 +126,7 @@ class RNScheduledService(Document):
 		allocations = frappe.get_all("RN Team Day Employee", filters={"team": self.team, "day_of_week": frappe.utils.get_datetime(self.starts_on).strftime("%A")})
 		if len(allocations) == 0:
 			frappe.throw("No allocations for this team. <br> Please allocate members to this team using Team Allocation Tool.")
+
+	def validate_address(self):
+		if self.billing_address_same_as_service and not self.billing_address:
+			frappe.throw("Please set the billing address.")

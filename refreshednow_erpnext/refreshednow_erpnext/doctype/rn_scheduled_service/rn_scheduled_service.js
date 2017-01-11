@@ -127,17 +127,10 @@ frappe.ui.form.on('RN Scheduled Service', {
 		frappe.db.get_value("Contact", frm.doc.contact_person, "customer", function(r){
 			if (r) {
 				cur_frm.set_value("customer", r.customer);
-				cur_frm.refresh_fields();	
+				cur_frm.refresh_fields();
 			} else if (frm.doc.contact_person) { //Display error message only if a contact is selected.
 				frappe.msgprint("No customer linked with this contact.");
 			}
-
-			console.log(r);
-			// if (!r.customer) {
-			// 	frm.set_value("customer", r.customer);
-			// } else {
-			// 	frappe.msgprint("No customer linked with this contact.");
-			// }
 		});
 		erpnext.utils.get_contact_details(frm);
 	}
