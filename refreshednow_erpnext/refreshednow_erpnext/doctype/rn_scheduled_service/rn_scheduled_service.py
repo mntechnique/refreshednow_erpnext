@@ -38,10 +38,17 @@ class RNScheduledService(Document):
 			
 		si.company = defaults_temp.get("company")
 		si.customer = self.customer
+
+		if self.billing_address_same_as_service:
+			si.customer_address = self.service_address
+		else:
+			si.customer_address = self.billing_address
+
 		si.delivery_date = add_days(si.transaction_date, 10)
 		si.currency = defaults_temp.get("currency")		
 		si.selling_price_list = defaults_temp.get("selling_price_list")
 		si.rn_scheduled_service = self.name
+
 
 		si.append("items", {
 			"item_code": self.service_type,
