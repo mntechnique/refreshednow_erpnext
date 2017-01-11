@@ -21,8 +21,6 @@ def rn_events_test(start, end, filters=None):
 def rn_events(start, end, filters=None):
 	service_item = None
 
-	print "Get Weekly Events: Filters", filters
-
 	filters = json.loads(filters)
 
 	slots = []
@@ -103,7 +101,7 @@ def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1)): #, brea
 			assert start <= end, "Start time should be before end time"
 
 			while True:
-				print "Start", start
+				#print "Start", start
 
 				#if start >= break_start and start <= break_start + break_duration:
 				
@@ -126,7 +124,7 @@ def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1)): #, brea
 					break
 
 
-	print "Actual slot count", actual_slot_count 
+	
 # 				# cutoff -= 1
 # 				# if cutoff == 0:
 # 				# 	break
@@ -498,12 +496,8 @@ def get_team_tool_data(service_type, day_of_week):
 	teams =  frappe.get_all("RN Team", filters={"service_type":service_type})
 	
 	employees = frappe.get_all("Employee", filters=[["designation", "in", ["Supervisor", "Junior Cleaner", "Senior Cleaner"]]], fields=["name", "employee_name", "designation"]) #TODO: Filter for On-Field employees.
-
 	team_names = [t.name for t in teams]
-
 	allocations = frappe.get_all("RN Team Day Employee", filters=[["team", "in", team_names], ["day_of_week", "=", day_of_week]], fields=["*"])
-
-	print "Allocations", allocations
 
 	out = {"data": { "teams": teams, "employees" : employees, "allocations": allocations, "day_of_week": day_of_week } }
 

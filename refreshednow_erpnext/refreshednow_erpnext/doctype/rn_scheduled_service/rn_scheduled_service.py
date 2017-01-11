@@ -110,13 +110,11 @@ class RNScheduledService(Document):
 				frappe.throw("This service overlaps with {0}".format(ss.name))
 
 	def validate_schedule_days(self, allow_scheduling_after_days=1, allow_scheduling_after_hours=14):
-		#days=1 => disallow scheduling of a service before tomorrow.
-		allowed_date = frappe.utils.datetime.datetime.today() + frappe.utils.datetime.timedelta(days=allow_scheduling_after_days)
+		#days=1 ---> disallow scheduling of a service before tomorrow.
+		allow_scheduling_after_date = frappe.utils.datetime.datetime.today() + frappe.utils.datetime.timedelta(days=allow_scheduling_after_days)
 
- 		print "Starts On", frappe.utils.getdate(self.starts_on), "allowed_date", allowed_date.date()
-
-		if frappe.utils.getdate(self.starts_on) > allowed_date.date():
-			frappe.throw("Services can be scheduled after {0}".format(frappe.utils.data.getdate(allowed_date)))
+		if frappe.utils.getdate(self.starts_on) < allow_scheduling_after_date.date():
+			frappe.throw("Services can be scheduled after {0}".format(frappe.utils.data.getdate(allow_scheduling_after_date)))
 
 	def check_no_of_vehicles(self):
 		if self.vehicle_count <= 0:
