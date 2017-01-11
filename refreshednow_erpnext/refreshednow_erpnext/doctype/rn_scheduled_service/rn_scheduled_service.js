@@ -107,9 +107,10 @@ frappe.ui.form.on('RN Scheduled Service', {
 	customer: function(frm) {
 		if (frm.doc.customer == "") {
 			frm.doc.customer = undefined;
-		}
+		} 
 
 		fetch_and_set_linked_fields(frm);
+		frm.set_value("bill_to", frm.doc.customer);
 	},
 	vehicle: function(frm) {
 		render_vehicles(frm);		
