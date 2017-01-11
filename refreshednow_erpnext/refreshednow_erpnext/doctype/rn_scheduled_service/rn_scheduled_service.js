@@ -39,7 +39,7 @@ frappe.ui.form.on('RN Scheduled Service', {
 				};
 			});	
 		})
-		cur_frm.set_query("contact", function() {
+		cur_frm.set_query("contact_person", function() {
 			return {
 				"filters": {
 					"customer": cur_frm.doc.customer
@@ -101,10 +101,14 @@ frappe.ui.form.on('RN Scheduled Service', {
 		frm.fields_dict.service_address.new_doc = quick_entry_service_address;
 		frm.fields_dict.billing_address.new_doc = quick_entry_billing_address;
 		frm.fields_dict.vehicle.new_doc = quick_entry_vehicle;
-		frm.fields_dict.contact.new_doc = quick_entry_contact;
+		frm.fields_dict.contact_person.new_doc = quick_entry_contact;
 		
 	},
 	customer: function(frm) {
+		if (frm.doc.customer == "") {
+			frm.doc.customer = undefined;
+		}
+
 		fetch_and_set_linked_fields(frm);
 	},
 	vehicle: function(frm) {
@@ -118,7 +122,26 @@ frappe.ui.form.on('RN Scheduled Service', {
 	}, 
 	service_address: function(frm) {
 		erpnext.utils.get_address_display(frm, "service_address", "service_address_display");
+	},
+	contact_person: function(frm) {
+		frappe.db.get_value("Contact", frm.doc.contact_person, "customer", function(r){
+			if (r) {
+				cur_frm.set_value("customer", r.customer);
+				cur_frm.refresh_fields();	
+			} else if (frm.doc.contact_person) { //Display error message only if a contact is selected.
+				frappe.msgprint("No customer linked with this contact.");
+			}
+
+			console.log(r);
+			// if (!r.customer) {
+			// 	frm.set_value("customer", r.customer);
+			// } else {
+			// 	frappe.msgprint("No customer linked with this contact.");
+			// }
+		});
+		erpnext.utils.get_contact_details(frm);
 	}
+
 });
 
 function render_vehicles(frm) {
@@ -182,7 +205,7 @@ function fetch_and_set_linked_fields(frm) {
 		"name", 
 		function(r) {
 			if (r) {
-				frm.set_value("contact", r.name);	
+				frm.set_value("contact_person", r.name);	
 			}
 		}
 	);
@@ -232,7 +255,6 @@ function quick_entry_customer() {
 
 function quick_entry_service_address() {
 	frappe._from_link = this;
-
 	mnt.quick_entry("Address", 
 	function(){}, 
 	{ 
@@ -256,9 +278,6 @@ function quick_entry_billing_address() {
 
 function quick_entry_vehicle() {
 	frappe._from_link = this;
-
-	//console.log(cur_frm.doc.customer);
-
 	mnt.quick_entry("Vehicle", 
 	function(){}, 
 	{ 
@@ -272,9 +291,6 @@ function quick_entry_vehicle() {
 
 function quick_entry_contact() {
 	frappe._from_link = this;
-
-	//console.log(cur_frm.doc.customer);
-
 	mnt.quick_entry("Contact", 
 	function(){}, 
 	{ 
