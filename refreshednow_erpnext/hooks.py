@@ -153,7 +153,9 @@ fixtures = [{"dt":"Custom Script", "filters": [["name", "in", ["Customer-Client"
 		"Vehicle-read_only_onload",
 		"Vehicle-title_field",
 		"Address-address_type-options",
-		"Address-read_only_onload"
+		"Address-read_only_onload",
+        "Contact-search-fields",
+        "Contact-read_only_onload"
 	]]]},
     {"dt": "Workflow", "filters": [["name", "in", [
         "RN Scheduled Service"
