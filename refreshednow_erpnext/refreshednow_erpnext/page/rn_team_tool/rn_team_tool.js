@@ -45,13 +45,14 @@ frappe.pages['rn-team-tool'].on_page_load = function(wrapper) {
 		}
 	)
 
-	//Set default route
-	if (frappe.get_route().length == 1) {
-		frappe.set_route("rn-team-tool", page.fields_dict["day_of_week"].get_value(), "Refreshed Go");
-	}
+	
 }
 
 frappe.pages['rn-team-tool'].on_page_show = function(wrapper) {
+	//Set default route
+	if (frappe.get_route().length == 1) {
+		frappe.set_route("rn-team-tool", wrapper.page.fields_dict["day_of_week"].get_value(), "Refreshed Go");
+	}
 	//render_weekly_calendar(wrapper);
 	var route = frappe.get_route();
 
