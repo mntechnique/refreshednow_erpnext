@@ -440,10 +440,10 @@ def customer_vehicle_onload(self,method):
 	self.get("__onload").customer_vehicle = frappe.get_all("Vehicle", fields=['*'],filters =[["rn_customer", "=", self.name]])
 
 @frappe.whitelist()
-def get_team_members(team_name):
-	members = frappe.db.get_all("RN Team Member", filters={"parent":team_name}, fields=['*'])
+def get_team_members(team_name, day_of_week):
+	members = frappe.db.get_all("RN Team Day Employee", filters={"team":team_name, "day_of_week": day_of_week}, fields=['*'])
 	for member in members:
-		member.update({"member_name": frappe.db.get_value("Employee", member.member, "employee_name")})
+		member.update({"member_name": frappe.db.get_value("Employee", member.employee, "employee_name")})
 
 	return members
 

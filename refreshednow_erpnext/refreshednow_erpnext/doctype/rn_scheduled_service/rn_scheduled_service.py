@@ -13,7 +13,7 @@ class RNScheduledService(Document):
 		self.check_overlap()
 		self.validate_schedule_days()
 		self.check_no_of_vehicles()
-		#self.validate_team_availability()
+		self.validate_team_availability()
 
 	def on_submit(self):
 		self.sales_invoice = self.create_si()
@@ -114,11 +114,7 @@ class RNScheduledService(Document):
 		if self.vehicle_count <= 0:
 			frappe.throw("Must have at least one vehicle for a service.")
 
-	
-	# def validate_team_availability(self):
-	# 	scheduled_services = frappe.get_all("RN Scheduled Service", filters=[["service_type", "=", self.service_type], 
-	# 		["starts_on", "=", self.starts_on], ["name", "!=", self.name]], fields=["*"])
-
-	# 	for service in scheduled_services:
-	# 		if service.team == self.team:
-	# 			frappe.throw("Team {0} is already scheduled for <a href='/desk#Form/{1}/{2}'>{2}</a>. Please select another team.".format(self.team, self.doctype, service.name))	
+	def validate_team_availability(self):
+		allocations = frappe.get_all("RN Team Day Employee", filters={"team": self.team, "day_of_week": frappe.utils.get_datetime(self.starts_on).strftime("%A")})
+		if len(allocations) == 0:
+			frappe.throw("No allocations for this team. <br> Please allocate members to this team using Team Allocation Tool.")

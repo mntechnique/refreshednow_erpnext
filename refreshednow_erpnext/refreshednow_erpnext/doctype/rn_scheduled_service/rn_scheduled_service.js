@@ -141,7 +141,10 @@ function render_team_members(frm) {
 	if (frm.doc.team) {
 		frappe.call({
 			method: "refreshednow_erpnext.api.get_team_members",
-			args: {"team_name": frm.doc.team },
+			args: {
+				"team_name": frm.doc.team, 
+				"day_of_week": moment(cur_frm.doc.starts_on).format("dddd") 
+			},
 			callback: function(r) {
 				//console.log(r);
 				$(frm.fields_dict['team_details_html'].wrapper)
