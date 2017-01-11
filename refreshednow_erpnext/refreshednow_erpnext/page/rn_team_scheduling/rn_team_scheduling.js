@@ -7,6 +7,8 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 	});
 
 
+	
+
 	//Load service items and timings for setting time slots
 	page.service_item_data = [];
 	frappe.call({
@@ -17,11 +19,6 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 		}
 	});
 
-	//Set default route.
-	if (frappe.get_route().length == 1) {
-		frappe.set_route("rn-team-scheduling", "weekly", frappe.datetime.obj_to_user(frappe.datetime.get_today()), "Refreshed Go");
-	}
-
 
 	//Add filter field and restrict to service items.
 	page.add_field(
@@ -29,7 +26,7 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 			fieldtype: "Link",
 			fieldname: "service_type",
 			options: "Item",
-			default: frappe.get_route()[3],
+			default: frappe.get_route()[3] || "Refreshed Go",
 			label: __("Service Type"),
 			reqd: 1,
 			input_css: {"z-index": 1},
@@ -60,7 +57,7 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 			fieldname: "scheduled_date",
 			options: "Item",
 			label: __("Scheduled Date"),
-			default: frappe.datetime.user_to_obj(frappe.get_route()[2]),
+			default: (frappe.get_route()[2] ? frappe.datetime.user_to_obj(frappe.get_route()[2]) : frappe.datetime.get_today()),
 			input_css: {"z-index": 1},
 			change: function() {
 				var selected = $(this).val();
@@ -102,6 +99,11 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 }
 
 frappe.pages['rn-team-scheduling'].on_page_show = function(wrapper) {
+	//Set default route.
+	if (frappe.get_route().length == 1) {
+		frappe.set_route("rn-team-scheduling", "weekly", frappe.datetime.obj_to_user(frappe.datetime.get_today()), "Refreshed Go");
+	}
+
 	//render_weekly_calendar(wrapper);
 	var route = frappe.get_route();
 
