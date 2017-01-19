@@ -495,7 +495,7 @@ def pe_on_cancel(self, method):
 def get_team_tool_data(service_type, day_of_week):
 	teams =  frappe.get_all("RN Team", filters={"service_type":service_type})
 	
-	employees = frappe.get_all("Employee", filters=[["designation", "in", ["Supervisor", "Junior Cleaner", "Senior Cleaner"]]], fields=["name", "employee_name", "designation"]) #TODO: Filter for On-Field employees.
+	employees = frappe.get_all("Employee", filters=[["designation", "in", ["Junior Cleaner", "Senior Cleaner"]]], fields=["name", "employee_name", "designation"]) #TODO: Filter for On-Field employees.
 	team_names = [t.name for t in teams]
 	allocations = frappe.get_all("RN Team Day Employee", filters=[["team", "in", team_names], ["day_of_week", "=", day_of_week]], fields=["*"])
 
