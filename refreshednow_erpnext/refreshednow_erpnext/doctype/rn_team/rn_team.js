@@ -21,10 +21,17 @@ frappe.ui.form.on('RN Team', {
 				}
 			}
 		});
-
+		frm.set_query("supervisor", function() {
+	        return {
+	            "filters": {
+	                "designation": "Supervisor"
+	            }
+	        };
+	    });
 	},
 });
 
 cur_frm.add_fetch("member", "employee_name", "member_name");
 cur_frm.add_fetch("member", "designation", "designation");
 cur_frm.add_fetch("structure", "service_type", "service_type");
+cur_frm.add_fetch("supervisor", "employee_name", "supervisor_name");
