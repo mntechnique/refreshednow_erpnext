@@ -1,48 +1,50 @@
+{% if (data) { %}
 <div id="team-daily-allocation">
-<table class="table table-bordered table-striped table-condensed table-hover">
-	<thead>
-		<tr>
-			<th style="width:20%">Staff</th>
-			{% for (var i=0, l=data.teams.length; i<l; i++) { %}
-				<th style="text-align:center"> {%= data.teams[i].name %}
-				</th>
-			{% } %}
-		</tr>
-	</thead>
-	<tbody>
-		{% for (var j=0, k=data.employees.length; j<k; j++) { %}
+	<table class="table table-bordered table-striped table-condensed table-hover">
+		<thead>
 			<tr>
-				<td>
-					{%= data.employees[j].employee_name %} 
-					<span class="text-muted small">{%= data.employees[j].designation %}</span>
-
-					{% if (data.allocations.filter(function(a) { return a.employee == data.employees[j].name } ).length > 0) { %}
-					<i class="fa fa-times close" data-employee="{%= data.employees[j].name %}" data-dow="{%= data.day_of_week %}"  onclick="cancel_all_allocations(this)"
-					 ></i>
-					 {% } %}
-				</td>
-
-				{% for (var x=0, y=data.teams.length; x<y; x++) { %}
-					<td style="text-align:center">
-						{% 
-							var team_name = data.teams[x].name;
-						 	var emp_name = data.employees[j].name;
-						 	var dow = data.day_of_week;
-
-						 	var found_alloc = data.allocations.filter(function(a) { 
-						 		return (a.team == team_name) && (a.employee == emp_name) && (a.day_of_week == dow);
-							});
-						%}
-
-						{% if (found_alloc.length > 0) { %}
-							<input type="checkbox" data-team="{%= team_name %}" data-employee="{%= emp_name %}" data-dow="{%= dow %}" onclick="checkbox_clicked(this)" checked/>
-						{% } else { %}
-							<input type="checkbox" data-team="{%= team_name %}" data-employee="{%= emp_name %}" data-dow="{%= dow %}" onclick="checkbox_clicked(this)"/>
-						{% } %}
-					</td>
+				<th style="width:20%">Staff</th>
+				{% for (var i=0, l=data.teams.length; i<l; i++) { %}
+					<th style="text-align:center"> {%= data.teams[i].name %}
+					</th>
 				{% } %}
 			</tr>
-		{% } %}
-	</tbody>
-</table>
+		</thead>
+		<tbody>
+			{% for (var j=0, k=data.employees.length; j<k; j++) { %}
+				<tr>
+					<td>
+						{%= data.employees[j].employee_name %} 
+						<span class="text-muted small">{%= data.employees[j].designation %}</span>
+
+						{% if (data.allocations.filter(function(a) { return a.employee == data.employees[j].name } ).length > 0) { %}
+						<i class="fa fa-times close" data-employee="{%= data.employees[j].name %}" data-dow="{%= data.day_of_week %}"  onclick="cancel_all_allocations(this)"
+						 ></i>
+						 {% } %}
+					</td>
+
+					{% for (var x=0, y=data.teams.length; x<y; x++) { %}
+						<td style="text-align:center">
+							{% 
+								var team_name = data.teams[x].name;
+							 	var emp_name = data.employees[j].name;
+							 	var dow = data.day_of_week;
+
+							 	var found_alloc = data.allocations.filter(function(a) { 
+							 		return (a.team == team_name) && (a.employee == emp_name) && (a.day_of_week == dow);
+								});
+							%}
+
+							{% if (found_alloc.length > 0) { %}
+								<input type="checkbox" data-team="{%= team_name %}" data-employee="{%= emp_name %}" data-dow="{%= dow %}" onclick="checkbox_clicked(this)" checked/>
+							{% } else { %}
+								<input type="checkbox" data-team="{%= team_name %}" data-employee="{%= emp_name %}" data-dow="{%= dow %}" onclick="checkbox_clicked(this)"/>
+							{% } %}
+						</td>
+					{% } %}
+				</tr>
+			{% } %}
+		</tbody>
+	</table>
 </div>
+{% } %}

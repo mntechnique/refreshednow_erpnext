@@ -6,21 +6,17 @@ frappe.pages['rn-team-tool'].on_page_load = function(wrapper) {
 		single_column: true
 	});
 
-	frappe.team_tool_page = page;
-
-	
 	page.add_field(
 		{
 			fieldtype: "Link",
 			fieldname: "service_type",
 			options: "Item",
 			label: __("Service Type"),
-			default: frappe.get_route()[2] || "Refreshed Go",
 			reqd: 1,
 			input_css: {"z-index": 1},
 			change: function(event) {
 				build_route(wrapper);
-			},
+			}
 		}
 	);
 	page.fields_dict["service_type"].get_query = function() {
@@ -35,42 +31,26 @@ frappe.pages['rn-team-tool'].on_page_load = function(wrapper) {
 			fieldtype: "Select",
 			fieldname: "day_of_week",
 			options: "Sunday\nMonday\nTuesday\nWednesday\nThursday\nFriday\nSaturday",
-			default: "Monday",
 			label: __("Day of Week"),
-			reqd: 1,
 			input_css: {"z-index": 1},
 			change: function(event) {
 				build_route(wrapper);
 			},
 		}
 	)
-
-	
 }
 
 frappe.pages['rn-team-tool'].on_page_show = function(wrapper) {
-	//Set default route
-	if (frappe.get_route().length == 1) {
-		frappe.set_route("rn-team-tool", wrapper.page.fields_dict["day_of_week"].get_value(), "Refreshed Go");
-	}
-	//render_weekly_calendar(wrapper);
+	
+	//render_weekly_calendar(wrapper);	
 	var route = frappe.get_route();
 
 	var day_of_week = route[1];
 	var service_type = route[2];
 
-	render_allocations(service_type, day_of_week);
+	render_allocations(service_type, day_of_week, wrapper);
+
 }
-
-// frappe.pages['rn-team-tool'].refresh = function(wrapper) {
-// 	var content = frappe.team_tool_page.wrapper.find(".page-content");
-
-// 	cb = frappe.team_tool_page.wrapper.find("input[type='checkbox']");
-
-// 	if (cb) {
-// 		console.log("checkboxes", cb);
-// 	}
-// }
 
 function build_route(wrapper) { //, show_daily="daily") {
 	var service_type = wrapper.page.fields_dict['service_type'].$input.val();
@@ -85,7 +65,9 @@ function build_route(wrapper) { //, show_daily="daily") {
 	};
 }
 
-function render_allocations(service_type, day_of_week) {
+function render_allocations(service_type, day_of_week, wrapper) {
+	page = wrapper.page;
+
 	frappe.call({
 		method: "refreshednow_erpnext.api.get_team_tool_data",
 		args: {
@@ -95,19 +77,18 @@ function render_allocations(service_type, day_of_week) {
 		freeze: true,
 		freeze_message: __("Retrieving..."),
 		callback: function(r) {
-			var content = frappe.team_tool_page.wrapper.find(".page-content");
-			frappe.team_tool_page.wrapper.find("#team-daily-allocation").remove();
-			content.append(frappe.render_template("team_allocation_view", r.message));
+			page.wrapper.find("#team-daily-allocation").remove();
+			page.wrapper.find(".alert-danger").remove();
+
+			if (r.message.data) {
+				page.main.after(frappe.render_template("team_allocation_view", r.message));
+			} else {
+				page.main.after('<div class="alert alert-danger" role="alert">Please select both Service Type and Day of Week.</div>');
+			}
 		}
 	});
 }
 
-// function checkboxes_rendered() {
-// 	var cb = frappe.team_tool_page.wrapper.find("input[type='checkbox']");
-// 	if (cb) {
-// 		console.log("checkboxes", cb);
-// 	}
-// }
 
 function checkbox_clicked(cb) {
 	frappe.call({
@@ -120,7 +101,6 @@ function checkbox_clicked(cb) {
 		freeze: true,
 		freeze_message: __("Updating allocation..."),
 		callback: function(r) {
-			console.log(r);
 			if (r.message && r.message.exc) {
 				frappe.msgprint(r.message.exc);
 				$(cb).removeAttr("checked");

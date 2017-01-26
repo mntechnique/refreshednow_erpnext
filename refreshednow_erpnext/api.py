@@ -18,14 +18,11 @@ def rn_events_test(start, end, filters=None):
 	return events
 
 @frappe.whitelist()
-def rn_events(start, end, filters=None):
-	service_item = None
-
-	filters = json.loads(filters)
-
+def rn_events(start=None, end=None, filters=None):
 	slots = []
 
-	if filters.get("service_type"):
+	if filters:
+		filters = json.loads(filters)
 		service_item = frappe.get_doc("Item", filters["service_type"])
 		service_date = frappe.utils.data.get_datetime(filters["scheduled_date"]) or frappe.utils.datetime.datetime.today()
 
@@ -67,7 +64,6 @@ def rn_events(start, end, filters=None):
 			#print iter_date
 
 			iter_date = iter_date + frappe.utils.datetime.timedelta(days=1)
-
 
 	return slots
 
@@ -492,14 +488,17 @@ def pe_on_cancel(self, method):
 
 #Team Tool
 @frappe.whitelist()
-def get_team_tool_data(service_type, day_of_week):
-	teams =  frappe.get_all("RN Team", filters={"service_type":service_type})
-	
-	employees = frappe.get_all("Employee", filters=[["designation", "in", ["Junior Cleaner", "Senior Cleaner"]]], fields=["name", "employee_name", "designation"]) #TODO: Filter for On-Field employees.
-	team_names = [t.name for t in teams]
-	allocations = frappe.get_all("RN Team Day Employee", filters=[["team", "in", team_names], ["day_of_week", "=", day_of_week]], fields=["*"])
+def get_team_tool_data(service_type=None, day_of_week=None):
+	out = {"data": None}
 
-	out = {"data": { "teams": teams, "employees" : employees, "allocations": allocations, "day_of_week": day_of_week } }
+	if service_type and day_of_week:
+		teams =  frappe.get_all("RN Team", filters={"service_type":service_type})
+		
+		employees = frappe.get_all("Employee", filters=[["designation", "in", ["Junior Cleaner", "Senior Cleaner"]]], fields=["name", "employee_name", "designation"]) #TODO: Filter for On-Field employees.
+		team_names = [t.name for t in teams]
+		allocations = frappe.get_all("RN Team Day Employee", filters=[["team", "in", team_names], ["day_of_week", "=", day_of_week]], fields=["*"])
+
+		out = {"data": { "teams": teams, "employees" : employees, "allocations": allocations, "day_of_week": day_of_week } }
 
 	return out
 
