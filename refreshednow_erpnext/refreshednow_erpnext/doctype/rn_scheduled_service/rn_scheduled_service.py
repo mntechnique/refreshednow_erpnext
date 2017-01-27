@@ -101,8 +101,8 @@ class RNScheduledService(Document):
 			starts_on = frappe.utils.data.get_datetime(self.starts_on)
 			ends_on = frappe.utils.data.get_datetime(self.ends_on)
 
-			if ss.team == self.team:
-				frappe.throw("Team {0} is already scheduled for <a href='/desk#Form/{1}/{2}'>{2}</a>. Please select another team.".format(self.team, self.doctype, ss.name))
+			# if ss.team == self.team:
+			# 	frappe.throw("Team {0} is already scheduled for <a href='/desk#Form/{1}/{2}'>{2}</a>. Please select another team.".format(self.team, self.doctype, ss.name))
 
 			if (starts_on > ss.starts_on and starts_on < ss.ends_on) or \
 				(ends_on > ss.starts_on and ends_on < ss.ends_on) or \

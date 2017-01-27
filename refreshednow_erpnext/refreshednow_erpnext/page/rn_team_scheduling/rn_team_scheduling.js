@@ -29,7 +29,6 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 			fieldname: "service_type",
 			options: "Item",
 			label: __("Service Type"),
-			reqd: 1,
 			input_css: {"z-index": 1},
 			change: function(event) {
 				var selected = $(this).val();
@@ -58,7 +57,6 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 			fieldname: "scheduled_date",
 			options: "Item",
 			label: __("Scheduled Date"),
-			reqd: 1,
 			input_css: {"z-index": 1},
 			change: function() {
 				var selected = $(this).val();
@@ -89,8 +87,10 @@ frappe.pages['rn-team-scheduling'].on_page_show = function(wrapper) {
 
 	var scheduled_date = route[2];
 	var service_type = route[3];
-	var scheduled_time = route[4] ? route[4] : null;
-
+	var scheduled_time = route[4];
+	// if (route[1] && (route[1] == "daily")) { 
+	// 	
+	// }
 	render_calendars(wrapper, service_type, scheduled_date, scheduled_time);
 }
 
@@ -348,14 +348,15 @@ function build_route(wrapper, rn_view) { //, show_daily="daily") {
 	if (rn_view == "daily") {
 		frappe.set_route("rn-team-scheduling", "daily", scheduled_date, service_type, timeslot);
 	} else if (rn_view == "weekly") {
-		frappe.set_route("rn-team-scheduling", "weekly", scheduled_date, service_type, timeslot);
+		frappe.set_route("rn-team-scheduling", "weekly", scheduled_date, service_type);
 	}
 	
+	//Force page refresh
 	if (frappe.get_route() == initial_route) {
 		frappe.set_route(frappe.get_route());
 	};
-	//frappe.set_re_route(frappe.get_route());
 }
+
 
 function on_day_click(date, service_type, team, wrapper) {
 	var service_item = wrapper.page.service_item_data.filter(function(item) { return item.item_code == service_type})[0]

@@ -41,7 +41,7 @@ frappe.pages['rn-team-tool'].on_page_load = function(wrapper) {
 }
 
 frappe.pages['rn-team-tool'].on_page_show = function(wrapper) {
-	
+	console.log("Wrapper", wrapper);
 	//render_weekly_calendar(wrapper);	
 	var route = frappe.get_route();
 
@@ -105,7 +105,7 @@ function checkbox_clicked(cb) {
 				frappe.msgprint(r.message.exc);
 				$(cb).removeAttr("checked");
 			} else {
-				frappe.pages['rn-team-tool'].on_page_show();
+				frappe.pages['rn-team-tool'].on_page_show(cur_page.page);
 			}	
 		}
 	});
