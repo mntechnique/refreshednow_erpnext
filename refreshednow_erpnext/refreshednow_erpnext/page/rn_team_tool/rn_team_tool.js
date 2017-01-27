@@ -15,7 +15,7 @@ frappe.pages['rn-team-tool'].on_page_load = function(wrapper) {
 			reqd: 1,
 			input_css: {"z-index": 1},
 			change: function(event) {
-				build_route(wrapper);
+				build_route_team_tool(wrapper);
 			}
 		}
 	);
@@ -34,7 +34,7 @@ frappe.pages['rn-team-tool'].on_page_load = function(wrapper) {
 			label: __("Day of Week"),
 			input_css: {"z-index": 1},
 			change: function(event) {
-				build_route(wrapper);
+				build_route_team_tool(wrapper);
 			},
 		}
 	)
@@ -52,7 +52,7 @@ frappe.pages['rn-team-tool'].on_page_show = function(wrapper) {
 
 }
 
-function build_route(wrapper) { //, show_daily="daily") {
+function build_route_team_tool(wrapper) { //, show_daily="daily") {
 	var service_type = wrapper.page.fields_dict['service_type'].$input.val();
 	var day_of_week = wrapper.page.fields_dict['day_of_week'].$input.val();
 
