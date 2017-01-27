@@ -103,6 +103,7 @@ frappe.ui.form.on('RN Scheduled Service', {
 		frm.fields_dict.vehicle.new_doc = quick_entry_vehicle;
 		frm.fields_dict.contact_person.new_doc = quick_entry_contact;
 		
+		if (!frm.doc.vehicle_count) { frm.set_value("vehicle_count", 1); }
 	},
 	customer: function(frm) {
 		if (frm.doc.customer == "") {
