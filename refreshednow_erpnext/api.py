@@ -3,7 +3,7 @@ from frappe import _
 import json
 import calendar
 #from datetime import date, datetime, timedelta
-
+from frappe.desk.reportview import get_match_cond
 
 @frappe.whitelist()
 def rn_events_test(start, end, filters=None):
@@ -555,5 +555,27 @@ def get_availability_for_team_dow(team, day_of_week):
 # 	if len(scheduled_services) > 0:
 
 
-
-
+# searches for customer
+@frappe.whitelist()
+def customer_query(doctype, txt, searchfield, start, page_len, filters):
+	return frappe.db.sql("""select cust.name, cont.phone, cont.mobile_no from `tabCustomer` as cust 
+		left outer join (select phone, mobile_no, customer from tabCustomer inner join tabContact on `tabCustomer`.name = customer) as cont 
+		on cust.name = cont.customer
+		where
+			({key} like %(txt)s
+				or cust.name like %(txt)s 
+				or cont.phone like %(txt)s 
+				or cont.mobile_no like %(txt)s)
+				and disabled=0 
+		order by
+			if(locate(%(_txt)s, cust.name), locate(%(_txt)s, cust.name), 99999),
+			idx desc,
+			cust.name
+		limit %(start)s, %(page_len)s""".format(**{
+			"key": searchfield
+		}), {
+			'txt': "%%%s%%" % txt,
+			'_txt': txt.replace("%", ""),
+			'start': start,
+			'page_len': page_len
+		})

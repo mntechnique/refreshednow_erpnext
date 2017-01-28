@@ -22,6 +22,11 @@ frappe.ui.form.on('RN Scheduled Service', {
 				};
 			});	
 		})
+		cur_frm.set_query("customer", function() {
+			return {
+				"query": "refreshednow_erpnext.api.customer_query"
+			};
+		});
 		cur_frm.set_query("contact_person", function() {
 			return {
 				"filters": {
@@ -49,7 +54,7 @@ frappe.ui.form.on('RN Scheduled Service', {
 			return {
 				"filters": {
 					"customer": frm.doc.customer,
-					"address_type": "Service"
+					"address_type": "Billing"
 				}
 			};
 		});
@@ -75,10 +80,11 @@ frappe.ui.form.on('RN Scheduled Service', {
 		if (!frm.doc.vehicle_count) { frm.set_value("vehicle_count", 1); }
 	},
 	customer: function(frm) {
+		clear_fields_on_customer_change();
 		if (frm.doc.customer) {
 			fetch_and_set_linked_fields(frm);
 			frm.set_value("bill_to", frm.doc.customer);
-		} else{
+		} else {
 			frm.doc.customer = undefined; //REQD
 		}
 	},
@@ -94,21 +100,24 @@ frappe.ui.form.on('RN Scheduled Service', {
 	service_address: function(frm) {
 		erpnext.utils.get_address_display(frm, "service_address", "service_address_display");
 	},
-	contact_person: function(frm) {
-		if(!frm.doc.contact_person) {
-			clear_fields_on_contact_change()
-		} else {
-			frappe.db.get_value("Contact", frm.doc.contact_person, "customer", function(r){
-				if (r) {
-					cur_frm.set_value("customer", r.customer);
-					cur_frm.refresh_fields();
-				} else if (frm.doc.contact_person) { //Display error message only if a contact is selected.
-					frappe.msgprint("No customer linked with this contact.");
-				}
-			});
-			erpnext.utils.get_contact_details(frm);
-		}
+	billing_address_same_as_service: function(frm) {
+		if (frm.doc.billing_address_same_as_service) frm.set_value("billing_address", "");
 	}
+	// contact_person: function(frm) {
+	// 	if(!frm.doc.contact_person) {
+	// 		cur_frm.set_value("customer", undefined);
+	// 	} else {
+	// 		frappe.db.get_value("Contact", frm.doc.contact_person, "customer", function(r){
+	// 			if (r) {
+	// 				cur_frm.set_value("customer", r.customer);
+	// 				cur_frm.refresh_fields();
+	// 			} else if (frm.doc.contact_person) { //Display error message only if a contact is selected.
+	// 				frappe.msgprint("No customer linked with this contact.");
+	// 			}
+	// 		});
+	// 		erpnext.utils.get_contact_details(frm);
+	// 	}
+	// }
 });
 
 function render_vehicles(frm) {
@@ -207,8 +216,8 @@ function quick_entry_service_address() {
 	mnt.quick_entry("Address", 
 	function(){}, 
 	{ 
-		"address_title":  this.$input.val() || (cur_frm.doc.customer + "-Service"),
-		"address_type": "Service",
+		"address_title":  this.$input.val() || (cur_frm.doc.customer),
+		"address_type": "Billing",
 		"customer": cur_frm.doc.customer
 	});
 }
@@ -219,7 +228,7 @@ function quick_entry_billing_address() {
 	mnt.quick_entry("Address", 
 	function(){}, 
 	{ 
-		"address_title": this.$input.val() || (cur_frm.doc.customer + "-Billing"),
+		"address_title": this.$input.val() || (cur_frm.doc.customer),
 		"address_type": "Billing",
 		"customer": cur_frm.doc.customer
 	});
@@ -249,14 +258,13 @@ function quick_entry_contact() {
 	});
 }
 
-function clear_fields_on_contact_change() {
-	cur_frm.set_value("customer", "");
+function clear_fields_on_customer_change() {
+	console.log("Clearing");
+	cur_frm.set_value("contact_person", "");
 	cur_frm.set_value("contact_display", "");
-	cur_frm.set_value("customer", "");
 	cur_frm.set_value("bill_to", "");
 	cur_frm.set_value("contact_phone", "");
 	cur_frm.set_value("contact_email", "");
 	cur_frm.set_value("service_address", "");
-	cur_frm.set_value("billing_address", "");
 	cur_frm.set_value("billing_address", "");
 }
