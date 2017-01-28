@@ -126,5 +126,5 @@ class RNScheduledService(Document):
 			frappe.throw("No allocations for this team. <br> Please allocate members to this team using Team Allocation Tool.")
 
 	def validate_address(self):
-		if self.billing_address_same_as_service and not self.billing_address:
+		if not self.billing_address_same_as_service and not self.billing_address:
 			frappe.throw("Please set the billing address.")

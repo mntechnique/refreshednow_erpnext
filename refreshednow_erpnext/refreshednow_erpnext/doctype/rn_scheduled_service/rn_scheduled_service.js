@@ -109,7 +109,6 @@ frappe.ui.form.on('RN Scheduled Service', {
 			erpnext.utils.get_contact_details(frm);
 		}
 	}
-
 });
 
 function render_vehicles(frm) {
