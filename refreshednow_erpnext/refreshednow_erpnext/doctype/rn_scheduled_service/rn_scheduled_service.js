@@ -12,23 +12,6 @@ frappe.ui.form.on('RN Scheduled Service', {
 			frappe.set_route("rn-team-scheduling");
 		});
 
-		
-		// //Set sales order if exists.
-		// frappe.db.get_value("Sales Order", {"rn_scheduled_service": cur_frm.doc.name}, "name", function(r) {
-		//     if (r) {
-		//         cur_frm.set_value("sales_order", r.name);
-		//     } else {
-		//     	add_make_so_button(cur_frm);
-		//     }
-		// });
-
-		// //Set sales order if exists.
-		// frappe.db.get_value("Sales Invoice", {"rn_scheduled_service": cur_frm.doc.name}, "name", function(r) {
-		//     if (r) {
-		//         cur_frm.set_value("sales_invoice", r.name);
-		//     }
-		// });
-
 		//Show service items only.
 		frappe.db.get_value("RN Settings", "RN Settings", "rn_service_item_group", function(r) {
 			cur_frm.set_query("service_type", function() {
@@ -77,21 +60,7 @@ frappe.ui.form.on('RN Scheduled Service', {
 				}
 			};
 		});
-		// //Set sales order if exists.
-		// frappe.db.get_value("Sales Order", {"rn_scheduled_service": cur_frm.doc.name}, "name", function(r) {
-		//     if (r) {
-		//         cur_frm.set_value("sales_order", r.name);
-		//     } else {
-		//     	add_make_so_button(cur_frm);
-		//     }
-		// });
-
-		// //Set sales order if exists.
-		// frappe.db.get_value("Sales Invoice", {"rn_scheduled_service": cur_frm.doc.name}, "name", function(r) {
-		//     if (r) {
-		//         cur_frm.set_value("sales_invoice", r.name);
-		//     }
-		// });
+		
 
 		render_vehicles(frm);
 		render_team_members(frm);
@@ -106,12 +75,12 @@ frappe.ui.form.on('RN Scheduled Service', {
 		if (!frm.doc.vehicle_count) { frm.set_value("vehicle_count", 1); }
 	},
 	customer: function(frm) {
-		if (frm.doc.customer == "") {
-			frm.doc.customer = undefined;
-		} 
-
-		fetch_and_set_linked_fields(frm);
-		frm.set_value("bill_to", frm.doc.customer);
+		if (frm.doc.customer) {
+			fetch_and_set_linked_fields(frm);
+			frm.set_value("bill_to", frm.doc.customer);
+		} else{
+			frm.doc.customer = undefined; //REQD
+		}
 	},
 	vehicle: function(frm) {
 		render_vehicles(frm);		
@@ -126,15 +95,19 @@ frappe.ui.form.on('RN Scheduled Service', {
 		erpnext.utils.get_address_display(frm, "service_address", "service_address_display");
 	},
 	contact_person: function(frm) {
-		frappe.db.get_value("Contact", frm.doc.contact_person, "customer", function(r){
-			if (r) {
-				cur_frm.set_value("customer", r.customer);
-				cur_frm.refresh_fields();
-			} else if (frm.doc.contact_person) { //Display error message only if a contact is selected.
-				frappe.msgprint("No customer linked with this contact.");
-			}
-		});
-		erpnext.utils.get_contact_details(frm);
+		if(!frm.doc.contact_person) {
+			clear_fields_on_contact_change()
+		} else {
+			frappe.db.get_value("Contact", frm.doc.contact_person, "customer", function(r){
+				if (r) {
+					cur_frm.set_value("customer", r.customer);
+					cur_frm.refresh_fields();
+				} else if (frm.doc.contact_person) { //Display error message only if a contact is selected.
+					frappe.msgprint("No customer linked with this contact.");
+				}
+			});
+			erpnext.utils.get_contact_details(frm);
+		}
 	}
 
 });
@@ -217,24 +190,6 @@ function render_timeslot(frm) {
 				.html(timeslot_html);
 }
 
-// function add_make_so_button(frm) {
-// 	if ((!frm.doc.sales_order) && (frm.doc.docstatus == 1)) {
-// 		frm.add_custom_button(__("Sales Order"), function() {
-// 			frappe.call({
-// 				method: "create_so",
-// 				doc: cur_frm.doc,
-// 				callback: function(r){
-// 					if (r) {
-// 						cur_frm.set_value("sales_order", r.message);
-// 						frappe.show_alert("Sales Order " + r.message + " created successfully.", 5);
-// 						cur_frm.refresh();
-// 					}
-// 				}
-// 			})
-// 		},__("Make"));
-// 	}
-// }
-
 function quick_entry_customer() {
 	frappe._from_link = this;
 
@@ -293,4 +248,16 @@ function quick_entry_contact() {
 		"last_name": this.$input.val().split(" ")[1] || "",
 		"customer": cur_frm.doc.customer,
 	});
+}
+
+function clear_fields_on_contact_change() {
+	cur_frm.set_value("customer", "");
+	cur_frm.set_value("contact_display", "");
+	cur_frm.set_value("customer", "");
+	cur_frm.set_value("bill_to", "");
+	cur_frm.set_value("contact_phone", "");
+	cur_frm.set_value("contact_email", "");
+	cur_frm.set_value("service_address", "");
+	cur_frm.set_value("billing_address", "");
+	cur_frm.set_value("billing_address", "");
 }

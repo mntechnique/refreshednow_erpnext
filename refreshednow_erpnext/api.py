@@ -543,3 +543,17 @@ def get_availability_for_team_dow(team, day_of_week):
 	allocations = frappe.get_all("RN Team Day Employee", filters={"team":team, "day_of_week":day_of_week})
 	if len(allocations) == 0:
 		return {"exc": "No available team members for this slot."}
+
+# @frappe.whitelist()
+# def get_team_availability(team, slot_date, slot_start_time, slot_end_time):
+# 	get_availability_for_team_dow(team, day_of_week)
+
+
+# 	#slot_start = slot_date 
+
+# 	scheduled_services = frappe.get_all("RN Scheduled Service", filters={"starts_on": slot_start, "ends_on": slot_end}, fields=['*'])
+# 	if len(scheduled_services) > 0:
+
+
+
+
