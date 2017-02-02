@@ -608,7 +608,11 @@ def prepare_bulk_print_html(names):
 	ss_list = []
 
 	for name in names:
-		ss_list.append(frappe.get_doc("RN Scheduled Service", name))
+		ss = frappe.get_doc("RN Scheduled Service", name)
+		employee = frappe.db.get_value("RN Team Day Employee", {"team":ss.team,"day_of_week":calendar.day_name[ss.starts_on.weekday()]},"employee")
+		cleaner_name = frappe.db.get_value("Employee", employee, "employee_name")
+		ss.update({"cleaner":cleaner_name})
+		ss_list.append(ss)
 
 	html_params = { "ss_list": ss_list }
 	final_html = frappe.render_template("refreshednow_erpnext/templates/includes/refreshed_jobsheet.html", html_params)
