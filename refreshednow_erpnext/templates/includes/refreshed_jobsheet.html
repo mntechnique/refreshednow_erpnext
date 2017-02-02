@@ -1,1 +1,46 @@
-<h1>Hello Print</h1>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#ccc;}
+.tg td{font-family:Arial, sans-serif;font-size:10px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#fff;}
+.tg th{font-family:Arial, sans-serif;font-size:10px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
+.tg .tg-yw4l{vertical-align:top}
+</style>
+
+<h1>Service Schedule</h1>
+<hr>
+{% for ss in ss_list %}
+<table class="tg">
+  <tr>
+    <th class="tg-yw4l" style="width:15%">Starts On</th>
+    <th class="tg-yw4l" style="width:85%">{{ss.starts_on}}</th>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">Name</td>
+    <td class="tg-yw4l">{{ss.customer}}</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">Address</td>
+    <td class="tg-yw4l">{{ss.service_address_display}}</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">Number</td>
+    <td class="tg-yw4l"></td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">Comments</td>
+    <td class="tg-yw4l">{{ss.remarks or "-"}}</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">Cleaner</td>
+    <td class="tg-yw4l"></td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">Cleaner Sign</td>
+    <td class="tg-yw4l"></td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">Supervisor Sign</td>
+    <td class="tg-yw4l"></td>
+  </tr>
+</table>
+<hr>
+{% endfor %}

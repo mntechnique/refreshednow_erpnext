@@ -4,6 +4,8 @@ import json
 import calendar
 #from datetime import date, datetime, timedelta
 from frappe.desk.reportview import get_match_cond
+import json, pdfkit, os
+from frappe.utils.pdf import get_pdf
 
 @frappe.whitelist()
 def rn_events_test(start, end, filters=None):
@@ -583,8 +585,8 @@ def customer_query(doctype, txt, searchfield, start, page_len, filters):
 @frappe.whitelist()
 def print_job_sheet(names):
 	if not frappe.has_permission("RN Scheduled Service", "write"):
-	frappe.throw(_("Not permitted"), frappe.PermissionError)
-
+		frappe.throw(_("Not permitted"), frappe.PermissionError)
+	
 	if len(names) == 0:
 		frappe.msgprint("No rows selected.")
 	
@@ -602,18 +604,13 @@ def print_job_sheet(names):
 
 def prepare_bulk_print_html(names):
 	names = names.split(",")
-
-	if len(names) > 4:
-		frappe.throw("The system cannot print more than 4 Senior Citizen records at a time.")
-
 	html = ""
-	sc_list = []
+	ss_list = []
 
 	for name in names:
-		sc_list.append(frappe.get_doc("Dignity Senior Citizen", name))
+		ss_list.append(frappe.get_doc("RN Scheduled Service", name))
 
-	has_sc_with_disease = [sc for sc in sc_list if (sc.allergic_to or sc.disease or sc.medication)]
-	html_params = { "sc_list": sc_list, "has_sc_with_disease": has_sc_with_disease }
+	html_params = { "ss_list": ss_list }
 	final_html = frappe.render_template("refreshednow_erpnext/templates/includes/refreshed_jobsheet.html", html_params)
 
 	return final_html
