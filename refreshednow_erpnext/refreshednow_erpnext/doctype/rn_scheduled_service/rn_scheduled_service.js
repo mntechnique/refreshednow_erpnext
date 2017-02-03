@@ -102,8 +102,8 @@ frappe.ui.form.on('RN Scheduled Service', {
 	},
 	billing_address_same_as_service: function(frm) {
 		if (frm.doc.billing_address_same_as_service) frm.set_value("billing_address", "");
-	}
-	// contact_person: function(frm) {
+	},
+	contact_person: function(frm) {
 	// 	if(!frm.doc.contact_person) {
 	// 		cur_frm.set_value("customer", undefined);
 	// 	} else {
@@ -117,7 +117,17 @@ frappe.ui.form.on('RN Scheduled Service', {
 	// 		});
 	// 		erpnext.utils.get_contact_details(frm);
 	// 	}
-	// }
+		frappe.db.get_value(
+			"Contact", 
+			frm.doc.contact_person, 
+			"phone", 
+			function(r) {
+				if (r) {
+					frm.set_value("contact_phone", r.phone);	
+				}
+			}
+		);
+	}
 });
 
 function render_vehicles(frm) {
