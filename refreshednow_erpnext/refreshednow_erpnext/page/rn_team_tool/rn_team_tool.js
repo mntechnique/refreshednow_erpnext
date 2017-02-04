@@ -121,7 +121,7 @@ function cancel_all_allocations(cross) {
 		freeze: true,
 		freeze_message: __("Cancelling allocations for " + $(cross).attr("data-dow")),
 		callback: function(r) {
-			frappe.pages['rn-team-tool'].on_page_show();
+			frappe.pages['rn-team-tool'].on_page_show(cur_page.page);
 		}
 	});	
 }

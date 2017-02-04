@@ -144,7 +144,7 @@ def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1)): #, brea
 
 # 	# out.append(frappe._dict({"start":break_start.isoformat(), "end":break_end.isoformat(), "type": "break"}))
 
- 	return out
+	return out
 
 
 # def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1), break_time="12:00:00", break_duration=frappe.utils.datetime.timedelta(minutes=30)):
@@ -286,16 +286,33 @@ def get_rn_daily_resources(filters):
 
 	filters = json.loads(filters)
 
-	# for x in xrange(1,10):
-	# 	print "Filters for resources:", filters
+	for x in xrange(1,10):
+		print "Filters for resources:", filters
 
 	out_teams = []
 	teams_by_service = frappe.get_all("RN Team", filters={ "service_type": filters["service_type"] }, fields=['name'], order_by="name")
 
+	# for team in teams_by_service:
+	# 	out_teams.append({"id":team.name, "title":team.name})
+
+	# return out_teams
+
+	# print "FILTERS", filters
+
+	scheduled_date_time = frappe.utils.get_datetime(filters["scheduled_date"] + ' ' + filters["scheduled_time"])
+	scheduled_dow = scheduled_date_time.strftime("%A")
+
+	#print "Scheduled DT", scheduled_date_time, "DOW", scheduled_dow 
+
 	for team in teams_by_service:
 		out_teams.append({"id":team.name, "title":team.name})
+		if len(frappe.get_all("RN Team Day Employee", {"team": team.name, "day_of_week": scheduled_dow})) > 0:
+			out_teams.append({"id":team.name, "title":team.name})
+		   
+	#print "Teams", out_teams
 
 	return out_teams
+
 
 
 @frappe.whitelist()
@@ -317,7 +334,7 @@ def get_rn_daily_events(start, end, filters=None):
 
 		service_color = "grey"
 		if service.get("workflow_state") == "To Schedule":
-		  	service_color = "#5cbbff"
+			service_color = "#5cbbff"
 		
 		if service.get("workflow_state") == "To Dispatch":
 			service_color = "#ffd55c"
