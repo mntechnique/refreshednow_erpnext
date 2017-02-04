@@ -282,12 +282,12 @@ def get_rn_daily_resources(filters):
 	# 	{ "id": 'd', "title": 'Team 4', "eventColor": 'red' }
 	# ]
 	# return resources
-	print "Get Daily Resources: Filters", filters
+	#print "Get Daily Resources: Filters", filters
 
 	filters = json.loads(filters)
 
-	for x in xrange(1,10):
-		print "Filters for resources:", filters
+	# for x in xrange(1,10):
+	# 	print "Filters for resources:", filters
 
 	out_teams = []
 	teams_by_service = frappe.get_all("RN Team", filters={ "service_type": filters["service_type"] }, fields=['name'], order_by="name")
@@ -305,14 +305,12 @@ def get_rn_daily_resources(filters):
 	#print "Scheduled DT", scheduled_date_time, "DOW", scheduled_dow 
 
 	for team in teams_by_service:
-		out_teams.append({"id":team.name, "title":team.name})
 		if len(frappe.get_all("RN Team Day Employee", {"team": team.name, "day_of_week": scheduled_dow})) > 0:
 			out_teams.append({"id":team.name, "title":team.name})
 		   
 	#print "Teams", out_teams
 
 	return out_teams
-
 
 
 @frappe.whitelist()
