@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 from frappe.utils import add_days, nowdate
+#from frappe.utils.datetime import datetime
 from frappe import _
 
 class RNScheduledService(Document):
@@ -41,11 +42,12 @@ class RNScheduledService(Document):
 		si.company = defaults_temp.get("company")
 		si.customer = self.customer
 
-		# if self.billing_address_same_as_service:
-		# 	si.customer_address = self.service_address
-		# else:
-		# 	si.customer_address = self.billing_address
 
+		#si.rn_service_time_slot = self.starts_on + ", " + self.starts_on + " - " + self.ends_on
+		starts_on = frappe.utils.get_datetime(self.starts_on)
+		ends_on = frappe.utils.get_datetime(self.ends_on)
+
+		si.rn_service_time_slot = frappe.utils.datetime.datetime.strftime(starts_on, "%d-%m-%Y") + '<br>' + frappe.utils.datetime.datetime.strftime(starts_on, "%H:%M %p") + ' - ' + frappe.utils.datetime.datetime.strftime(ends_on, "%H:%M %p")
 
 		if self.billing_address:
 			si.customer_address = self.billing_address
@@ -56,7 +58,6 @@ class RNScheduledService(Document):
 		si.currency = defaults_temp.get("currency")		
 		si.selling_price_list = defaults_temp.get("selling_price_list")
 		si.rn_scheduled_service = self.name
-
 
 		si.append("items", {
 			"item_code": self.service_type,

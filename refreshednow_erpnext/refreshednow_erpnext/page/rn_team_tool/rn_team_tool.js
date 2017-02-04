@@ -5,7 +5,6 @@ frappe.pages['rn-team-tool'].on_page_load = function(wrapper) {
 		title: 'Team Tool',
 		single_column: true
 	});
-
 	page.add_field(
 		{
 			fieldtype: "Link",
