@@ -16,7 +16,7 @@
 {% endif %}
   <tr>
     <th class="tg-yw4l" style="width:10%">Starts On</th>
-    <th class="tg-yw4l" style="width:90%">{{ ss.starts_on.strftime("%A") + ', ' + ss.starts_on.strftime("%d-%b-%Y") + ', ' + ss.starts_on.strftime("%H:%M") + ' to ' + ss.ends_on.strftime("%H:%M") }}</th>
+    <th class="tg-yw4l" style="width:90%"><strong>{{ ss.service_type + " - " }}</strong> {{ ss.starts_on.strftime("%A") + ', ' + ss.starts_on.strftime("%d-%b-%Y") + ', ' + ss.starts_on.strftime("%H:%M") + ' to ' + ss.ends_on.strftime("%H:%M") }}</th>
   </tr>
   <tr>
     <td class="tg-yw4l">Name</td>
@@ -32,7 +32,7 @@
   </tr>
   <tr>
     <td class="tg-yw4l">Comments</td>
-    <td class="tg-yw4l">{{ss.remarks or "-"}}</td>
+    <td class="tg-yw4l">{{ss.notes or "-"}}</td>
   </tr>
   <tr>
     <td class="tg-yw4l">Cleaner</td>
