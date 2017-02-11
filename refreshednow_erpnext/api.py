@@ -492,3 +492,26 @@ def send_sms(mobile_no, message):
 	#print sms_settings.sms_gateway_url, querystring
 	response = requests.request("GET", sms_settings.sms_gateway_url, params=querystring)
 	return response.text
+
+def service_reminder_sms():
+
+	if (frappe.utils.now_datetime().hour < 20):
+		tomorrow = frappe.utils.data.add_days(frappe.utils.nowdate(),1)
+		rnss_list = frappe.get_all("RN Scheduled Service", fields=["*"], filters=[["starts_on", ">=", tomorrow]])
+		hour_before = frappe.utils.get_datetime() - frappe.utils.datetime.timedelta(hours=1)
+		hour_after = frappe.utils.get_datetime() + frappe.utils.datetime.timedelta(hours=1)
+		for s in rnss_list:
+			if frappe.utils.get_datetime(s.starts_on).hour < hour_after and \
+				frappe.utils.get_datetime(s.starts_on).hour > hour_before :
+					sms_message = "We look forward to refreshing your car tomorrow at"
+					sms_message += frappe.utils.data.format_datetime(s.starts_on,"EEEE MMM d 'at' HH a")
+					sms_message += "using"
+					sms_message += s.service_type
+					sms_message += " Thanks for using Refreshed Car Care. "
+					#send_sms(s.contact_phone, sms_message)
+					note = frappe.new_doc("Note")
+					note.title = "SMS Log"+ frappe.utils.nowdate() + frappe.utils.nowtime()
+					note.public = 1
+					note.content = "Sending message to "+ s.contact_phone +"<hr>" + sms_message
+					note.save()
+					frappe.db.commit()

@@ -98,23 +98,11 @@ doc_events = {
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"refreshednow_erpnext.tasks.all"
-# 	],
-# 	"daily": [
-# 		"refreshednow_erpnext.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"refreshednow_erpnext.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"refreshednow_erpnext.tasks.weekly"
-# 	]
-# 	"monthly": [
-# 		"refreshednow_erpnext.tasks.monthly"
-# 	]
-# }
+scheduler_events = {
+	"hourly": [
+		"refreshednow_erpnext.api.service_reminder_sms"
+	]
+}
 
 # Testing
 # -------
