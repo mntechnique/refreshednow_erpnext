@@ -1,5 +1,5 @@
 <style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;border-color:#ccc;font-size:12px;}
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#ccc;font-size:10px;}
 .tg td{font-family:Arial, sans-serif;padding:5px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#fff;}
 .tg th{font-family:Arial, sans-serif;font-weight:normal;padding:5px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
 .tg .tg-yw4l{vertical-align:top}
@@ -16,8 +16,8 @@
     <table class="tg">
   {% endif %}
     <tr>
-      <th class="tg-yw4l" style="width:10%">Starts On</th>
-      <th class="tg-yw4l" style="width:90%"><strong>{{ ss.service_type + " - " }}</strong> {{ ss.starts_on.strftime("%A") + ', ' + ss.starts_on.strftime("%d-%b-%Y") + ', ' + ss.starts_on.strftime("%H:%M") + ' to ' + ss.ends_on.strftime("%H:%M") }}</th>
+      <th class="tg-yw4l" style="width:10%; ">Starts On</th>
+      <th class="tg-yw4l" style="width:90%; font-size:13px;"><strong>{{ ss.service_type + " - " }}</strong> {{ ss.starts_on.strftime("%A") + ', ' + ss.starts_on.strftime("%d-%b-%Y") + ', ' + ss.starts_on.strftime("%H:%M") + ' to ' + ss.ends_on.strftime("%H:%M") }}</th>
     </tr>
     <tr>
       <td class="tg-yw4l">Name</td>
