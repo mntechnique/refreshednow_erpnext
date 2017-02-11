@@ -99,146 +99,17 @@ def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1)): #, brea
 			assert start <= end, "Start time should be before end time"
 
 			while True:
-				#print "Start", start
-
-				#if start >= break_start and start <= break_start + break_duration:
-				
-				# if start >= break_start:
-				# 	context_duration = break_duration
-				# 	slot = frappe._dict({"start":start.isoformat(), "end":(start + context_duration).isoformat(), "type":"break"})
-				# else:
-				#context_duration = duration
 				slot = frappe._dict({"start":start.isoformat(), "end":(start +  duration).isoformat()})
 				
 				actual_slot_count += 1
 					
 				out.append(slot)
 				start +=  duration
-				
-				# print "Start at End of Loop", start, end
-				# print "End condition", start >= end
 
 				if start > end:
 					break
 
-
-	
-# 				# cutoff -= 1
-# 				# if cutoff == 0:
-# 				# 	break
-
-# 	# break_start = frappe.utils.datetime.datetime.combine(hours[0].date(), frappe.utils.get_time(break_time))
-# 	# break_end = break_start + break_duration
-	
-# 	# print "Break Start:", break_start, "Break duration", break_duration, "Break end", break_end
-
-# 	# # for o in out:
-# 	# # 	if (frappe.utils.get_datetime(o.get("start")) > break_start) or break_start > frappe.utils.get_datetime(o.get("start")):
-# 	# # 		out.remove(o)
-
-# 	# for o in out:
-# 	# 	if (frappe.utils.get_datetime(o.get("start")) > break_start and frappe.utils.get_datetime(o.get("start")) < break_end) or \
-# 	# 		(frappe.utils.get_datetime(o.get("end")) > break_start and frappe.utils.get_datetime(o.get("end")) < break_end) or \
-# 	# 		(frappe.utils.get_datetime(o.get("start")) <= break_start and frappe.utils.get_datetime(o.get("end")) >= break_end):
-# 	# 		out.remove(o)
-
-# 	# out.append(frappe._dict({"start":break_start.isoformat(), "end":break_end.isoformat(), "type": "break"}))
-
 	return out
-
-
-# def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1), break_time="12:00:00", break_duration=frappe.utils.datetime.timedelta(minutes=30)):
-# 	"""
-# 	Generate Timeslots based on list of hours and duration
-
-# 	:param hours: list of hours = [frappe.utils.datetime.datetime(2016, 12, 14, 9),
-# 																frappe.utils.datetime.datetime(2016, 12, 14, 18)]
-# 	:param duration: default duration of one hour.
-# 	"""
-
-# 	"""
-	
-# 	"""
-# 	out = []
-
-# 	slots = sorted([(hours[0]) + (hours[1])])
-# 	print "INIT SLOTS", slots
-
-# 	break_start = frappe.utils.datetime.datetime.combine(hours[0].date(), frappe.utils.get_time(break_time))
-
-# 	for start, end in slots:		
-# 		if start != break_start:
-# 			out.append(frappe._dict({"start":start.isoformat(), "end":(start + duration).isoformat()}))
-# 			start += duration
-# 		else
-# 			out.append(frappe._dict({"start":start.isoformat(), "end":(start + break_duration).isoformat(), "type": "break"}))
-# 			start += break_duration
-
-# 		if start >= end:
-# 			print "start>end out", out
-# 			return out		
-
-# 	print "out", out
-# 	return out
-
-	
-# 	# for start, end in ((slots[i][1], slots[i+1][0]) for i in range(len(slots)-1)):
-# 	# 		assert start <= end, "Start time should be before end time"
-# 	# 		while start + duration <= end:
-# 	# 				out.append(frappe._dict({"start":start.isoformat(), "end":(start + duration).isoformat()}))
-# 	# 				start += duration
-
-	
-	
-# 	#print "Break Start:", break_start, "Break duration", break_duration, "Break end", break_end
-
-# 	# for o in out:
-# 	# 	if (frappe.utils.get_datetime(o.get("start")) > break_start) or break_start > frappe.utils.get_datetime(o.get("start")):
-# 	# 		out.remove(o)
-
-# 	# for o in out:
-# 	# 	if (frappe.utils.get_datetime(o.get("start")) > break_start and frappe.utils.get_datetime(o.get("start")) < break_end) or \
-# 	# 		(frappe.utils.get_datetime(o.get("end")) > break_start and frappe.utils.get_datetime(o.get("end")) < break_end) or \
-# 	# 		(frappe.utils.get_datetime(o.get("start")) <= break_start and frappe.utils.get_datetime(o.get("end")) >= break_end):
-# 	# 		out.remove(o)
-
-# 	# out.append(frappe._dict({"start":break_start.isoformat(), "end":break_end.isoformat(), "type": "break"}))
-
-	
-
-# def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1), break_time="12:00:00", break_duration=frappe.utils.datetime.timedelta(minutes=30)):
-# 	"""
-# 	Generate Timeslots based on list of hours and duration
-
-# 	:param hours: list of hours = [frappe.utils.datetime.datetime(2016, 12, 14, 9),
-# 																frappe.utils.datetime.datetime(2016, 12, 14, 18)]
-# 	:param duration: default duration of one hour.
-# 	"""
-# 	actual_slot_count = 0
-
-# 	out = []
-# 	slots = sorted([(hours[0], hours[0])] + [(hours[1], hours[1])])
-# 	for start, end in ((slots[i][1], slots[i+1][0]) for i in range(len(slots)-1)):
-# 			assert start <= end, "Start time should be before end time"
-# 			while start <= end:
-# 					out.append(frappe._dict({"start":start.isoformat(), "end":(start + duration).isoformat()}))
-# 					actual_slot_count += 1
-# 					start += duration
-
-# 	break_start = frappe.utils.datetime.datetime.combine(hours[0].date(), frappe.utils.get_time(break_time))
-# 	break_end = break_start + break_duration
-	
-# 	#print "Break Start:", break_start, "Break duration", break_duration, "Break end", break_end
-# 	print actual_slot_count
-# 	for o in out:
-# 		if (frappe.utils.get_datetime(o.get("start")) > break_start and frappe.utils.get_datetime(o.get("start")) < break_end) or \
-# 			(frappe.utils.get_datetime(o.get("end")) > break_start and frappe.utils.get_datetime(o.get("end")) < break_end) or \
-# 			(frappe.utils.get_datetime(o.get("start")) <= break_start and frappe.utils.get_datetime(o.get("end")) >= break_end):
-# 			out.remove(o)
-
-# 	out.append(frappe._dict({"start":break_start.isoformat(), "end":break_end.isoformat(), "type": "break"}))
-
-# 	return out
 
 @frappe.whitelist()
 def get_settings(fieldname):
@@ -274,44 +145,19 @@ def get_service_item_data():
 
 @frappe.whitelist()
 def get_rn_daily_resources(filters):
-	# resources = []
-	# resources = [
-	# 	{ "id": 'a', "title": 'Team 1' },
-	# 	{ "id": 'b', "title": 'Team 2', "eventColor": 'green' },
-	# 	{ "id": 'c', "title": 'Team 3', "eventColor": 'orange' },
-	# 	{ "id": 'd', "title": 'Team 4', "eventColor": 'red' }
-	# ]
-	# return resources
-	#print "Get Daily Resources: Filters", filters
-
 	filters = json.loads(filters)
-
-	# for x in xrange(1,10):
-	# 	print "Filters for resources:", filters
 
 	out_teams = []
 	teams_by_service = frappe.get_all("RN Team", filters={ "service_type": filters["service_type"] }, fields=['name'], order_by="name")
 
-	# for team in teams_by_service:
-	# 	out_teams.append({"id":team.name, "title":team.name})
-
-	# return out_teams
-
-	# print "FILTERS", filters
-
 	scheduled_date_time = frappe.utils.get_datetime(filters["scheduled_date"] + ' ' + filters["scheduled_time"])
 	scheduled_dow = scheduled_date_time.strftime("%A")
-
-	#print "Scheduled DT", scheduled_date_time, "DOW", scheduled_dow 
 
 	for team in teams_by_service:
 		if len(frappe.get_all("RN Team Day Employee", {"team": team.name, "day_of_week": scheduled_dow})) > 0:
 			out_teams.append({"id":team.name, "title":team.name})
-		   
-	#print "Teams", out_teams
 
 	return out_teams
-
 
 @frappe.whitelist()
 def get_rn_daily_events(start, end, filters=None):
@@ -323,9 +169,6 @@ def get_rn_daily_events(start, end, filters=None):
 		filters=[["service_type", "=", filters["service_type"]], \
 		["starts_on", "=", frappe.utils.data.get_datetime(filters["scheduled_date"] + ' ' + filters["scheduled_time"])],
 		["docstatus", "!=", 2]], fields=['*'])
-
-	# print "Start:", start, "End:", end, "Filters:", filters
-	# print "Services:", scheduled_services
 
 	for service in scheduled_services:
 		print service
@@ -355,15 +198,6 @@ def get_rn_daily_events(start, end, filters=None):
 
 	return out_services
 
-	# events = [
-	# 	{ "id": '1', "resourceId": 'a', "start": '2016-12-09', "end": '2016-12-08', "title": 'event 1' },
-	# 	{ "id": '2', "resourceId": 'a', "start": '2016-12-21T09:00:00', "end": '2016-12-21T10:00:00', "title": 'event 2' },
-	# 	{ "id": '3', "resourceId": 'b', "start": '2016-12-22T11:30:00', "end": '2016-12-22T12:30:00', "title": 'event 3' },
-	# 	{ "id": '4', "resourceId": 'c', "start": '2016-12-22T11:30:00', "end": '2016-12-22T12:30:00', "title": 'event 4' },
-	# 	{ "id": '5', "resourceId": 'd', "start": '2016-12-09T10:00:00', "end": '2016-12-09T10:00:00', "title": 'event 5' }
-	# ]
-	# return events
-
 #Datasource for weekly grid. Available people
 @frappe.whitelist()
 def get_available_teams_for_slot(service_item, start_time):
@@ -379,13 +213,6 @@ def get_available_teams_for_slot(service_item, start_time):
 		allocations = frappe.get_all("RN Team Day Employee", filters={"team":team.name, "day_of_week": frappe.utils.get_datetime(start_time).strftime("%A") })
 		if len(allocations) > 0:
 			no_of_teams_for_service += 1
-
-	#Get Scheduled Services for time by team
-	#no_of_teams_for_service = int(frappe.db.count("RN Team", filters={"service_type": service_item.name})) or 0
-
-	# team_count_by_service = [t.teams for t in get_service_wise_count_of_teams() if t["service_type"] = service_type]
-	# no_of_booked_services = int(frappe.db.count("RN Scheduled Service",
-	# 						filters={ "service_type": service_item.name, "starts_on": start_time}))
 
 	no_of_booked_services = len(frappe.get_all("RN Scheduled Service", \
 		filters=[["service_type", "=", service_item.name], \
@@ -468,22 +295,6 @@ def sales_order_on_submit(self, method):
 def sales_order_on_cancel(self, method):
 	pass
 
-# def si_on_update_after_submit(self, method):
-# 	if self.status == "Paid":
-# 		frappe.msgprint("Si Update on Submit Called")
-# 		rnss = frappe.get_doc("RN Scheduled Service", self.rn_scheduled_service)
-# 		if rnss.workflow_state != "Stopped":
-# 			rnss.workflow_state = "Completed"
-# 			rnss.save()
-# 			frappe.db.commit()
-
-# def si_on_cancel(self, method):
-# 	rnss = frappe.get_doc("RN Scheduled Service", self.rn_scheduled_service)
-# 	if rnss.workflow_state != "Completed":
-# 		rnss.workflow_state = "To Dispatch"
-# 		rnss.save()
-# 		frappe.db.commit()	
-
 def pe_on_submit(self, method):
 	invoices = [inv.reference_name for inv in self.references if inv.reference_doctype == "Sales Invoice"]
 
@@ -561,17 +372,6 @@ def get_availability_for_team_dow(team, day_of_week):
 	allocations = frappe.get_all("RN Team Day Employee", filters={"team":team, "day_of_week":day_of_week})
 	if len(allocations) == 0:
 		return {"exc": "No available team members for this slot."}
-
-# @frappe.whitelist()
-# def get_team_availability(team, slot_date, slot_start_time, slot_end_time):
-# 	get_availability_for_team_dow(team, day_of_week)
-
-
-# 	#slot_start = slot_date 
-
-# 	scheduled_services = frappe.get_all("RN Scheduled Service", filters={"starts_on": slot_start, "ends_on": slot_end}, fields=['*'])
-# 	if len(scheduled_services) > 0:
-
 
 # searches for customer
 @frappe.whitelist()
