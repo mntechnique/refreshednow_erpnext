@@ -630,6 +630,8 @@ def prepare_bulk_print_html(names):
 		ss.update({"cleaner":cleaner_name})
 		ss_list.append(ss)
 
+	ss_list = sorted(ss_list, key=lambda v:v.get("starts_on"))
+
 	html_params = { "ss_list": ss_list }
 	final_html = frappe.render_template("refreshednow_erpnext/templates/includes/refreshed_jobsheet.html", html_params)
 

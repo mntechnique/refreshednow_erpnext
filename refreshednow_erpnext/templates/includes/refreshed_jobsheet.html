@@ -7,45 +7,46 @@
 
 <h1>Service Schedule</h1>
 {% set count_per_page = 1 %}
-{% for ss in ss_list %}
-{% if count_per_page == 3 %}
-  <table class="tg" style="page-break-after: always">
-{% else %}
-  <table class="tg">
-{% endif %}
-  <tr>
-    <th class="tg-yw4l" style="width:10%">Starts On</th>
-    <th class="tg-yw4l" style="width:90%"><strong>{{ ss.service_type + " - " }}</strong> {{ ss.starts_on.strftime("%A") + ', ' + ss.starts_on.strftime("%d-%b-%Y") + ', ' + ss.starts_on.strftime("%H:%M") + ' to ' + ss.ends_on.strftime("%H:%M") }}</th>
-  </tr>
-  <tr>
-    <td class="tg-yw4l">Name</td>
-    <td class="tg-yw4l">{{ss.customer}}</td>
-  </tr>
-  <tr>
-    <td class="tg-yw4l">Address</td>
-    <td class="tg-yw4l">{{ss.service_address_display}}</td>
-  </tr>
-  <tr>
-    <td class="tg-yw4l">Number</td>
-    <td class="tg-yw4l">{{ss.contact_phone or "-"}}</td>
-  </tr>
-  <tr>
-    <td class="tg-yw4l">Comments</td>
-    <td class="tg-yw4l">{{ss.notes or "-"}}</td>
-  </tr>
-  <tr>
-    <td class="tg-yw4l">Cleaner</td>
-    <td class="tg-yw4l">{{ss.cleaner}}</td>
-  </tr>
-  <tr>
-    <td class="tg-yw4l">Cleaner Sign</td>
-    <td class="tg-yw4l"></td>
-  </tr>
-  <tr>
-    <td class="tg-yw4l">Supervisor Sign</td>
-    <td class="tg-yw4l"></td>
-  </tr>
-</table>
-{% set count_per_page = count_per_page + 1 %}
 
+{% for ss in ss_list %}
+  {% if count_per_page == 3 %}
+    {% set count_per_page = 0 %}
+    <table class="tg" style="page-break-after: always">
+  {% else %}
+    <table class="tg">
+  {% endif %}
+    <tr>
+      <th class="tg-yw4l" style="width:10%">Starts On</th>
+      <th class="tg-yw4l" style="width:90%"><strong>{{ ss.service_type + " - " }}</strong> {{ ss.starts_on.strftime("%A") + ', ' + ss.starts_on.strftime("%d-%b-%Y") + ', ' + ss.starts_on.strftime("%H:%M") + ' to ' + ss.ends_on.strftime("%H:%M") }}</th>
+    </tr>
+    <tr>
+      <td class="tg-yw4l">Name</td>
+      <td class="tg-yw4l">{{ss.customer}}</td>
+    </tr>
+    <tr>
+      <td class="tg-yw4l">Address</td>
+      <td class="tg-yw4l">{{ss.service_address_display}}</td>
+    </tr>
+    <tr>
+      <td class="tg-yw4l">Number</td>
+      <td class="tg-yw4l">{{ss.contact_phone or "-"}}</td>
+    </tr>
+    <tr>
+      <td class="tg-yw4l">Comments</td>
+      <td class="tg-yw4l">{{ss.notes or "-"}}</td>
+    </tr>
+    <tr>
+      <td class="tg-yw4l">Cleaner</td>
+      <td class="tg-yw4l">{{ss.cleaner}}</td>
+    </tr>
+    <tr>
+      <td class="tg-yw4l">Cleaner Sign</td>
+      <td class="tg-yw4l"></td>
+    </tr>
+    <tr>
+      <td class="tg-yw4l">Supervisor Sign</td>
+      <td class="tg-yw4l"></td>
+    </tr>
+  </table>
+  {% set count_per_page = count_per_page + 1 %}
 {% endfor %}
