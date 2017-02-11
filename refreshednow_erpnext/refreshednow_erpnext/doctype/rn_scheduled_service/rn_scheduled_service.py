@@ -20,6 +20,12 @@ class RNScheduledService(Document):
 	def on_submit(self):
 		if not self.sales_invoice:
 			self.sales_invoice = self.create_si()
+		sms_message = "Thank you for contacting Refreshed Car Care. "
+		sms_message += "We have taken your booking for "
+		sms_message += self.service_type
+		sms_message += " on "
+		sms_message += frappe.utils.data.format_datetime(self.starts_on,"EEEE MMM d 'at' HH a")
+		#send_sms(self.contact_phone, "")
 
 	def on_cancel(self):
 		linked_si = frappe.db.get_value("Sales Invoice", filters={"rn_scheduled_service": self.name}, fieldname="name")

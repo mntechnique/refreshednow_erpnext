@@ -668,3 +668,24 @@ def rn_get_pdf(html, options=None):
 def cleanup(fname):
 	if os.path.exists(fname):
 		os.remove(fname)
+
+@frappe.whitelist()
+def send_sms(mobile_no, message):
+	import requests
+
+	sms_settings = frappe.get_doc("SMS Settings")
+
+	querystring = {}
+
+	for p in sms_settings.parameters:
+		querystring[p.parameter]=p.value
+
+	querystring.update({
+		"sendername":sms_settings.sms_sender_name,
+		sms_settings.receiver_parameter:mobile_no,
+		sms_settings.message_parameter:message
+	})
+
+	#print sms_settings.sms_gateway_url, querystring
+	response = requests.request("GET", sms_settings.sms_gateway_url, params=querystring)
+	return response.text
