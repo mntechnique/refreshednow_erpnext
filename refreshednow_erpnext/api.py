@@ -350,6 +350,7 @@ def get_rn_daily_events(start, end, filters=None):
 			"resourceId": service.team,
 			"start": service.starts_on.isoformat(),
 			"end": service.ends_on.isoformat(), 
+			"className": "rn-team",
 			"color": service_color })
 
 	return out_services
