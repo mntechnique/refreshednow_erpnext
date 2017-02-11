@@ -410,6 +410,7 @@ function render_daily_event_row(r, wrapper, page_filters) {
 					"resourceId":v["name"],
 					"start": selected_start_time,
 					"end": selected_end_time,
+					"className": "rn-team",
 					"color":"grey"
 				});
 			}
