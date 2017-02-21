@@ -121,7 +121,9 @@ function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultD
 			wrapper.page.fields_dict['scheduled_date'].set_input(calEvent.start.toDate());
 
 			if (calEvent.title == "Break") {
-				frappe.msgprint("Cannot schedule a service during break time.")
+				frappe.msgprint("Cannot schedule a service during break time.");
+			} else if (calEvent.title == "-") {
+				frappe.msgprint("No teams available for this slot.");
 			} else {
 				localStorage.setItem("rn_scheduling_view", "daily");
 				build_route(wrapper, "daily");
