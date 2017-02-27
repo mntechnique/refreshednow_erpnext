@@ -14,7 +14,7 @@ class RNScheduledService(Document):
 	def validate(self):
 		self.validate_address()
 		self.check_overlap()
-		self.validate_schedule_days()
+		self.validate_schedule_days(allow_scheduling_after_days=0)
 		self.check_no_of_vehicles()
 		self.validate_team_availability()
 
@@ -125,7 +125,7 @@ class RNScheduledService(Document):
 		allow_scheduling_after_date = frappe.utils.datetime.datetime.today() + frappe.utils.datetime.timedelta(days=allow_scheduling_after_days)
 
 		if frappe.utils.getdate(self.starts_on) < allow_scheduling_after_date.date():
-			frappe.throw("Services can be scheduled after {0}".format(frappe.utils.data.getdate(allow_scheduling_after_date)))
+			frappe.throw("Services can be scheduled after {0}".format(frappe.utils.datetime.datetime.strftime(frappe.utils.data.getdate(allow_scheduling_after_date), "%d %b %Y")))
 
 	def check_no_of_vehicles(self):
 		if self.vehicle_count <= 0:
