@@ -500,9 +500,9 @@ def service_reminder_sms():
 	sms_message = ""
 	
 	for s in rnss_list:		
-		sms_message = "We look forward to refreshing your car tomorrow at"
-		sms_message += frappe.utils.data.format_datetime(s.starts_on,"EEEE MMM d 'at' HH a")
-		sms_message += "using"
+		sms_message = "We look forward to refreshing your car tomorrow at "
+		sms_message += frappe.utils.data.format_datetime(s.starts_on,"EEEE MMM d 'at' HH:m a")
+		sms_message += " using "
 		sms_message += s.service_type
 		sms_message += " Thanks for using Refreshed Car Care. "
 		print sms_message
@@ -510,13 +510,13 @@ def service_reminder_sms():
 		note = frappe.new_doc("Note")
 		note.title = "SMS Log"+ frappe.utils.nowdate() + frappe.utils.nowtime()
 		note.public = 1
-		note.content = "Sending message to "+ s.contact_phone +"<hr>" + sms_message
+		note.content = "Sending message to " + s.contact_phone or " " + "<hr>" + sms_message
 		note.save()
 		frappe.db.commit()
 
 	#>>>>>>>>>>>>>>>>Check
 	note = frappe.new_doc("Note")
-	note.title = "SMS Func called"+ frappe.utils.nowdate() + frappe.utils.nowtime()
+	note.title = "SMS Func called at "+ frappe.utils.nowdate() + frappe.utils.nowtime() + " for " + s.customer + s.name
 	note.public = 1
 	note.content = "Hourly scheduler invoked" + str(rnss_list)
 	note.save()
