@@ -191,6 +191,6 @@ def fire_sms_on_submit(service_type, starts_on, contact_phone):
 		note = frappe.new_doc("Note")
 		note.title = "SMS Log"+ frappe.utils.nowdate() + frappe.utils.nowtime()
 		note.public = 1
-		note.content = "Sending message to " + contact_phone or " " + "<hr>" + sms_message
+		note.content = "Sending message to " + contact_phone + "<hr>" + sms_message
 		note.save()
 		frappe.db.commit()

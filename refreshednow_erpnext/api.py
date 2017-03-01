@@ -504,21 +504,14 @@ def service_reminder_sms():
 		sms_message += frappe.utils.data.format_datetime(s.starts_on,"EEEE MMM d 'at' HH:m a")
 		sms_message += " using "
 		sms_message += s.service_type
-		sms_message += " Thanks for using Refreshed Car Care. "
+		sms_message += " Thanks for using Refreshed Car Care."
 		print sms_message
-		#send_sms(s.contact_phone, sms_message)
-		note = frappe.new_doc("Note")
-		note.title = "SMS Log"+ frappe.utils.nowdate() + frappe.utils.nowtime()
-		note.public = 1
-		note.content = "Sending message to " + s.contact_phone or " " + "<hr>" + sms_message
-		note.save()
-		frappe.db.commit()
-
-	#>>>>>>>>>>>>>>>>Check
-	note = frappe.new_doc("Note")
-	note.title = "SMS Func called at "+ frappe.utils.nowdate() + frappe.utils.nowtime() + " for " + s.customer + s.name
-	note.public = 1
-	note.content = "Hourly scheduler invoked" + str(rnss_list)
-	note.save()
-	frappe.db.commit()
-	#>>>>>>>>>>>>>>>>Check		
+		if not s.sms_checkbox:
+			frappe.db.set_value("RN Scheduled Service", s.name, sms_checkbox,1)
+			#send_sms(s.contact_phone, sms_message)
+			note = frappe.new_doc("Note")
+			note.title = "SMS Log"+ frappe.utils.nowdate() + frappe.utils.nowtime()
+			note.public = 1
+			note.content = "Sending message to " + s.contact_phone + "<hr>" + sms_message
+			note.save()
+			frappe.db.commit()
