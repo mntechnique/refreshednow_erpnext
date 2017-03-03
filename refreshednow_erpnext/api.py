@@ -494,9 +494,13 @@ def send_sms(mobile_no, message):
 	return response.text
 
 def service_reminder_sms():
-	tomorrow = frappe.utils.data.add_to_date(str(frappe.utils.datetime.datetime.now().replace(minute=0, second=0, microsecond=0)),days=1)
-	t_1 = frappe.utils.data.add_to_date(str(frappe.utils.datetime.datetime.now().replace(minute=56, second=0, microsecond=0)),days=1)
-	rnss_list = frappe.get_all("RN Scheduled Service", fields=["*"], filters=[["starts_on", "Between", [tomorrow,t_1]],["docstatus","=", 1]])
+	# t_1 = frappe.utils.data.add_to_date(tomorrow,hours=1)
+	# rnss_list = frappe.get_all("RN Scheduled Service", fields=["*"], filters=[["starts_on", "Between", [tomorrow,t_1]],["docstatus","=", 1]])
+	# rnss_list = frappe.get_all("RN Scheduled Service", fields=["*"], filters=[["docstatus","=", 1]], limit=5)
+	# tomorrow = frappe.utils.data.add_to_date(str(frappe.utils.datetime.datetime.now().replace(minute=0, second=0, microsecond=0)),days=1)
+
+	tomorrow = frappe.utils.data.add_to_date(str(frappe.utils.datetime.date.today()),days=1)	
+	rnss_list = frappe.db.sql("""select * from `tabRN Scheduled Service` where docstatus=1 and date(starts_on)={start_date}""".format(start_date=tomorrow))	
 	sms_message = ""
 
 	for s in rnss_list:		
