@@ -516,7 +516,7 @@ def service_reminder_sms():
 			note = frappe.new_doc("Note")
 			note.title = "SMS Log"+ frappe.utils.nowdate() + frappe.utils.nowtime()
 			note.public = 1
-			note.content = "Sending message to " + s.contact_phone + "<hr>" + sms_message
+			note.content = "Sending message to " + s.customer + "on" + s.contact_phone + "<hr>" + sms_message
 			note.save()
 			frappe.db.commit()
 			print note.content
