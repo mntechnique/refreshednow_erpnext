@@ -21,7 +21,7 @@ class RNScheduledService(Document):
 	def on_submit(self):
 		if not self.sales_invoice:
 			self.sales_invoice = self.create_si()
-		fire_sms_on_submit(self.service_type,self.starts_on,self.contact_phone)	
+		fire_sms_on_submit(self.service_type,self.starts_on,self.contact_phone)
 
 
 	def on_cancel(self):
@@ -36,12 +36,12 @@ class RNScheduledService(Document):
 		defaults_temp = frappe.defaults.get_defaults()
 
 		#Create a sales order if customer is selected.
-		si = frappe.new_doc("Sales Invoice")	
+		si = frappe.new_doc("Sales Invoice")
 		si.transaction_date = self.starts_on
 
 		if self.bill_to:
-			si.rn_bill_to = self.bill_to 
-			
+			si.rn_bill_to = self.bill_to
+
 		si.company = defaults_temp.get("company")
 		si.customer = self.customer
 
@@ -58,7 +58,7 @@ class RNScheduledService(Document):
 			si.customer_address = self.service_address
 
 		si.delivery_date = add_days(si.transaction_date, 10)
-		si.currency = defaults_temp.get("currency")		
+		si.currency = defaults_temp.get("currency")
 		si.selling_price_list = defaults_temp.get("selling_price_list")
 		si.rn_scheduled_service = self.name
 
@@ -81,14 +81,14 @@ class RNScheduledService(Document):
 		defaults_temp = frappe.defaults.get_defaults()
 
 		#Create a sales order if customer is selected.
-		so = frappe.new_doc("Sales Order")	
+		so = frappe.new_doc("Sales Order")
 		so.transaction_date = self.starts_on
 
 
 		so.company = defaults_temp.get("company")
 		so.customer = self.customer
 		so.delivery_date = add_days(so.transaction_date, 10)
-		so.currency = defaults_temp.get("currency")		
+		so.currency = defaults_temp.get("currency")
 		so.selling_price_list = defaults_temp.get("selling_price_list")
 		so.rn_scheduled_service = self.name
 
@@ -149,18 +149,18 @@ def customer_query(doctype, txt, searchfield, start, page_len, filters):
 	# 	fields = ["name", "customer_group", "territory"]
 	# else:
 	# 	fields = ["name", "customer_name", "customer_group", "territory"]
-		
+
 	# meta = frappe.get_meta("Customer")
 	# fields = fields + [f for f in meta.get_search_fields() if not f in fields]
 
 	# fields = ", ".join(fields)
 
 	return frappe.db.sql("""select cust.name, cont.name, cont.phone, cont.mobile_no from `tabCustomer` as cust inner join `tabContact` as cont
-		on cust.name = cont.customer 
+		on cust.name = cont.customer
 		where docstatus < 2
 			and ({key} like %(txt)s
-				or cust.name like %(txt)s 
-				or cont.phone like %(txt)s 
+				or cust.name like %(txt)s
+				or cont.phone like %(txt)s
 				or cont.mobile_no like %(txt)s)
 				and disabled=0
 			{mcond}
@@ -186,11 +186,11 @@ def fire_sms_on_submit(service_type, starts_on, contact_phone):
 		sms_message += service_type
 		sms_message += " on "
 		sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d 'at' HH:m a")
-		# send_sms(self.contact_phone, sms_message)		
+		# send_sms(self.contact_phone, sms_message)
 
 		note = frappe.new_doc("Note")
 		note.title = "SMS Log"+ frappe.utils.nowdate() + frappe.utils.nowtime()
 		note.public = 1
-		note.content = "Sending message to " + s.customer + "on" + contact_phone + "<hr>" + sms_message
+		note.content = "Sending message to " +  contact_phone + "<hr>" + sms_message
 		note.save()
 		frappe.db.commit()
