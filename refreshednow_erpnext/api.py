@@ -7,20 +7,20 @@ from frappe.desk.reportview import get_match_cond
 import json, pdfkit, os
 from frappe.utils.pdf import get_pdf
 
-@frappe.whitelist()
-def rn_events_test(start, end, filters=None):
-	events = [
-		{ "id": '1', "start": '2016-12-20', "end": '2016-12-20', "title": 'event 1'},
-		{ "id": '2', "start": '2016-12-20T09:00:00', "end": '2016-12-20T14:00:00', "title": 'event 2'},
-		{ "id": '3', "start": '2016-12-21T11:30:00', "end": '2016-12-21T12:00:00', "title": 'event 3' },
-		{ "id": '4', "start": '2016-12-22T07:30:00', "end": '2016-12-22T09:30:00', "title": 'event 4' },
-		{ "id": '5', "start": '2016-12-23T10:00:00', "end": '2016-12-23T15:00:00', "title": 'event 5' },
-		{ "id": '6', "start": '2016-12-24T10:00:00', "end": '2016-12-24T15:00:00', "title": filters }
-	]
-	return events
+# @frappe.whitelist()
+# def rn_events_test(start, end, filters=None):
+# 	events = [
+# 		{ "id": '1', "start": '2016-12-20', "end": '2016-12-20', "title": 'event 1'},
+# 		{ "id": '2', "start": '2016-12-20T09:00:00', "end": '2016-12-20T14:00:00', "title": 'event 2'},
+# 		{ "id": '3', "start": '2016-12-21T11:30:00', "end": '2016-12-21T12:00:00', "title": 'event 3' },
+# 		{ "id": '4', "start": '2016-12-22T07:30:00', "end": '2016-12-22T09:30:00', "title": 'event 4' },
+# 		{ "id": '5', "start": '2016-12-23T10:00:00', "end": '2016-12-23T15:00:00', "title": 'event 5' },
+# 		{ "id": '6', "start": '2016-12-24T10:00:00', "end": '2016-12-24T15:00:00', "title": filters }
+# 	]
+# 	return events
 
 @frappe.whitelist()
-def rn_events(start=None, end=None, filters=None):
+def rn_events_test(start=None, end=None, filters=None):
 	slots = []
 
 	if filters:
@@ -527,3 +527,5 @@ def service_reminder_sms():
 			note.save()
 			frappe.db.commit()
 			print note.content
+
+			
