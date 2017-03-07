@@ -20,7 +20,7 @@ from frappe.utils.pdf import get_pdf
 # 	return events
 
 @frappe.whitelist()
-def rn_events_test(start=None, end=None, filters=None):
+def rn_events(start=None, end=None, filters=None):
 	slots = []
 
 	if filters:
