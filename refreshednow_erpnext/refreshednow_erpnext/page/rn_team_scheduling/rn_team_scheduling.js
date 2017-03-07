@@ -114,7 +114,7 @@ function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultD
 		eventDurationEditable: false,
 		disableDragging: true,
 		editable: false,
-		//firstDay: frappe.datetime.str_to_obj(defaultDate).getDay(), 
+		columnFormat: "ddd D/M",
 		eventClick: function(calEvent, jsEvent, view) {
 			
 			wrapper.page.selected_event_info = {"calEvent": calEvent, "jsEvent": jsEvent, "view": view};
