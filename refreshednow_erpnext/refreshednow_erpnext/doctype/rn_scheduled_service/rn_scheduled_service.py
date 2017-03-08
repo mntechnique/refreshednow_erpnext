@@ -101,6 +101,8 @@ class RNScheduledService(Document):
 
 		try:
 			so.save()
+			so.submit()
+			frappe.db.commit()
 		except Exception, e:
 			frappe.throw(_("Sales Order was not saved. <br/> %s" % (e)))
 		else:
