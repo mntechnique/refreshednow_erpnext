@@ -587,7 +587,7 @@ def send_service_reminder_sms():
 		note = frappe.new_doc("Note")
 		note.title = "SMS Log"+ frappe.utils.nowdate() + frappe.utils.nowtime()
 		note.public = 1
-		note.content = "Sending message to " + s.customer + "on" + s.contact_phone + "<hr>" + msg + "<hr>" + s.name
+		note.content = "Sending message to " + s.customer + " on " + s.contact_phone + "<hr>" + msg + "<hr>" + s.name
 		note.save()
 		frappe.db.commit()
 
@@ -602,7 +602,7 @@ def send_service_reminder_sms():
 		note = frappe.new_doc("Note")
 		note.title = "SMS Log"+ frappe.utils.nowdate() + frappe.utils.nowtime()
 		note.public = 1
-		note.content = "Sending message to " + s.customer + "on" + s.contact_phone + "<hr>" + msg
+		note.content = "Sending message to " + s.customer + " on " + s.contact_phone + "<hr>" + msg
 		note.save()
 		frappe.db.commit()
 

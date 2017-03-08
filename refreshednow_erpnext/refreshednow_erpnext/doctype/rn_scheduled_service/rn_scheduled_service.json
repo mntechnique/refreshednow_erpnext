@@ -938,7 +938,7 @@
    "unique": 0
   }, 
   {
-   "allow_on_submit": 0, 
+   "allow_on_submit": 1, 
    "bold": 0, 
    "collapsible": 0, 
    "columns": 0, 
@@ -1061,7 +1061,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2017-03-08 13:53:10.873850", 
+ "modified": "2017-03-08 18:33:13.138727", 
  "modified_by": "Administrator", 
  "module": "RefreshedNow ERPNext", 
  "name": "RN Scheduled Service", 
@@ -1071,7 +1071,7 @@
   {
    "amend": 0, 
    "apply_user_permissions": 0, 
-   "cancel": 0, 
+   "cancel": 1, 
    "create": 1, 
    "delete": 1, 
    "email": 1, 
@@ -1086,7 +1086,7 @@
    "role": "Support Team", 
    "set_user_permissions": 0, 
    "share": 1, 
-   "submit": 0, 
+   "submit": 1, 
    "write": 1
   }
  ], 
