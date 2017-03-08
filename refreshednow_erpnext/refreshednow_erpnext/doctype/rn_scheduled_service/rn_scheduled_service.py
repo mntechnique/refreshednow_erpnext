@@ -19,65 +19,65 @@ class RNScheduledService(Document):
 		self.validate_team_availability()
 
 	def on_submit(self):
-		if not self.sales_invoice:
-			self.sales_invoice = self.create_si()
+		if not self.sales_order:
+			self.sales_order = self.create_sales_order()
 		fire_sms_on_submit(self.service_type,self.starts_on,self.contact_phone)
 
 
 	def on_cancel(self):
-		linked_si = frappe.db.get_value("Sales Invoice", filters={"rn_scheduled_service": self.name}, fieldname="name")
+		linked_so = frappe.db.get_value("Sales Order", filters={"rn_scheduled_service": self.name}, fieldname="name")
 
-		if linked_si:
-			osi = frappe.get_doc("Sales Invoice", linked_si)
-			osi.cancel()
+		if linked_so:
+			oso = frappe.get_doc("Sales Order", linked_so)
+			oso.cancel()
 			frappe.db.commit()
 
-	def create_si(self):
-		defaults_temp = frappe.defaults.get_defaults()
+	# def create_sales_invoice(self):
+	# 	defaults_temp = frappe.defaults.get_defaults()
 
-		#Create a sales order if customer is selected.
-		si = frappe.new_doc("Sales Invoice")
-		si.transaction_date = self.starts_on
+	# 	#Create a sales order if customer is selected.
+	# 	si = frappe.new_doc("Sales Order")
+	# 	si.transaction_date = self.starts_on
 
-		if self.bill_to:
-			si.rn_bill_to = self.bill_to
+	# 	if self.bill_to:
+	# 		si.rn_bill_to = self.bill_to
 
-		si.company = defaults_temp.get("company")
-		si.customer = self.customer
+	# 	si.company = defaults_temp.get("company")
+	# 	si.customer = self.customer
 
 
-		#si.rn_service_time_slot = self.starts_on + ", " + self.starts_on + " - " + self.ends_on
-		starts_on = frappe.utils.get_datetime(self.starts_on)
-		ends_on = frappe.utils.get_datetime(self.ends_on)
+	# 	#si.rn_service_time_slot = self.starts_on + ", " + self.starts_on + " - " + self.ends_on
+	# 	starts_on = frappe.utils.get_datetime(self.starts_on)
+	# 	ends_on = frappe.utils.get_datetime(self.ends_on)
 
-		si.rn_service_time_slot = frappe.utils.datetime.datetime.strftime(starts_on, "%d-%m-%Y") + '<br>' + frappe.utils.datetime.datetime.strftime(starts_on, "%H:%M %p") + ' - ' + frappe.utils.datetime.datetime.strftime(ends_on, "%H:%M %p")
+	# 	si.rn_service_time_slot = frappe.utils.datetime.datetime.strftime(starts_on, "%d-%m-%Y") + '<br>' + frappe.utils.datetime.datetime.strftime(starts_on, "%H:%M %p") + ' - ' + frappe.utils.datetime.datetime.strftime(ends_on, "%H:%M %p")
 
-		if self.billing_address:
-			si.customer_address = self.billing_address
-		else:
-			si.customer_address = self.service_address
+	# 	if self.billing_address:
+	# 		si.customer_address = self.billing_address
+	# 	else:
+	# 		si.customer_address = self.service_address
 
-		si.delivery_date = add_days(si.transaction_date, 10)
-		si.currency = defaults_temp.get("currency")
-		si.selling_price_list = defaults_temp.get("selling_price_list")
-		si.rn_scheduled_service = self.name
+	# 	si.delivery_date = add_days(si.transaction_date, 10)
+	# 	si.currency = defaults_temp.get("currency")
+	# 	si.selling_price_list = defaults_temp.get("selling_price_list")
+	# 	si.rn_scheduled_service = self.name
 
-		si.append("items", {
-			"item_code": self.service_type,
-			"qty": float(self.vehicle_count),
-			"rate": frappe.db.get_value("Item Price", filters={"price_list":si.selling_price_list}, fieldname="price_list_rate"),
-			"conversion_factor": 1.0
-		})
+	# 	si.append("items", {
+	# 		"item_code": self.service_type,
+	# 		"qty": float(self.vehicle_count),
+	# 		"rate": frappe.db.get_value("Item Price", filters={"price_list":si.selling_price_list}, fieldname="price_list_rate"),
+	# 		"conversion_factor": 1.0
+	# 	})
 
-		try:
-			si.save()
-			si.submit()
-		except Exception, e:
-			frappe.throw(_("Sales Invoice was not saved. <br/> %s" % (e)))
-		else:
-			return si.name
+	# 	try:
+	# 		si.save()
+	# 		si.submit()
+	# 	except Exception, e:
+	# 		frappe.throw(_("Sales Invoice was not saved. <br/> %s" % (e)))
+	# 	else:
+	# 		return si.name
 
-	def create_so(self):
+	def create_sales_order(self):
 		defaults_temp = frappe.defaults.get_defaults()
 
 		#Create a sales order if customer is selected.
