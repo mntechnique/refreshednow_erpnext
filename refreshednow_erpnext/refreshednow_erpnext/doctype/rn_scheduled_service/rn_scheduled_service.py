@@ -91,6 +91,9 @@ class RNScheduledService(Document):
 		so.currency = defaults_temp.get("currency")
 		so.selling_price_list = defaults_temp.get("selling_price_list")
 		so.rn_scheduled_service = self.name
+		starts_on = frappe.utils.get_datetime(self.starts_on)
+		ends_on = frappe.utils.get_datetime(self.ends_on)
+		so.rn_service_time_slot = frappe.utils.datetime.datetime.strftime(starts_on, "%d-%m-%Y") + '<br>' + frappe.utils.datetime.datetime.strftime(starts_on, "%H:%M %p") + ' - ' + frappe.utils.datetime.datetime.strftime(ends_on, "%H:%M %p")
 
 		so.append("items", {
 			"item_code": self.service_type,
@@ -98,6 +101,7 @@ class RNScheduledService(Document):
 			"rate": frappe.db.get_value("Item Price", filters={"price_list":so.selling_price_list}, fieldname="price_list_rate"),
 			"conversion_factor": 1.0
 		})
+
 
 		try:
 			so.save()
