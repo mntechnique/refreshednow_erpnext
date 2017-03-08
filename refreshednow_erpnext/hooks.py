@@ -117,7 +117,7 @@ scheduler_events = {
 # 	"frappe.desk.doctype.event.event.get_events": "refreshednow_erpnext.event.get_events"
 # }
 
-fixtures = [{"dt":"Custom Script", "filters": [["name", "in", ["Customer-Client"]]]},
+fixtures = [{"dt":"Custom Script", "filters": [["name", "in", ["Customer-Client","Contact-Client"]]]},
 	{"dt": "Custom Field", "filters": [["name", "in", [
 		"Item-rn_sb_service_item_info",
 		"Item-rn_start_time_hours",
