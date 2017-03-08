@@ -83,6 +83,8 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 }
 
 frappe.pages['rn-team-scheduling'].on_page_show = function(wrapper) {
+	console.log("Page Show Called");
+
 	//render_weekly_calendar(wrapper);
 	var route = frappe.get_route();
 

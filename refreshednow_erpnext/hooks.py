@@ -99,8 +99,9 @@ doc_events = {
 # ---------------
 
 scheduler_events = {
-	"daily": [
-		"refreshednow_erpnext.api.service_reminder_sms"
+	"hourly": [
+        "refreshednow_erpnext.api.hourly_call"
+		#"refreshednow_erpnext.api.send_service_reminder_sms"
 	]
 }
 
