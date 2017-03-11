@@ -41,7 +41,7 @@ def rn_events(start=None, end=None, filters=None):
 			end_time = iter_date
 			end_time = end_time.replace(hour=int(service_item.rn_end_time_hours), minute=int(service_item.rn_end_time_minutes), second=0, microsecond=0)
 
-			daily_slots = get_slots_with_break(hours=[start_time, end_time], 
+			daily_slots = get_slots_with_break(hours=[start_time, end_time],
 				duration=frappe.utils.datetime.timedelta(minutes=int(service_item.rn_service_duration)),
 				break_time=service_item.rn_break_start_time_hours + ":" + service_item.rn_break_start_time_minutes + ":00",
 				break_duration=frappe.utils.datetime.timedelta(minutes=int(service_item.rn_break_duration)))
@@ -100,9 +100,9 @@ def get_slots(hours, duration=frappe.utils.datetime.timedelta(hours=1)): #, brea
 
 			while True:
 				slot = frappe._dict({"start":start.isoformat(), "end":(start +  duration).isoformat()})
-				
+
 				actual_slot_count += 1
-					
+
 				out.append(slot)
 				start +=  duration
 
@@ -125,8 +125,8 @@ def get_settings(fieldname):
 def get_service_item_data():
 	service_items = frappe.get_all("Item",
 		filters={"item_group": get_settings("rn_service_item_group")},
-		fields=["name", "item_code", 
-				"rn_start_time_hours", "rn_start_time_minutes", "rn_end_time_hours", "rn_end_time_minutes", "rn_service_duration", 
+		fields=["name", "item_code",
+				"rn_start_time_hours", "rn_start_time_minutes", "rn_end_time_hours", "rn_end_time_minutes", "rn_service_duration",
 				"rn_break_duration", "rn_break_start_time_hours", "rn_break_start_time_minutes"])
 
 	out = []
@@ -176,23 +176,23 @@ def get_rn_daily_events(start, end, filters=None):
 		service_color = "grey"
 		if service.get("workflow_state") == "To Schedule":
 			service_color = "#5cbbff"
-		
+
 		if service.get("workflow_state") == "To Dispatch":
 			service_color = "#ffd55c"
-		
+
 		if service.get("workflow_state") == "To Bill":
 			service_color = "#ff985c"
-		
+
 		if service.get("workflow_state") == "Completed":
 			service_color = "#c0ff5c"
-		
+
 		if service.get("workflow_state") == "Stopped":
 			service_color = "grey"
-		
+
 		out_services.append({"id": service.name,
 			"resourceId": service.team,
 			"start": service.starts_on.isoformat(),
-			"end": service.ends_on.isoformat(), 
+			"end": service.ends_on.isoformat(),
 			"className": "rn-team",
 			"color": service_color })
 
@@ -206,7 +206,7 @@ def get_available_teams_for_slot(service_item, start_time):
 
 	#Get teams by service.
 	teams_for_service = frappe.get_all("RN Team", filters={"service_type" : service_item.name })
-	
+
 	no_of_teams_for_service = 0
 
 	for team in teams_for_service:
@@ -313,7 +313,7 @@ def pe_on_cancel(self, method):
 
 		if rnss_id:
 			frappe.db.set_value("RN Scheduled Service", rnss_id, "workflow_state", "To Bill")
-			frappe.db.commit()	
+			frappe.db.commit()
 
 #Team Tool
 @frappe.whitelist()
@@ -322,8 +322,8 @@ def get_team_tool_data(service_type=None, day_of_week=None):
 
 	if service_type and day_of_week:
 		teams =  frappe.get_all("RN Team", filters={"service_type":service_type})
-		
-		employees = frappe.get_all("Employee", filters=[["designation", "in", ["Junior Cleaner", "Senior Cleaner"]]], fields=["name", "employee_name", "designation"]) #TODO: Filter for On-Field employees.
+
+		employees = frappe.get_all("Employee", filters=[["designation", "in", ["Junior Cleaner", "Senior Cleaner"]]], fields=["name", "employee_name", "designation", "rn_weekly_off"]) #TODO: Filter for On-Field employees.
 		team_names = [t.name for t in teams]
 		allocations = frappe.get_all("RN Team Day Employee", filters=[["team", "in", team_names], ["day_of_week", "=", day_of_week]], fields=["*"])
 
@@ -341,9 +341,9 @@ def update_team_day_employee(employee, team, day_of_week):
 
 	if len(allocations) == 1:
 		allocation = frappe.get_doc("RN Team Day Employee", allocations[0].get("name"))
-	else:		
+	else:
 		allocation = frappe.new_doc("RN Team Day Employee")
-	
+
 	allocation.employee = employee
 	allocation.team = team
 	allocation.day_of_week = day_of_week
@@ -376,15 +376,15 @@ def get_availability_for_team_dow(team, day_of_week):
 # searches for customer
 @frappe.whitelist()
 def customer_query(doctype, txt, searchfield, start, page_len, filters):
-	return frappe.db.sql("""select cust.name, cont.phone, cont.mobile_no from `tabCustomer` as cust 
-		left outer join (select phone, mobile_no, customer from tabCustomer inner join tabContact on `tabCustomer`.name = customer) as cont 
+	return frappe.db.sql("""select cust.name, cont.phone, cont.mobile_no from `tabCustomer` as cust
+		left outer join (select phone, mobile_no, customer from tabCustomer inner join tabContact on `tabCustomer`.name = customer) as cont
 		on cust.name = cont.customer
 		where
 			({key} like %(txt)s
-				or cust.name like %(txt)s 
-				or cont.phone like %(txt)s 
+				or cust.name like %(txt)s
+				or cont.phone like %(txt)s
 				or cont.mobile_no like %(txt)s)
-				and disabled=0 
+				and disabled=0
 		order by
 			if(locate(%(_txt)s, cust.name), locate(%(_txt)s, cust.name), 99999),
 			idx desc,
@@ -402,18 +402,18 @@ def customer_query(doctype, txt, searchfield, start, page_len, filters):
 def print_job_sheet(names):
 	if not frappe.has_permission("RN Scheduled Service", "write"):
 		frappe.throw(_("Not permitted"), frappe.PermissionError)
-	
+
 	if len(names) == 0:
 		frappe.msgprint("No rows selected.")
-	
+
 	final_html = prepare_bulk_print_html(names)
 
-	pdf_options = { 
+	pdf_options = {
 					"no-outline": None,
 					"encoding": "UTF-8",
 					"title": "Job Sheet"
 				}
-		
+
 	frappe.local.response.filename = "{filename}.pdf".format(filename="job_sheet_list".replace(" ", "-").replace("/", "-"))
 	frappe.local.response.filecontent = rn_get_pdf(final_html, options=pdf_options)
 	frappe.local.response.type = "download"
@@ -496,22 +496,22 @@ def send_sms(mobile_no, message):
 # def service_reminder_sms():
 # 	# tomorrow = frappe.utils.data.add_to_date(frappe.utils.datetime.datetime.today().replace(minute=0, second=0, microsecond=0), days=1)
 # 	# t_1 = frappe.utils.data.add_to_date(tomorrow,hours=1)
-	
+
 # 	# print "TOMORROW", tomorrow
 # 	# print "T_1", t_1
 
 # 	# rnss_list = frappe.get_all("RN Scheduled Service", fields=["*"], filters=[["starts_on", "Between", [tomorrow,t_1]],["docstatus","=", 1], ["sms_checkbox", "!=", 1]])
 # 	tomorrow = frappe.utils.data.add_to_date(str(frappe.utils.datetime.datetime.now().replace(minute=0, second=0, microsecond=0)),days=1)
-# 	rnss_list = frappe.get_all("RN Scheduled Service", 
+# 	rnss_list = frappe.get_all("RN Scheduled Service",
 # 		fields=["*"], filters=[["docstatus","=", 1]], limit=5)
 
 # 	print "RNSS", rnss_list
 
-# 	# tomorrow = frappe.utils.data.add_to_date(str(frappe.utils.datetime.date.today()),days=1)	
-# 	# rnss_list = frappe.db.sql("""select * from `tabRN Scheduled Service` where docstatus=1 and date(starts_on)={start_date}""".format(start_date=tomorrow))	
+# 	# tomorrow = frappe.utils.data.add_to_date(str(frappe.utils.datetime.date.today()),days=1)
+# 	# rnss_list = frappe.db.sql("""select * from `tabRN Scheduled Service` where docstatus=1 and date(starts_on)={start_date}""".format(start_date=tomorrow))
 # 	sms_message = ""
 
-# 	for s in rnss_list:		
+# 	for s in rnss_list:
 # 		sms_message = "We look forward to refreshing your car tomorrow at "
 # 		sms_message += frappe.utils.data.format_datetime(s.starts_on,"EEEE MMM d 'at' HH:m a")
 # 		sms_message += " using '"
@@ -531,8 +531,13 @@ def send_sms(mobile_no, message):
 
 #GRN
 def hourly_call():
+<<<<<<< HEAD
 	frappe.publish_realtime(event="msgprint", message="Hourly beat {0}".format(frappe.utils.get_datetime())) 
 	
+=======
+	#frappe.publish_realtime(event="msgprint", message="Reminder sms sent at {0}".format(frappe.utils.get_datetime()))
+
+>>>>>>> 3916fd34f32918e631320d579dad9ed900a5d7c5
 	send_service_reminder_sms()
 
 	# note = frappe.new_doc("Note")
@@ -552,13 +557,15 @@ def send_service_reminder_sms():
 	def get_msg(svc, on_day):
 		sms_message = """We look forward to refreshing your car {on_day} at {on_time} using '{service_type}'.
 		 Thanks for using Refreshed Car Care.""".format(
-			on_day=on_day, 
+			on_day=on_day,
 			on_time=frappe.utils.data.format_datetime(s.starts_on,"EEEE MMM d 'at' HH:m a"),
 			service_type=svc.service_type
 		)
 
+
 	# IF current time is 8PM, check services scheduled for tomorrow.
 	# Send smses
+
 
 	msg = get_msg(service, "tomorrow")
 	note = frappe.new_doc("Note")
@@ -571,11 +578,11 @@ def send_service_reminder_sms():
 	#if frappe.utils.datetime.time(13,45) <= frappe.utils.datetime.datetime.now().time() <= frappe.utils.datetime.time(14,15):
 
 	tomorrow = frappe.utils.data.add_to_date(frappe.utils.today(), days=1)
-	services = frappe.db.sql("""SELECT * FROM `tabRN Scheduled Service` 
-					WHERE date(starts_on) = '{starts_on_date}' 
+	services = frappe.db.sql("""SELECT * FROM `tabRN Scheduled Service`
+					WHERE date(starts_on) = '{starts_on_date}'
 					AND docstatus = 1
 					AND sms_checkbox != 1""".format(
-						starts_on_date=tomorrow 
+						starts_on_date=tomorrow
 					), as_dict=1)
 
 	for service in services:
@@ -592,19 +599,19 @@ def send_service_reminder_sms():
 	# tomorrow_upper = frappe.utils.data.add_to_date(tomorrow, minutes=45)
 	# tomorrow_lower = frappe.utils.data.add_to_date(tomorrow, minutes=-45)
 
-	# services_today = frappe.db.sql("""SELECT * FROM `tabRN Scheduled Service` 
+	# services_today = frappe.db.sql("""SELECT * FROM `tabRN Scheduled Service`
 	# 	WHERE docstatus = 1 and
-	# 		sms_checkbox != 1 and 
+	# 		sms_checkbox != 1 and
 	# 		date(starts_on) = '{starts_on_date}'
 	# 	""".format(starts_on_date=datetime.date.today())
 	# 	, as_dict=1)
 
-	# services_tomorrow = frappe.get_all("RN Scheduled Service", 
+	# services_tomorrow = frappe.get_all("RN Scheduled Service",
 	# 	filters=[
 	# 		["sms_checkbox", "!=", 1]
 	# 		["docstatus", "=", 1]
 	# 		["starts_on", "Between", [tomorrow_upper, tomorrow_lower]],
-	# 	], 
+	# 	],
 	# 	fields=["*"])
 
 	# for s in services_today:
@@ -636,4 +643,5 @@ def send_service_reminder_sms():
 	# 	frappe.db.commit()
 
 	# 	frappe.msgprint("Sent SMS")
-	# 	print note.content		
+	# 	print note.content
+

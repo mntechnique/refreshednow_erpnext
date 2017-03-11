@@ -12,9 +12,11 @@
 		</thead>
 		<tbody>
 			{% for (var j=0, k=data.employees.length; j<k; j++) { %}
+				{%	var rn_weekly_off = data.employees[j].rn_weekly_off;
+					var emp_name = data.employees[j].name; %}
 				<tr>
 					<td>
-						{%= data.employees[j].employee_name %} 
+						{%= data.employees[j].employee_name %}
 						<span class="text-muted small">{%= data.employees[j].designation %}</span>
 
 						{% if (data.allocations.filter(function(a) { return a.employee == data.employees[j].name } ).length > 0) { %}
@@ -23,24 +25,29 @@
 						 {% } %}
 					</td>
 
-					{% for (var x=0, y=data.teams.length; x<y; x++) { %}
-						<td style="text-align:center">
-							{% 
-								var team_name = data.teams[x].name;
-							 	var emp_name = data.employees[j].name;
-							 	var dow = data.day_of_week;
+					{% for (var x=0, y=data.teams.length; x<=y-1; x++) { %}
+						{%  var dow = data.day_of_week;
+							var team_name = data.teams[x].name;
+							var found_alloc = data.allocations.filter(function(a) {
+							return (a.team == team_name) && (a.employee == emp_name) && (a.day_of_week == dow);
+							});
+						%}
 
-							 	var found_alloc = data.allocations.filter(function(a) { 
-							 		return (a.team == team_name) && (a.employee == emp_name) && (a.day_of_week == dow);
-								});
-							%}
+						{% if (rn_weekly_off == dow) { %}
+							<td style="text-align:center; background-color: #ea4335" title="Weekly Off">
+								<input disabled="True" type="checkbox"/>
+							</td>
+						{% } else { %}
+							<td style="text-align:center;">
 
-							{% if (found_alloc.length > 0) { %}
-								<input type="checkbox" data-team="{%= team_name %}" data-employee="{%= emp_name %}" data-dow="{%= dow %}" onclick="checkbox_clicked(this)" checked/>
-							{% } else { %}
-								<input type="checkbox" data-team="{%= team_name %}" data-employee="{%= emp_name %}" data-dow="{%= dow %}" onclick="checkbox_clicked(this)"/>
-							{% } %}
-						</td>
+								{% if (found_alloc.length > 0) { %}
+									<input type="checkbox" data-team="{%= team_name %}" data-employee="{%= emp_name %}" data-dow="{%= dow %}" onclick="checkbox_clicked(this)" checked/>
+								{% } else { %}
+									<input type="checkbox" data-team="{%= team_name %}" data-employee="{%= emp_name %}" data-dow="{%= dow %}" onclick="checkbox_clicked(this)"/>
+								{% } %}
+							</td>
+						{% } %}
+
 					{% } %}
 				</tr>
 			{% } %}
