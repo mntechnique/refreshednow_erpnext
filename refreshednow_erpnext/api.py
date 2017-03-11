@@ -549,7 +549,6 @@ def send_service_reminder_sms():
 	#Get all services scheduled for current date, with unchecked sms_checkbox
 	#Get all services scheduled between now and (12 hours + 45mins) and (12 hours - 45 mins) with unchecked sms_checkbox
 
-
 	def get_msg(svc, on_day):
 		sms_message = """We look forward to refreshing your car {on_day} at {on_time} using '{service_type}'.
 		 Thanks for using Refreshed Car Care.""".format(
@@ -558,53 +557,83 @@ def send_service_reminder_sms():
 			service_type=svc.service_type
 		)
 
-	
-	tomorrow = frappe.utils.data.add_to_date(str(frappe.utils.datetime.datetime.now().replace(minute=0, second=0, microsecond=0)),days=1)
-	tomorrow_upper = frappe.utils.data.add_to_date(tomorrow, minutes=45)
-	tomorrow_lower = frappe.utils.data.add_to_date(tomorrow, minutes=-45)
+	# IF current time is 8PM, check services scheduled for tomorrow.
+	# Send smses
 
-	services_today = frappe.db.sql("""SELECT * FROM `tabRN Scheduled Service` 
-		WHERE docstatus = 1 and
-			sms_checkbox != 1 and 
-			date(starts_on) = '{starts_on_date}'
-		""".format(starts_on_date=datetime.date.today())
-		, as_dict=1)
+	msg = get_msg(service, "tomorrow")
+	note = frappe.new_doc("Note")
+	note.title = "SMS Log - "+ frappe.utils.nowdate() + frappe.utils.nowtime()
+	note.public = 1
+	note.content = "Attempting to fire SMS at {0}".format(frappe.utils.nowdate() + frappe.utils.nowtime())
+	note.save()
+	frappe.db.commit()
 
-	services_tomorrow = frappe.get_all("RN Scheduled Service", 
-		filters=[
-			["sms_checkbox", "!=", 1]
-			["docstatus", "=", 1]
-			["starts_on", "Between", [tomorrow_upper, tomorrow_lower]],
-		], 
-		fields=["*"])
+	#if frappe.utils.datetime.time(13,45) <= frappe.utils.datetime.datetime.now().time() <= frappe.utils.datetime.time(14,15):
 
-	for s in services_today:
-		msg = get_msg(s, "today")
-		frappe.db.set_value("RN Scheduled Service", s.name, "sms_checkbox",1)
-		frappe.db.commit()
+	tomorrow = frappe.utils.data.add_to_date(frappe.utils.today(), days=1)
+	services = frappe.db.sql("""SELECT * FROM `tabRN Scheduled Service` 
+					WHERE date(starts_on) = '{starts_on_date}' 
+					AND docstatus = 1
+					AND sms_checkbox != 1""".format(
+						starts_on_date=tomorrow 
+					), as_dict=1)
 
-
+	for service in services:
+		msg = get_msg(service, "tomorrow")
 		note = frappe.new_doc("Note")
 		note.title = "SMS Log"+ frappe.utils.nowdate() + frappe.utils.nowtime()
 		note.public = 1
-		note.content = "Sending message to " + s.customer + " on " + s.contact_phone + "<hr>" + msg + "<hr>" + s.name
+		note.content = "Sending message to " + service.customer + " on " + service.contact_phone + "<hr>" + msg + "<hr>" + service.name
 		note.save()
 		frappe.db.commit()
 
-		frappe.msgprint("Sent SMS")
-		print note.content
 
-	for s in services_tomorrow:
-		msg = get_msg(s, "tomorrow")
-		frappe.db.set_value("RN Scheduled Service", s.name, "sms_checkbox",1)
-		frappe.db.commit()
+	# tomorrow = frappe.utils.data.add_to_date(str(frappe.utils.datetime.datetime.now().replace(minute=0, second=0, microsecond=0)),days=1)
+	# tomorrow_upper = frappe.utils.data.add_to_date(tomorrow, minutes=45)
+	# tomorrow_lower = frappe.utils.data.add_to_date(tomorrow, minutes=-45)
 
-		note = frappe.new_doc("Note")
-		note.title = "SMS Log"+ frappe.utils.nowdate() + frappe.utils.nowtime()
-		note.public = 1
-		note.content = "Sending message to " + s.customer + " on " + s.contact_phone + "<hr>" + msg
-		note.save()
-		frappe.db.commit()
+	# services_today = frappe.db.sql("""SELECT * FROM `tabRN Scheduled Service` 
+	# 	WHERE docstatus = 1 and
+	# 		sms_checkbox != 1 and 
+	# 		date(starts_on) = '{starts_on_date}'
+	# 	""".format(starts_on_date=datetime.date.today())
+	# 	, as_dict=1)
 
-		frappe.msgprint("Sent SMS")
-		print note.content		
+	# services_tomorrow = frappe.get_all("RN Scheduled Service", 
+	# 	filters=[
+	# 		["sms_checkbox", "!=", 1]
+	# 		["docstatus", "=", 1]
+	# 		["starts_on", "Between", [tomorrow_upper, tomorrow_lower]],
+	# 	], 
+	# 	fields=["*"])
+
+	# for s in services_today:
+	# 	msg = get_msg(s, "today")
+	# 	frappe.db.set_value("RN Scheduled Service", s.name, "sms_checkbox",1)
+	# 	frappe.db.commit()
+
+
+	# 	note = frappe.new_doc("Note")
+	# 	note.title = "SMS Log"+ frappe.utils.nowdate() + frappe.utils.nowtime()
+	# 	note.public = 1
+	# 	note.content = "Sending message to " + s.customer + " on " + s.contact_phone + "<hr>" + msg + "<hr>" + s.name
+	# 	note.save()
+	# 	frappe.db.commit()
+
+	# 	frappe.msgprint("Sent SMS")
+	# 	print note.content
+
+	# for s in services_tomorrow:
+	# 	msg = get_msg(s, "tomorrow")
+	# 	frappe.db.set_value("RN Scheduled Service", s.name, "sms_checkbox",1)
+	# 	frappe.db.commit()
+
+	# 	note = frappe.new_doc("Note")
+	# 	note.title = "SMS Log"+ frappe.utils.nowdate() + frappe.utils.nowtime()
+	# 	note.public = 1
+	# 	note.content = "Sending message to " + s.customer + " on " + s.contact_phone + "<hr>" + msg
+	# 	note.save()
+	# 	frappe.db.commit()
+
+	# 	frappe.msgprint("Sent SMS")
+	# 	print note.content		

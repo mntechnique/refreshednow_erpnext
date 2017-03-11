@@ -12,9 +12,9 @@
   "docstatus": 0, 
   "doctype": "Custom Script", 
   "dt": "Contact", 
-  "modified": "2017-03-08 16:07:02.868641", 
+  "modified": "2017-03-11 11:54:12.116215", 
   "name": "Contact-Client", 
-  "script": "frappe.ui.form.on(\"Contact\", \"validate\", function(frm) {\n    if (frm.doc.phone != 10 ) {\n        msgprint(\"Mobile should be equal to ten digit long.\");\n        validated = false;\n    }\n});", 
+  "script": "frappe.ui.form.on(\"Contact\", \"validate\", function(frm) {\n    if (frm.doc.phone.length != 10 ) {\n        msgprint(\"Mobile should be equal to ten digit long.\");\n        validated = false;\n    }\n});", 
   "script_type": "Client"
  }
 ]

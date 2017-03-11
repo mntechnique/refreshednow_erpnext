@@ -20,7 +20,10 @@ class RNScheduledService(Document):
 
 	def on_submit(self):
 		if not self.sales_order:
-			self.sales_order = self.create_sales_order()
+			so_name = self.create_sales_order()
+			frappe.db.set_value("RN Scheduled Service", self.name, "sales_order", so_name)
+			frappe.db.commit()
+
 		fire_sms_on_submit(self.service_type,self.starts_on,self.contact_phone)
 
 
@@ -84,7 +87,6 @@ class RNScheduledService(Document):
 		so = frappe.new_doc("Sales Order")
 		so.transaction_date = self.starts_on
 
-
 		so.company = defaults_temp.get("company")
 		so.customer = self.customer
 		so.delivery_date = add_days(so.transaction_date, 10)
@@ -107,6 +109,7 @@ class RNScheduledService(Document):
 			so.submit()
 			frappe.db.commit()
 		except Exception, e:
+			print "Exception", e
 			frappe.throw(_("Sales Order was not saved. <br/> %s" % (e)))
 		else:
 			return so.name
