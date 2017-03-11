@@ -531,7 +531,7 @@ def send_sms(mobile_no, message):
 
 #GRN
 def hourly_call():
-	#frappe.publish_realtime(event="msgprint", message="Reminder sms sent at {0}".format(frappe.utils.get_datetime())) 
+	frappe.publish_realtime(event="msgprint", message="Hourly beat {0}".format(frappe.utils.get_datetime())) 
 	
 	send_service_reminder_sms()
 
