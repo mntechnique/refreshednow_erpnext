@@ -7,6 +7,9 @@ from frappe.desk.reportview import get_match_cond
 import json, pdfkit, os
 from frappe.utils.pdf import get_pdf
 
+import datetime
+from dateutil import tz
+
 # @frappe.whitelist()
 # def rn_events_test(start, end, filters=None):
 # 	events = [
@@ -531,13 +534,7 @@ def send_sms(mobile_no, message):
 
 #GRN
 def hourly_call():
-<<<<<<< HEAD
-	frappe.publish_realtime(event="msgprint", message="Hourly beat {0}".format(frappe.utils.get_datetime())) 
-	
-=======
-	#frappe.publish_realtime(event="msgprint", message="Reminder sms sent at {0}".format(frappe.utils.get_datetime()))
-
->>>>>>> 3916fd34f32918e631320d579dad9ed900a5d7c5
+	#frappe.publish_realtime(event="msgprint", message="Hourly beat {0}".format(frappe.utils.get_datetime())) 
 	send_service_reminder_sms()
 
 	# note = frappe.new_doc("Note")
@@ -549,31 +546,36 @@ def hourly_call():
 
 
 def send_service_reminder_sms():
-	import datetime
+	
 	#Hourly beat started
 	#Get all services scheduled for current date, with unchecked sms_checkbox
 	#Get all services scheduled between now and (12 hours + 45mins) and (12 hours - 45 mins) with unchecked sms_checkbox
 
-	def get_msg(svc, on_day):
+	def get_msg(service, on_day):
 		sms_message = """We look forward to refreshing your car {on_day} at {on_time} using '{service_type}'.
 		 Thanks for using Refreshed Car Care.""".format(
 			on_day=on_day,
-			on_time=frappe.utils.data.format_datetime(s.starts_on,"EEEE MMM d 'at' HH:m a"),
-			service_type=svc.service_type
+			on_time=frappe.utils.data.format_datetime(service.starts_on,"EEEE MMM d 'at' HH:mm a"),
+			service_type=service.service_type
 		)
+		return sms_message
 
 
 	# IF current time is 8PM, check services scheduled for tomorrow.
 	# Send smses
 
+	# nowtime_utc = frappe.utils.datetime.datetime.utcnow()
+	# nowtime_utc.replace(tzinfo=tz.gettz("UTC"))
 
-	msg = get_msg(service, "tomorrow")
-	note = frappe.new_doc("Note")
-	note.title = "SMS Log - "+ frappe.utils.nowdate() + frappe.utils.nowtime()
-	note.public = 1
-	note.content = "Attempting to fire SMS at {0}".format(frappe.utils.nowdate() + frappe.utils.nowtime())
-	note.save()
-	frappe.db.commit()
+	# nowtime_ak = nowtime_utc.astimezone(tz.gettz("Asia/Kolkata"))
+
+	# if frappe.utils.datetime.time(19,45) <= nowtime_ak.time().replace(second=0, microsecond=0) <= frappe.utils.datetime.time(20,15):
+	# note = frappe.new_doc("Note")
+	# note.title = "SMS Log - "+ frappe.utils.nowdate() + frappe.utils.nowtime()
+	# note.public = 1
+	# note.content = "Attempting to fire SMS at {0}".format(frappe.utils.nowdate() + frappe.utils.nowtime())
+	# note.save()
+	# frappe.db.commit()
 
 	#if frappe.utils.datetime.time(13,45) <= frappe.utils.datetime.datetime.now().time() <= frappe.utils.datetime.time(14,15):
 
@@ -588,11 +590,15 @@ def send_service_reminder_sms():
 	for service in services:
 		msg = get_msg(service, "tomorrow")
 		note = frappe.new_doc("Note")
-		note.title = "SMS Log"+ frappe.utils.nowdate() + frappe.utils.nowtime()
+		note.title = "SMS Log (Reminder) - "+ frappe.utils.nowdate() + frappe.utils.nowtime()
 		note.public = 1
-		note.content = "Sending message to " + service.customer + " on " + service.contact_phone + "<hr>" + msg + "<hr>" + service.name
+		note.content = "Sending message to {0} on {1} <hr> {2} <hr> {3}".format(service.customer or "'No Cust'", service.contact_phone or "'Phone No'",  msg or "'Message'", service.name or "'Service Name'")
 		note.save()
+
+		frappe.db.set_value("RN Scheduled Service", service.name, "sms_checkbox", 1)
+
 		frappe.db.commit()
+
 
 
 	# tomorrow = frappe.utils.data.add_to_date(str(frappe.utils.datetime.datetime.now().replace(minute=0, second=0, microsecond=0)),days=1)

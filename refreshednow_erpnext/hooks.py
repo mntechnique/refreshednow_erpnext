@@ -101,7 +101,6 @@ doc_events = {
 scheduler_events = {
 	"hourly": [
         "refreshednow_erpnext.api.hourly_call"
-		#"refreshednow_erpnext.api.send_service_reminder_sms"
 	]
 }
 

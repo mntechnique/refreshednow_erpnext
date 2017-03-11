@@ -25,7 +25,7 @@ class RNScheduledService(Document):
 	def on_submit(self):
 			# frappe.db.set_value("RN Scheduled Service", self.name, "sales_order", so_name)
 			# frappe.db.commit()
-		fire_sms_on_submit(self.service_type,self.starts_on,self.contact_phone)
+		fire_sms_on_submit(self.service_type, self.starts_on, self.contact_phone)
 
 
 	def on_cancel(self):
@@ -191,8 +191,8 @@ def customer_query(doctype, txt, searchfield, start, page_len, filters):
 
 def fire_sms_on_submit(service_type, starts_on, contact_phone):
 
-	for x in xrange(1,10):
-		print "Service Type: ", service_type, "Starts On: ", starts_on, "Contact Phone: ", contact_phone 
+	# for x in xrange(1,10):
+	# 	print "Service Type: ", service_type, "Starts On: ", starts_on, "Contact Phone: ", contact_phone 
 
 	sms_message = "Thank you for contacting Refreshed Car Care. "
 	sms_message += "We have taken your booking for "
@@ -202,8 +202,8 @@ def fire_sms_on_submit(service_type, starts_on, contact_phone):
 	# send_sms(self.contact_phone, sms_message)
 
 	note = frappe.new_doc("Note")
-	note.title = "SMS Log"+ frappe.utils.nowdate() + frappe.utils.nowtime()
+	note.title = "SMS Log (Confirmation) - "+ frappe.utils.nowdate() + frappe.utils.nowtime()
 	note.public = 1
-	note.content = "Sending message to " +  contact_phone + "<hr>" + sms_message
+	note.content = "Sending message to {0} <hr> {1}".format(contact_phone or "Contact Phone", sms_message or "Message Content")
 	note.save()
 	frappe.db.commit()
