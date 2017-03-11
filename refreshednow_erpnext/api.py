@@ -174,7 +174,7 @@ def get_rn_daily_events(start, end, filters=None):
 		["docstatus", "!=", 2]], fields=['*'])
 
 	for service in scheduled_services:
-		print service
+		print "Service: ", service.name
 
 		service_color = "grey"
 		if service.get("workflow_state") == "To Schedule":

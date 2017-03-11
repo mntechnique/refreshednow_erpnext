@@ -83,21 +83,15 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 }
 
 frappe.pages['rn-team-scheduling'].on_page_show = function(wrapper) {
-	console.log("Page Show Called");
-
-	//render_weekly_calendar(wrapper);
 	var route = frappe.get_route();
 
 	var scheduled_date = route[2];
 	var service_type = route[3];
 	var scheduled_time = route[4];
-	// if (route[1] && (route[1] == "daily")) { 
-	// 	
-	// }
+	
 	render_calendars(wrapper, service_type, scheduled_date, scheduled_time);
 }
-
-
+	
 function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultDate, page_filters, wrapper) {
 	return	{
 		header:{
@@ -243,7 +237,9 @@ function render_calendars(wrapper, service_type, scheduled_date, scheduled_time=
 		if (service_type && scheduled_date && scheduled_time) {
 			//Daily
 			scheduled_date = frappe.datetime.user_to_str(scheduled_date);
-			scheduled_time = moment(scheduled_time, "hhmm").format("hh:mm:ss");
+			//scheduled_time = moment(scheduled_time, "hhmm").format("hh:mm:ss");
+			scheduled_time = moment(scheduled_time, "hhmm").format("H:mm:ss");
+
 			var daily_options = prepare_daily_options(minTime, 
 				maxTime, 
 				scheduled_date, 
