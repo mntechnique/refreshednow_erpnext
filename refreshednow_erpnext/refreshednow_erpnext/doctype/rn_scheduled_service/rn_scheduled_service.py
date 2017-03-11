@@ -18,9 +18,13 @@ class RNScheduledService(Document):
 		self.check_no_of_vehicles()
 		self.validate_team_availability()
 
-	def on_submit(self):
+	def before_submit(self):
 		if not self.sales_order:
 			self.sales_order = self.create_sales_order()
+		
+	def on_submit(self):
+			# frappe.db.set_value("RN Scheduled Service", self.name, "sales_order", so_name)
+			# frappe.db.commit()
 		fire_sms_on_submit(self.service_type,self.starts_on,self.contact_phone)
 
 
@@ -84,7 +88,6 @@ class RNScheduledService(Document):
 		so = frappe.new_doc("Sales Order")
 		so.transaction_date = self.starts_on
 
-
 		so.company = defaults_temp.get("company")
 		so.customer = self.customer
 		so.delivery_date = add_days(so.transaction_date, 10)
@@ -98,16 +101,16 @@ class RNScheduledService(Document):
 		so.append("items", {
 			"item_code": self.service_type,
 			"qty": 1.0,
-			"rate": frappe.db.get_value("Item Price", filters={"price_list":so.selling_price_list}, fieldname="price_list_rate"),
+			"rate": frappe.db.get_value("Item Price", filters={"price_list":so.selling_price_list, "item_code": self.service_type}, fieldname="price_list_rate"),
 			"conversion_factor": 1.0
 		})
-
 
 		try:
 			so.save()
 			so.submit()
 			frappe.db.commit()
 		except Exception, e:
+			print "Exception", e
 			frappe.throw(_("Sales Order was not saved. <br/> %s" % (e)))
 		else:
 			return so.name
@@ -187,6 +190,10 @@ def customer_query(doctype, txt, searchfield, start, page_len, filters):
 		})
 
 def fire_sms_on_submit(service_type, starts_on, contact_phone):
+
+	for x in xrange(1,10):
+		print "Service Type: ", service_type, "Starts On: ", starts_on, "Contact Phone: ", contact_phone 
+
 	sms_message = "Thank you for contacting Refreshed Car Care. "
 	sms_message += "We have taken your booking for "
 	sms_message += service_type
