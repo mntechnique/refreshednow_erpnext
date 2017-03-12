@@ -575,8 +575,12 @@ def send_service_reminder_sms():
 	nowtime_ak = nowtime_utc.astimezone(tz.gettz("Asia/Kolkata"))
 
 	#Comparison times are adjusted for SF time.
-	if frappe.utils.datetime.time(14,15) <= nowtime_ak.time().replace(second=0, microsecond=0) <= frappe.utils.datetime.time(14,45):
+
+
+	#if frappe.utils.datetime.time(14,15) <= nowtime_ak.time().replace(second=0, microsecond=0) <= frappe.utils.datetime.time(14,45):
 	#if frappe.utils.datetime.time(13,45) <= frappe.utils.datetime.datetime.now().time() <= frappe.utils.datetime.time(14,15):
+
+	if nowtime_ak.hour in [15,16,17]:
 		tomorrow = frappe.utils.data.add_to_date(frappe.utils.today(), days=1)
 		services = frappe.db.sql("""SELECT * FROM `tabRN Scheduled Service`
 						WHERE date(starts_on) = '{starts_on_date}'
