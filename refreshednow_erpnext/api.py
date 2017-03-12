@@ -576,7 +576,7 @@ def send_service_reminder_sms():
 	# frappe.db.commit()
 
 	#Comparison times are adjusted for SF time.
-	if frappe.utils.datetime.time(13,45) <= nowtime_ak.time().replace(second=0, microsecond=0) <= frappe.utils.datetime.time(14,15):
+	if frappe.utils.datetime.time(14,15) <= nowtime_ak.time().replace(second=0, microsecond=0) <= frappe.utils.datetime.time(14,45):
 	#if frappe.utils.datetime.time(13,45) <= frappe.utils.datetime.datetime.now().time() <= frappe.utils.datetime.time(14,15):
 		tomorrow = frappe.utils.data.add_to_date(frappe.utils.today(), days=1)
 		services = frappe.db.sql("""SELECT * FROM `tabRN Scheduled Service`
