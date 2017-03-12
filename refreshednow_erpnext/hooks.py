@@ -147,6 +147,7 @@ fixtures = [{"dt":"Custom Script", "filters": [["name", "in", ["Customer-Client"
 		"Address-read_only_onload",
         "Contact-search_fields",
         "Contact-read_only_onload",
+        "Contact-phone-reqd",
         "Sales Invoice-select_print_heading-default"
 	]]]},
     {"dt": "Workflow", "filters": [["name", "in", [
