@@ -1,0 +1,22 @@
+{
+ "content": null, 
+ "creation": "2016-12-04 23:11:35.450531", 
+ "docstatus": 0, 
+ "doctype": "Page", 
+ "idx": 0, 
+ "modified": "2016-12-04 23:11:35.450531", 
+ "modified_by": "Administrator", 
+ "module": "RefreshedNow ERPNext", 
+ "name": "rn-daily-allocation", 
+ "owner": "Administrator", 
+ "page_name": "rn-daily-allocation", 
+ "roles": [
+  {
+   "role": "All"
+  }
+ ], 
+ "script": null, 
+ "standard": "Yes", 
+ "style": null, 
+ "title": "Daily Cleaner Allocation"
+}
