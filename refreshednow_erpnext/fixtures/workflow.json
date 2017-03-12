@@ -1,0 +1,75 @@
+[
+ {
+  "docstatus": 0, 
+  "doctype": "Workflow", 
+  "document_type": "RN Scheduled Service", 
+  "is_active": 1, 
+  "modified": "2017-01-04 18:29:23.837586", 
+  "name": "RN Scheduled Service", 
+  "override_status": 0, 
+  "states": [
+   {
+    "allow_edit": "Support Team", 
+    "doc_status": "0", 
+    "message": null, 
+    "state": "To Schedule", 
+    "update_field": "", 
+    "update_value": null
+   }, 
+   {
+    "allow_edit": "Support Team", 
+    "doc_status": "1", 
+    "message": null, 
+    "state": "To Dispatch", 
+    "update_field": null, 
+    "update_value": null
+   }, 
+   {
+    "allow_edit": "Support Team", 
+    "doc_status": "1", 
+    "message": null, 
+    "state": "To Bill", 
+    "update_field": null, 
+    "update_value": null
+   }, 
+   {
+    "allow_edit": "Support Team", 
+    "doc_status": "1", 
+    "message": null, 
+    "state": "Completed", 
+    "update_field": "", 
+    "update_value": null
+   }, 
+   {
+    "allow_edit": "Support Team", 
+    "doc_status": "2", 
+    "message": null, 
+    "state": "Stopped", 
+    "update_field": "", 
+    "update_value": null
+   }
+  ], 
+  "transitions": [
+   {
+    "action": "Confirm", 
+    "allowed": "Support Team", 
+    "next_state": "To Dispatch", 
+    "state": "To Schedule"
+   }, 
+   {
+    "action": "Dispatch", 
+    "allowed": "Support Team", 
+    "next_state": "To Bill", 
+    "state": "To Dispatch"
+   }, 
+   {
+    "action": "Stop", 
+    "allowed": "Support Team", 
+    "next_state": "Stopped", 
+    "state": "To Dispatch"
+   }
+  ], 
+  "workflow_name": "RN Scheduled Service", 
+  "workflow_state_field": "workflow_state"
+ }
+]

@@ -1,0 +1,20 @@
+[
+ {
+  "docstatus": 0, 
+  "doctype": "Custom Script", 
+  "dt": "Customer", 
+  "modified": "2017-01-02 12:41:48.418624", 
+  "name": "Customer-Client", 
+  "script": "frappe.ui.form.on(\"Customer\", \"refresh\", function(frm) {\n     if (!cur_frm.doc.__islocal) {\n        $(frm.fields_dict['rn_customer_vehicles'].wrapper)\n            .html(frappe.render_template(\"customer_vehicle\", cur_frm.doc.__onload))\n\t    .find(\".btn-vehicle\").on(\"click\", function() {\n            \tfrappe.new_doc(\"Vehicle\");\n\t    });\n    \t}\n});", 
+  "script_type": "Client"
+ }, 
+ {
+  "docstatus": 0, 
+  "doctype": "Custom Script", 
+  "dt": "Contact", 
+  "modified": "2017-03-11 13:59:30.910671", 
+  "name": "Contact-Client", 
+  "script": "frappe.ui.form.on(\"Contact\", \"validate\", function(frm) {\n    if (frm.doc.phone.length != 10 ) {\n        msgprint(\"Please enter a valid 10-digit mobile no in this field.\");\n        validated = false;\n    }\n});", 
+  "script_type": "Client"
+ }
+]

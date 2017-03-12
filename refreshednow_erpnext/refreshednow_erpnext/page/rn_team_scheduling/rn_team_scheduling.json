@@ -1,0 +1,19 @@
+{
+ "content": null, 
+ "creation": "2016-12-23 20:21:33.485873", 
+ "docstatus": 0, 
+ "doctype": "Page", 
+ "icon": "icon-check", 
+ "idx": 0, 
+ "modified": "2016-12-23 20:21:33.485873", 
+ "modified_by": "Administrator", 
+ "module": "RefreshedNow ERPNext", 
+ "name": "rn-team-scheduling", 
+ "owner": "Administrator", 
+ "page_name": "rn-team-scheduling", 
+ "roles": [], 
+ "script": null, 
+ "standard": "Yes", 
+ "style": null, 
+ "title": "Team Scheduling"
+}

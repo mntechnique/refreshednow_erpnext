@@ -1,0 +1,26 @@
+<div class="clearfix"></div>
+<div class="row">
+
+	{% if ((!team_members) || (team_members.length == 0)) { %}
+		<div class="col-md-12 col-xs-12">
+			<h2 class="text-muted text-center">Please add members to this team.</h2>
+		</div>
+	{% } else { %}
+		<div class="col-md-12 col-xs-12">
+			<table class="table table-bordered table-striped table-hover table-condensed table-responsive">
+				<thead>
+					<tr>
+						<th>{{ team_name }} members</th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for (var i=0, l=team_members.length; i<=l-1; i++) { %}
+					<tr>
+						<td>{{ team_members[i].member_name }}</td>
+					</tr>
+				{% } %}
+				</tbody>
+			</table>
+		</div>
+	{% } %}
+</div>

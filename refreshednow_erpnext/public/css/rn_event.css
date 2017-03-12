@@ -1,0 +1,11 @@
+.rn-team,
+.rn-team div,
+.rn-team span {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+.rn-team .fc-content .fc-title {
+	padding-top: 25%;
+}
+

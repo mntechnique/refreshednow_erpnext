@@ -1,4 +1,59 @@
-<div class="panel panel-primary">
-  <div class="panel-heading">{{ caller_info["caller_type"] }}</div>
-  <div class="panel-body">{{caller_info.name}}</div>
+<div id="rn-ccc">
+    <div class="panel panel-default" style="margin-top:2%;">
+         <div class="panel-heading">
+            <div class="row" >
+                <div class="col-xs-6">
+                    {{ caller_info["caller_type"] }}
+                </div>
+                <div class="col-xs-6 text-right">
+                    {% if caller_info["caller_type"] == "Customer" %}
+                        <button class="btn btn-sm btn-info" id="btn-open-scheduling">Allocate</button>
+                    {% endif %}    
+                </div>
+            </div>
+        </div>
+        {% if caller_info["caller_type"] == "New Lead" %}
+            <div class="panel-body">
+                <div class="row">
+                     <div class="col-xs-6"><button id="btn-create-lead" class="btn btn-sm btn-secondary pull-right"
+                     type="button"> Create New Lead </button></div>
+                      <div class="col-xs-6"><button id="btn-create-customer" class="btn btn-sm btn-secondary pull-left"
+                     type="button"> Add Customer Contact </button></div>
+                </div>
+            </div>
+        {% endif %}
+        {% if caller_info["caller_type"] == "Lead" %}
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <label>Lead Name : </label> <a href="/desk#Form/Lead/{{ caller_info.name }}">{{ caller_info.display_name }}</a>
+                    </div>
+                    <div class="col-xs-8"><label>Type : </label> {{ caller_info.caller_type }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-4"><label>Email : </label> {{ caller_info.email_id }}</div>
+                    <div class="col-xs-4"><label>Mobile : </label> {{ caller_info.mobile_number }}</div>
+                    <div class="col-xs-4"><label>Phone : </label> {{ caller_info.phone }}</div>
+                </div>
+            </div>
+        {% endif %}
+        {% if caller_info["caller_type"] == "Customer" %}
+            <div class="panel-body">
+                <div class="row">
+                        <div class="col-xs-4">
+                        <label>Contact Name : </label> <a href="/desk#Form/Contact/{{ caller_info.mobile_number}}-{{ caller_info.name }}">{{ caller_info.name }}</a>
+                        </div>
+                         <div class="col-xs-4">
+                        <label>Customer Name : </label> <a href="/desk#Form/Customer/{{ caller_info.name }}">{{ caller_info.display_name }}</a>
+                        </div>
+                        <div class="col-xs-4"><label>Type : </label> {{ caller_info.caller_type }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-4"><label>Email : </label> {{ caller_info.email_id }}</div>
+                    <div class="col-xs-4"><label>Mobile : </label> {{ caller_info.mobile_number }}</div>
+                    <div class="col-xs-4"><label>Phone : </label> {{ caller_info.phone }}</div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
 </div>

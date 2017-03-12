@@ -1,0 +1,36 @@
+<div class="clearfix"></div>
+<div class="row">
+	<div class="col-md-12 col-xs-12 text-right">
+		<button class="btn btn-xs btn-default btn-vehicle">Add</button>
+	</div>
+</div>
+<div class="row">
+	{% if (customer_vehicle.length == 0) { %}
+		<div class="col-md-12 col-xs-12">
+			<h2 class="text-muted text-center">No vehicle(s) linked to this Customer.</h2>
+		</div>
+	{% } else { %}
+		<div class="col-md-12 col-xs-12">
+			<table class="table table-bordered table-striped table-hover table-condensed table-responsive">
+				<thead>
+					<tr>
+						<th>License Plate Number</th>
+						<th>Make</th>
+						<th>Model</th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for (var i=0, l=customer_vehicle.length; i<=l-1; i++) { %}
+
+					<tr>
+						<td><a href="/desk#Form/Vehicle/{{ customer_vehicle[i].license_plate }}">{{ customer_vehicle[i].license_plate }}</a></td>
+						<td>{{ customer_vehicle[i].make }}</td>
+						<td>{{ customer_vehicle[i].model }}</td>
+					</tr>
+				
+				{% } %}
+				</tbody>
+			</table>
+		</div>
+	{% } %}
+</div>

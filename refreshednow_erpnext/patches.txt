@@ -1,0 +1,1 @@
+execute:frappe.delete_doc("Custom Field", "Sales Order-rn_scheduled_service") #2017-01-03

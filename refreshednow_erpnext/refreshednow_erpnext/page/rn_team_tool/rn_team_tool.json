@@ -1,0 +1,22 @@
+{
+ "content": null, 
+ "creation": "2017-01-08 20:25:05.481086", 
+ "docstatus": 0, 
+ "doctype": "Page", 
+ "idx": 0, 
+ "modified": "2017-01-08 20:25:05.481086", 
+ "modified_by": "Administrator", 
+ "module": "RefreshedNow ERPNext", 
+ "name": "rn-team-tool", 
+ "owner": "Administrator", 
+ "page_name": "rn-team-tool", 
+ "roles": [
+  {
+   "role": "Support Team"
+  }
+ ], 
+ "script": null, 
+ "standard": "Yes", 
+ "style": null, 
+ "title": "Team Tool"
+}

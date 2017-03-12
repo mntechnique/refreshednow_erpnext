@@ -1,0 +1,47 @@
+[
+ {
+  "docstatus": 0, 
+  "doctype": "Workflow State", 
+  "icon": "", 
+  "modified": "2017-01-03 10:31:02.399317", 
+  "name": "To Dispatch", 
+  "style": "Primary", 
+  "workflow_state_name": "To Dispatch"
+ }, 
+ {
+  "docstatus": 0, 
+  "doctype": "Workflow State", 
+  "icon": "", 
+  "modified": "2017-01-03 10:31:08.070771", 
+  "name": "To Bill", 
+  "style": "Warning", 
+  "workflow_state_name": "To Bill"
+ }, 
+ {
+  "docstatus": 0, 
+  "doctype": "Workflow State", 
+  "icon": "", 
+  "modified": "2017-01-03 10:30:32.626209", 
+  "name": "Completed", 
+  "style": "Success", 
+  "workflow_state_name": "Completed"
+ }, 
+ {
+  "docstatus": 0, 
+  "doctype": "Workflow State", 
+  "icon": "", 
+  "modified": "2017-01-02 23:00:10.586958", 
+  "name": "Stopped", 
+  "style": "", 
+  "workflow_state_name": "Stopped"
+ }, 
+ {
+  "docstatus": 0, 
+  "doctype": "Workflow State", 
+  "icon": "", 
+  "modified": "2017-01-03 10:30:15.422566", 
+  "name": "To Schedule", 
+  "style": "Info", 
+  "workflow_state_name": "To Schedule"
+ }
+]

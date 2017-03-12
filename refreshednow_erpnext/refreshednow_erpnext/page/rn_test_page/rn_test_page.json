@@ -1,0 +1,22 @@
+{
+ "content": null, 
+ "creation": "2017-03-07 18:10:46.858663", 
+ "docstatus": 0, 
+ "doctype": "Page", 
+ "idx": 0, 
+ "modified": "2017-03-07 18:10:46.858663", 
+ "modified_by": "Administrator", 
+ "module": "RefreshedNow ERPNext", 
+ "name": "rn-test-page", 
+ "owner": "Administrator", 
+ "page_name": "rn-test-page", 
+ "roles": [
+  {
+   "role": "System Manager"
+  }
+ ], 
+ "script": null, 
+ "standard": "Yes", 
+ "style": null, 
+ "title": "Test Page"
+}
