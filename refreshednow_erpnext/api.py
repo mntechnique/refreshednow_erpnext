@@ -564,40 +564,39 @@ def send_service_reminder_sms():
 	# IF current time is 8PM, check services scheduled for tomorrow.
 	# Send smses
 
-	# nowtime_utc = frappe.utils.datetime.datetime.utcnow()
-	# nowtime_utc.replace(tzinfo=tz.gettz("UTC"))
+	nowtime_utc = frappe.utils.datetime.datetime.utcnow()
+	nowtime_utc = nowtime_utc.replace(tzinfo=tz.gettz("UTC"))
+	nowtime_ak = nowtime_utc.astimezone(tz.gettz("Asia/Kolkata"))
 
-	# nowtime_ak = nowtime_utc.astimezone(tz.gettz("Asia/Kolkata"))
-
-	# if frappe.utils.datetime.time(19,45) <= nowtime_ak.time().replace(second=0, microsecond=0) <= frappe.utils.datetime.time(20,15):
 	# note = frappe.new_doc("Note")
 	# note.title = "SMS Log - "+ frappe.utils.nowdate() + frappe.utils.nowtime()
 	# note.public = 1
 	# note.content = "Attempting to fire SMS at {0}".format(frappe.utils.nowdate() + frappe.utils.nowtime())
-	# note.save()
+	# note.save() ap
 	# frappe.db.commit()
 
+	#Comparison times are adjusted for SF time.
+	if frappe.utils.datetime.time(13,45) <= nowtime_ak.time().replace(second=0, microsecond=0) <= frappe.utils.datetime.time(14,15):
 	#if frappe.utils.datetime.time(13,45) <= frappe.utils.datetime.datetime.now().time() <= frappe.utils.datetime.time(14,15):
+		tomorrow = frappe.utils.data.add_to_date(frappe.utils.today(), days=1)
+		services = frappe.db.sql("""SELECT * FROM `tabRN Scheduled Service`
+						WHERE date(starts_on) = '{starts_on_date}'
+						AND docstatus = 1
+						AND sms_checkbox != 1""".format(
+							starts_on_date=tomorrow
+						), as_dict=1)
 
-	tomorrow = frappe.utils.data.add_to_date(frappe.utils.today(), days=1)
-	services = frappe.db.sql("""SELECT * FROM `tabRN Scheduled Service`
-					WHERE date(starts_on) = '{starts_on_date}'
-					AND docstatus = 1
-					AND sms_checkbox != 1""".format(
-						starts_on_date=tomorrow
-					), as_dict=1)
+		for service in services:
+			msg = get_msg(service, "tomorrow")
+			note = frappe.new_doc("Note")
+			note.title = "SMS Log (Reminder) - "+ frappe.utils.nowdate() + frappe.utils.nowtime()
+			note.public = 1
+			note.content = "Sending message to {0} on {1} <hr> {2} <hr> {3}".format(service.customer or "'No Cust'", service.contact_phone or "'Phone No'",  msg or "'Message'", service.name or "'Service Name'")
+			note.save()
 
-	for service in services:
-		msg = get_msg(service, "tomorrow")
-		note = frappe.new_doc("Note")
-		note.title = "SMS Log (Reminder) - "+ frappe.utils.nowdate() + frappe.utils.nowtime()
-		note.public = 1
-		note.content = "Sending message to {0} on {1} <hr> {2} <hr> {3}".format(service.customer or "'No Cust'", service.contact_phone or "'Phone No'",  msg or "'Message'", service.name or "'Service Name'")
-		note.save()
+			frappe.db.set_value("RN Scheduled Service", service.name, "sms_checkbox", 1)
 
-		frappe.db.set_value("RN Scheduled Service", service.name, "sms_checkbox", 1)
-
-		frappe.db.commit()
+			frappe.db.commit()
 
 
 
