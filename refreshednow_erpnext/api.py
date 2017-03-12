@@ -534,15 +534,21 @@ def send_sms(mobile_no, message):
 
 #GRN
 def hourly_call():
-	#frappe.publish_realtime(event="msgprint", message="Hourly beat {0}".format(frappe.utils.get_datetime())) 
-	send_service_reminder_sms()
+		#frappe.publish_realtime(event="msgprint", message="Hourly beat {0}".format(frappe.utils.get_datetime())) 
 
-	# note = frappe.new_doc("Note")
-	# note.title = "SMS Log"
-	# note.public = 1
-	# note.content = "Blah at {0}".format(frappe.utils.get_datetime())
-	# note.save()
-	# frappe.db.commit()
+	ex = None
+	try:
+		send_service_reminder_sms()
+	except Exception as e:
+		ex = e
+	
+	note = frappe.new_doc("Note")
+	note.title = "Hourly beat {0}".format(frappe.utils.nowdate() + frappe.utils.nowtime())
+	note.public = 1
+	note.content = "Hourly beat. <hr> {0}".format(ex) if ex else "No exception"
+	note.save()
+	frappe.db.commit()
+	
 
 
 def send_service_reminder_sms():
@@ -567,13 +573,6 @@ def send_service_reminder_sms():
 	nowtime_utc = frappe.utils.datetime.datetime.utcnow()
 	nowtime_utc = nowtime_utc.replace(tzinfo=tz.gettz("UTC"))
 	nowtime_ak = nowtime_utc.astimezone(tz.gettz("Asia/Kolkata"))
-
-	# note = frappe.new_doc("Note")
-	# note.title = "SMS Log - "+ frappe.utils.nowdate() + frappe.utils.nowtime()
-	# note.public = 1
-	# note.content = "Attempting to fire SMS at {0}".format(frappe.utils.nowdate() + frappe.utils.nowtime())
-	# note.save() ap
-	# frappe.db.commit()
 
 	#Comparison times are adjusted for SF time.
 	if frappe.utils.datetime.time(14,15) <= nowtime_ak.time().replace(second=0, microsecond=0) <= frappe.utils.datetime.time(14,45):
