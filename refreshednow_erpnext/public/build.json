@@ -2,7 +2,15 @@
 	"js/refreshednow.min.js": [
 		"public/js/available_cleaners.html",
 		"public/js/daily_allocation.html",
-        "public/js/caller_information.html"
+		"public/js/rn_calendar.js",
+        "public/js/customer_vehicle.html",
+		"public/js/caller_information.html",
+        "public/js/customer_vehicle.html",
+        "public/js/team_details.html",
+        "public/js/rn_utils.js",
+        "public/js/team_allocation_view.html"
+	],
+	"css/refreshednow.min.css": [
+		"public/css/rn_event.css"
 	]
 }
-
