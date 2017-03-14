@@ -538,12 +538,21 @@ def send_service_reminder_sms():
 
 		for service in services:
 			msg = get_msg(service, "tomorrow")
+
+			note_content = ""
+			try:
+				send_sms(service.contact_phone, msg)
+				note_content = "Sent message to {0} on {1} <hr> {2} <hr> {3}".format(service.customer or "'No Cust'", service.contact_phone or "'Phone No'",  msg or "'Message'", service.name or "'Service Name'")
+				frappe.db.set_value("RN Scheduled Service", service.name, "sms_checkbox", 1)
+				frappe.db.commit()
+			except Exception as e:
+				note_content = "Unable to send message to {0} on {1} <hr> {2} <hr> {3} <hr> {4}".format(service.customer or "'No Cust'", service.contact_phone or "'Phone No'",  msg or "'Message'", service.name or "'Service Name'", ex)
+
+
 			note = frappe.new_doc("Note")
 			note.title = "SMS Log (Reminder) - "+ frappe.utils.nowdate() + frappe.utils.nowtime()
 			note.public = 1
-			note.content = "Sending message to {0} on {1} <hr> {2} <hr> {3}".format(service.customer or "'No Cust'", service.contact_phone or "'Phone No'",  msg or "'Message'", service.name or "'Service Name'")
+			note.content = note_content 
 			note.save()
-
-			frappe.db.set_value("RN Scheduled Service", service.name, "sms_checkbox", 1)
 
 			frappe.db.commit()
