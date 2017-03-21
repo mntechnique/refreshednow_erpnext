@@ -484,7 +484,7 @@ def send_sms(mobile_no, message):
 	querystring = {}
 
 	for p in sms_settings.parameters:
-		querystring[p.parameter]=p.value
+		querystring.update({p.parameter:p.value})
 
 	querystring.update({
 		"sendername":sms_settings.sms_sender_name,
