@@ -326,7 +326,10 @@ def get_team_tool_data(service_type=None, day_of_week=None):
 	if service_type and day_of_week:
 		teams =  frappe.get_all("RN Team", filters={"service_type":service_type})
 
-		employees = frappe.get_all("Employee", filters=[["designation", "in", ["Junior Cleaner", "Senior Cleaner"]]], fields=["name", "employee_name", "designation", "rn_weekly_off"]) #TODO: Filter for On-Field employees.
+		designations = frappe.get_all("RN Team Staff Detail", fields=["designation"], distinct=True) 
+		designations = [d.designation for d in designations]
+
+		employees = frappe.get_all("Employee", filters=[["designation", "in", designations]], fields=["name", "employee_name", "designation", "rn_weekly_off"]) #TODO: Filter for On-Field employees.
 		team_names = [t.name for t in teams]
 		allocations = frappe.get_all("RN Team Day Employee", filters=[["team", "in", team_names], ["day_of_week", "=", day_of_week]], fields=["*"])
 
@@ -484,7 +487,7 @@ def send_sms(mobile_no, message):
 	querystring = {}
 
 	for p in sms_settings.parameters:
-		querystring[p.parameter]=p.value
+		querystring.update({p.parameter:p.value})
 
 	querystring.update({
 		"sendername":sms_settings.sms_sender_name,
