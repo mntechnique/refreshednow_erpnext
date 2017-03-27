@@ -519,10 +519,12 @@ def send_service_reminder_sms():
 		sms_message = """We look forward to refreshing your car {on_day} at {on_time} using '{service_type}'.
 		 Thanks for using Refreshed Car Care.""".format(
 			on_day=on_day,
-			on_time=frappe.utils.data.format_datetime(service.starts_on,"EEEE MMM d 'at' HH:mm a"),
+			on_time=frappe.utils.data.format_datetime(service.starts_on,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.starts_on, "ha").lower(),
 			service_type=service.service_type
 		)
 		return sms_message
+
+
 
 	nowtime_utc = frappe.utils.datetime.datetime.utcnow()
 	nowtime_utc = nowtime_utc.replace(tzinfo=tz.gettz("UTC"))
