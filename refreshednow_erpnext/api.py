@@ -516,10 +516,10 @@ def hourly_call():
 def send_service_reminder_sms():
 	
 	def get_msg(service, on_day):
-		sms_message = """We look forward to refreshing your car {on_day} at {on_time} using '{service_type}'.
+		sms_message = """We look forward to refreshing your car {on_day}, {on_time} using {service_type}.
 		 Thanks for using Refreshed Car Care.""".format(
 			on_day=on_day,
-			on_time=frappe.utils.data.format_datetime(service.starts_on,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.starts_on, "ha").lower(),
+			on_time=frappe.utils.data.format_datetime(service.starts_on,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.starts_on, "h:mm a").lower(),
 			service_type=service.service_type
 		)
 		return sms_message

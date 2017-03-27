@@ -194,9 +194,10 @@ def fire_sms_on_submit(service_type, starts_on, contact_phone):
 	sms_message = "Thank you for contacting Refreshed Car Care. "
 	sms_message += "We have taken your booking for a "
 	sms_message += service_type
-	sms_message += " for "
+	sms_message += " on "
+	sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(starts_on, "h:mm a").lower()
 	#sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d 'at' H:mm a")
-	sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(starts_on, "ha").lower()
+	#sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(starts_on, "ha").lower()
 
 	status_msg = ""
 
@@ -211,3 +212,5 @@ def fire_sms_on_submit(service_type, starts_on, contact_phone):
 	note.content = status_msg #"Sending message to {0} <hr> {1}".format(contact_phone or "Contact Phone", sms_message or "Message Content")
 	note.save()
 	frappe.db.commit()
+
+
