@@ -192,10 +192,11 @@ def customer_query(doctype, txt, searchfield, start, page_len, filters):
 def fire_sms_on_submit(service_type, starts_on, contact_phone):
 
 	sms_message = "Thank you for contacting Refreshed Car Care. "
-	sms_message += "We have taken your booking for "
+	sms_message += "We have taken your booking for a "
 	sms_message += service_type
-	sms_message += " on "
-	sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d 'at' H:mm a")
+	sms_message += " for "
+	#sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d 'at' H:mm a")
+	sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(starts_on, "h:mm a").lower()
 
 	status_msg = ""
 
