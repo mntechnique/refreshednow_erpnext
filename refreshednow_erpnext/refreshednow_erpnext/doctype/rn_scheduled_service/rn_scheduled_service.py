@@ -196,7 +196,7 @@ def fire_sms_on_submit(service_type, starts_on, contact_phone):
 	sms_message += service_type
 	sms_message += " for "
 	#sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d 'at' H:mm a")
-	sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(starts_on, "ha").lower()
+	sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(starts_on, "h:mm a").lower()
 
 	status_msg = ""
 
