@@ -31,7 +31,7 @@ frappe.ui.form.on('RN Scheduled Service', {
 			return {
 				"query": "refreshednow_erpnext.api.contact_query",
 				"filters": {
-					"link_name": cur_frm.doc.customer
+					"customer": frm.doc.customer
 				}
 			};
 		});

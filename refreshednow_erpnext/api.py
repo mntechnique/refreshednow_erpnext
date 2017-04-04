@@ -412,11 +412,13 @@ def customer_query(doctype, txt, searchfield, start, page_len, filters):
 
 @frappe.whitelist()
 def contact_query(doctype, txt, searchfield, start, page_len, filters):
-	return frappe.db.sql("""select A.parent, A.link_name, B.mobile_no, B.phone from `tabDynamic Link` AS A inner join `tabContact` AS B on A.parent=B.name
+	out = frappe.db.sql("""select A.parent, A.link_name, B.mobile_no, B.phone
+		from `tabDynamic Link` AS A inner join `tabContact` AS B on A.parent=B.name
 		where
 			A.parenttype="contact" and
+			A.link_name = '{customer}'and
 			({key} like %(txt)s
-				or A.link_name like %(txt)s
+				or A.parent like %(txt)s
 				or mobile_no like %(txt)s
 				or phone like %(txt)s)
 		order by
@@ -425,12 +427,41 @@ def contact_query(doctype, txt, searchfield, start, page_len, filters):
 			B.name
 		limit %(start)s, %(page_len)s""".format(**{
 			"key":"B.name" if  searchfield == "name" else searchfield,
+			'customer': filters.get('customer')
 		}), {
 			'txt': "%%%s%%" % txt,
 			'_txt': txt.replace("%", ""),
 			'start': start,
 			'page_len': page_len
+
 		})
+
+	# out = frappe.db.sql("""select A.parent, A.link_name, B.mobile_no, B.phone from `tabDynamic Link` AS A inner join `tabContact` AS B on A.parent=B.name
+	# 	where
+	# 		A.parenttype="contact" and
+	# 		({key} like %(txt)s
+	# 			or A.parent like %(txt)s
+	# 			or A.link_name = '{customer}'
+	# 			or mobile_no like %(txt)s
+	# 			or phone like %(txt)s)
+	# 	order by
+	# 		if(locate(%(_txt)s, B.name), locate(%(_txt)s, B.name), 99999),
+	# 		B.idx desc,
+	# 		B.name
+	# 	limit %(start)s, %(page_len)s""".format(**{
+	# 		"key":"B.name" if  searchfield == "name" else searchfield,
+	# 		'customer': filters.get('customer')
+	# 	}), {
+	# 		'txt': "%%%s%%" % txt,
+	# 		'_txt': txt.replace("%", ""),
+	# 		'start': start,
+	# 		'page_len': page_len
+
+	# 	})
+	for x in xrange(1,10):
+		print out
+
+	return out
 
 @frappe.whitelist()
 def print_job_sheet(names):
