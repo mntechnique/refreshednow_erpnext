@@ -21,7 +21,7 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 	// if (frappe.get_route().length == 1) {
 	// 	frappe.set_route("rn-team-scheduling", "weekly", frappe.datetime.obj_to_user(frappe.datetime.get_today()), "Refreshed Go");
 	// }
-	
+
 	//Add filter field and restrict to service items.
 	page.add_field(
 		{
@@ -32,7 +32,7 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 			input_css: {"z-index": 1},
 			change: function(event) {
 				var selected = $(this).val();
-				var items = [];	
+				var items = [];
 				$.each(wrapper.page.service_item_data, function(k,v) {
 					items.push(v["item_code"]);
 				});
@@ -49,7 +49,7 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 				"item_group": "Services"
 			}
 		}
-	}	
+	}
 	//Add filter field and restrict to service items.
 	page.add_field(
 		{
@@ -57,7 +57,7 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 			fieldname: "scheduled_date",
 			options: "Item",
 			label: __("Scheduled Date"),
-			default: frappe.datetime.get_today(),
+			//default: frappe.datetime.get_today(),
 			input_css: {"z-index": 1},
 			change: function() {
 				var selected = $(this).val();
@@ -88,10 +88,10 @@ frappe.pages['rn-team-scheduling'].on_page_show = function(wrapper) {
 	var scheduled_date = route[2];
 	var service_type = route[3];
 	var scheduled_time = route[4];
-	
+
 	render_calendars(wrapper, service_type, scheduled_date, scheduled_time);
 }
-	
+
 function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultDate, page_filters, wrapper) {
 	return	{
 		header:{
@@ -112,7 +112,7 @@ function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultD
 		editable: false,
 		columnFormat: "ddd D/M",
 		eventClick: function(calEvent, jsEvent, view) {
-			
+
 			wrapper.page.selected_event_info = {"calEvent": calEvent, "jsEvent": jsEvent, "view": view};
 			wrapper.page.fields_dict['scheduled_date'].set_input(calEvent.start.toDate());
 
@@ -124,7 +124,7 @@ function prepare_weekly_options(minTime="07:00:00", maxTime="17:00:00", defaultD
 				localStorage.setItem("rn_scheduling_view", "daily");
 				build_route(wrapper, "daily");
 			}
-		}, 
+		},
 		defaultDate: defaultDate,
 		/* Fetch events via a callback function*/
 		events: function(start, end, timezone, callback) {
@@ -175,7 +175,7 @@ function prepare_daily_options(minTime="07:00:00", maxTime="17:00:00", defaultDa
 					if (r.message && r.message.exc) {
 						frappe.msgprint(r.message.exc)
 					} else {
-						on_event_click(calEvent, page_filters, wrapper);	
+						on_event_click(calEvent, page_filters, wrapper);
 					}
 				}
 			});
@@ -207,30 +207,30 @@ function prepare_daily_options(minTime="07:00:00", maxTime="17:00:00", defaultDa
 
 
 function render_calendars(wrapper, service_type, scheduled_date, scheduled_time=null) {
-	frappe.require(["assets/refreshednow_erpnext/js/lib/fullcalendar.min.js", 
+	frappe.require(["assets/refreshednow_erpnext/js/lib/fullcalendar.min.js",
 	"assets/refreshednow_erpnext/js/lib/fullcalendar.min.css",
-	"assets/refreshednow_erpnext/js/lib/scheduler.min.js", 
-	"assets/refreshednow_erpnext/js/lib/scheduler.min.css"], 
+	"assets/refreshednow_erpnext/js/lib/scheduler.min.js",
+	"assets/refreshednow_erpnext/js/lib/scheduler.min.css"],
 
 	function() {
 		var page = wrapper.page;
 		var minTime = ""; var maxTime = "";
 
-		$.each(page.service_item_data, function (k,v) { 
+		$.each(page.service_item_data, function (k,v) {
 			if (v["item_code"] == service_type) {
 				minTime = v["start_time"];
 				maxTime = v["end_time"];
 			}
-		});	
+		});
 
 		//Dispose previous instances.
 		if (page.weekly_calendar) {
 			page.weekly_calendar.$cal.fullCalendar('destroy');
-			page.weekly_calendar = null;	
+			page.weekly_calendar = null;
 		}
 		if (page.daily_calendar) {
 			page.daily_calendar.$cal.fullCalendar('destroy');
-			page.daily_calendar = null;	
+			page.daily_calendar = null;
 		}
 		page.wrapper.find(".alert-danger").remove();
 
@@ -240,9 +240,9 @@ function render_calendars(wrapper, service_type, scheduled_date, scheduled_time=
 			//scheduled_time = moment(scheduled_time, "hhmm").format("hh:mm:ss");
 			scheduled_time = moment(scheduled_time, "hhmm").format("H:mm:ss");
 
-			var daily_options = prepare_daily_options(minTime, 
-				maxTime, 
-				scheduled_date, 
+			var daily_options = prepare_daily_options(minTime,
+				maxTime,
+				scheduled_date,
 				{"service_type": service_type, "scheduled_date": scheduled_date, "scheduled_time": scheduled_time},
 				wrapper
 			);
@@ -252,9 +252,9 @@ function render_calendars(wrapper, service_type, scheduled_date, scheduled_time=
 		} else if (service_type && scheduled_date) {
 			//Weekly
 			scheduled_date = frappe.datetime.user_to_str(scheduled_date);
-			var weekly_options = prepare_weekly_options(minTime, 
-				maxTime, 
-				scheduled_date, 
+			var weekly_options = prepare_weekly_options(minTime,
+				maxTime,
+				scheduled_date,
 				{"service_type": service_type, "scheduled_date": scheduled_date},
 				wrapper
 			);
@@ -268,18 +268,18 @@ function render_calendars(wrapper, service_type, scheduled_date, scheduled_time=
 }
 
 // function render_calendars(wrapper, service_type, scheduled_date, scheduled_time=null) {
-// 	frappe.require(["assets/refreshednow_erpnext/js/lib/fullcalendar.min.js", 
+// 	frappe.require(["assets/refreshednow_erpnext/js/lib/fullcalendar.min.js",
 // 	"assets/refreshednow_erpnext/js/lib/fullcalendar.min.css",
-// 	"assets/refreshednow_erpnext/js/lib/scheduler.min.js", 
-// 	"assets/refreshednow_erpnext/js/lib/scheduler.min.css"], 
+// 	"assets/refreshednow_erpnext/js/lib/scheduler.min.js",
+// 	"assets/refreshednow_erpnext/js/lib/scheduler.min.css"],
 
 // 	function() {
 // 		var page = wrapper.page;
-		
+
 // 		if (service_type) && ((scheduled_date) || (scheduled_time)) {
 // 			var minTime = ""; var maxTime = "";
 
-// 			$.each(page.service_item_data, function (k,v) { 
+// 			$.each(page.service_item_data, function (k,v) {
 // 				if (v["item_code"] == service_type) {
 // 					minTime = v["start_time"];
 // 					maxTime = v["end_time"];
@@ -296,16 +296,16 @@ function render_calendars(wrapper, service_type, scheduled_date, scheduled_time=
 // 				scheduled_time = moment(scheduled_time, "hhmm").format("hh:mm:ss");
 // 			}
 
-// 			var weekly_options = prepare_weekly_options(minTime, 
-// 				maxTime, 
-// 				scheduled_date, 
+// 			var weekly_options = prepare_weekly_options(minTime,
+// 				maxTime,
+// 				scheduled_date,
 // 				{"service_type": service_type, "scheduled_date": scheduled_date},
 // 				wrapper
 // 			);
 
-// 			var daily_options = prepare_daily_options(minTime, 
-// 				maxTime, 
-// 				scheduled_date, 
+// 			var daily_options = prepare_daily_options(minTime,
+// 				maxTime,
+// 				scheduled_date,
 // 				{"service_type": service_type, "scheduled_date": scheduled_date, "scheduled_time": scheduled_time},
 // 				wrapper
 // 			);
@@ -314,19 +314,19 @@ function render_calendars(wrapper, service_type, scheduled_date, scheduled_time=
 
 // 			if (page.weekly_calendar) {
 // 				page.weekly_calendar.$cal.fullCalendar('destroy');
-// 				page.weekly_calendar = null;	
+// 				page.weekly_calendar = null;
 // 			}
-			
+
 // 			if (frappe.get_route().indexOf("weekly") != -1) {
 // 				page.weekly_calendar = new refreshednow_erpnext.RNCalendar(weekly_options, page, "weekly");
 // 			}
-			
+
 // 			//Dispose previous instance.
 // 			if (page.daily_calendar) {
 // 				page.daily_calendar.$cal.fullCalendar('destroy');
-// 				page.daily_calendar = null;	
+// 				page.daily_calendar = null;
 // 			}
-			
+
 // 			if (frappe.get_route().indexOf("daily") != -1) {
 // 				page.daily_calendar = new refreshednow_erpnext.RNCalendar(daily_options, page, "daily");
 // 			}
@@ -351,7 +351,7 @@ function build_route(wrapper, rn_view) { //, show_daily="daily") {
 	} else if (rn_view == "weekly") {
 		frappe.set_route("rn-team-scheduling", "weekly", scheduled_date, service_type);
 	}
-	
+
 	//Force page refresh
 	if (frappe.get_route() == initial_route) {
 		frappe.set_route(frappe.get_route());
@@ -370,7 +370,7 @@ function on_day_click(date, service_type, team, wrapper) {
 	rnss.team = team;
 	rnss.starts_on = date.format("Y-M-D HH:mm:ss");
 	rnss.ends_on = date.add(service_item.service_duration,'m').format("Y-M-D HH:mm:ss"); //Replace with service duration.
-	
+
 	frappe.set_route("Form", "RN Scheduled Service", rnss.name);
 }
 
@@ -387,22 +387,22 @@ function on_event_click(calEvent, page_filters, wrapper) {
 function render_daily_event_row(r, wrapper, page_filters) {
 
 	var events = r.message || [];
-				
+
 	var service_item = wrapper.page.service_item_data.filter(function(item) { return item.item_code == page_filters['service_type']})[0];
 	var teams = service_item.teams;
 
 	if (wrapper.page.selected_event_info) {
 		var selected_start_time = wrapper.page.selected_event_info.calEvent.start.toISOString();
 		var selected_end_time =  wrapper.page.selected_event_info.calEvent.end.toISOString();
-		
+
 		//Find an Event under the Resource column which starts at 'selected_start_time'
-		//If such an event is not found, render. 
+		//If such an event is not found, render.
 		$.each(teams, function(i, v) {
 			//Find event for resource v["name"]
 			var event_in_slot_under_resource = events.filter(function(event) {
 				return (event["resourceId"] == v["name"]) && (event["start"] == selected_start_time)
 			});
-			
+
 
 			if (event_in_slot_under_resource.length == 0) {
 				events.push({

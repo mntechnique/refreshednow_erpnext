@@ -20,7 +20,7 @@ frappe.ui.form.on('RN Scheduled Service', {
 						"item_group": r.rn_service_item_group,
 					}
 				};
-			});	
+			});
 		})
 		cur_frm.set_query("customer", function() {
 			return {
@@ -29,8 +29,9 @@ frappe.ui.form.on('RN Scheduled Service', {
 		});
 		cur_frm.set_query("contact_person", function() {
 			return {
+				"query": "refreshednow_erpnext.api.contact_query",
 				"filters": {
-					"customer": cur_frm.doc.customer
+					"link_name": cur_frm.doc.customer
 				}
 			};
 		});
@@ -65,7 +66,7 @@ frappe.ui.form.on('RN Scheduled Service', {
 				}
 			};
 		});
-		
+
 
 		render_vehicles(frm);
 		render_team_members(frm);
@@ -76,7 +77,7 @@ frappe.ui.form.on('RN Scheduled Service', {
 		frm.fields_dict.billing_address.new_doc = quick_entry_billing_address;
 		frm.fields_dict.vehicle.new_doc = quick_entry_vehicle;
 		frm.fields_dict.contact_person.new_doc = quick_entry_contact;
-		
+
 		if (!frm.doc.vehicle_count) { frm.set_value("vehicle_count", 1); }
 	},
 	customer: function(frm) {
@@ -89,14 +90,14 @@ frappe.ui.form.on('RN Scheduled Service', {
 		}
 	},
 	vehicle: function(frm) {
-		render_vehicles(frm);		
+		render_vehicles(frm);
 	},
 	team: function(frm) {
 		render_team_members(frm);
 	},
 	billing_address: function(frm) {
 		erpnext.utils.get_address_display(frm, "billing_address", "billing_address_display");
-	}, 
+	},
 	service_address: function(frm) {
 		erpnext.utils.get_address_display(frm, "service_address", "service_address_display");
 	},
@@ -118,12 +119,12 @@ frappe.ui.form.on('RN Scheduled Service', {
 	// 		erpnext.utils.get_contact_details(frm);
 	// 	}
 		frappe.db.get_value(
-			"Contact", 
-			frm.doc.contact_person, 
-			"phone", 
+			"Contact",
+			frm.doc.contact_person,
+			"phone",
 			function(r) {
 				if (r) {
-					frm.set_value("contact_phone", r.phone);	
+					frm.set_value("contact_phone", r.phone);
 				}
 			}
 		);
@@ -151,13 +152,13 @@ function render_team_members(frm) {
 		frappe.call({
 			method: "refreshednow_erpnext.api.get_team_members",
 			args: {
-				"team_name": frm.doc.team, 
-				"day_of_week": moment(cur_frm.doc.starts_on).format("dddd") 
+				"team_name": frm.doc.team,
+				"day_of_week": moment(cur_frm.doc.starts_on).format("dddd")
 			},
 			callback: function(r) {
 				//console.log(r);
 				$(frm.fields_dict['team_details_html'].wrapper)
-				 .html(frappe.render_template("team_details", {"team_name": frm.doc.team, "team_members": r.message}));	
+				 .html(frappe.render_template("team_details", {"team_name": frm.doc.team, "team_members": r.message}));
 			}
 		});
 	}
@@ -166,32 +167,32 @@ function render_team_members(frm) {
 function fetch_and_set_linked_fields(frm) {
 	frappe.db.get_value(
 		"Address",
-		{ "customer":frm.doc.customer, "address_type":"Billing", "is_primary_address":true }, 
-		"name", 
+		{ "customer":frm.doc.customer, "address_type":"Billing", "is_primary_address":true },
+		"name",
 		function(r) {
 			if (r) {
 				//console.log(r);
-				frm.set_value("billing_address", r.name);	
+				frm.set_value("billing_address", r.name);
 			}
 		}
 	);
 	frappe.db.get_value(
 		"Address",
-		{ "customer":frm.doc.customer, "address_type":"Service" }, 
-		"name", 
+		{ "customer":frm.doc.customer, "address_type":"Service" },
+		"name",
 		function(r) {
 			if (r) {
-				frm.set_value("service_address", r.name);	
+				frm.set_value("service_address", r.name);
 			}
 		}
 	);
 	frappe.db.get_value(
 		"Contact",
-		{ "customer":frm.doc.customer, "is_primary_contact": 1 }, 
-		"name", 
+		{ "customer":frm.doc.customer, "is_primary_contact": 1 },
+		"name",
 		function(r) {
 			if (r) {
-				frm.set_value("contact_person", r.name);	
+				frm.set_value("contact_person", r.name);
 			}
 		}
 	);
@@ -211,9 +212,9 @@ function render_timeslot(frm) {
 function quick_entry_customer() {
 	frappe._from_link = this;
 
-	mnt.quick_entry("Customer", 
-	function(){}, 
-	{ 
+	mnt.quick_entry("Customer",
+	function(){},
+	{
 		"customer_name": this.$input.val(),
 		"customer_group": "All Customer Groups",
 		"customer_type": "Individual",
@@ -223,9 +224,9 @@ function quick_entry_customer() {
 
 function quick_entry_service_address() {
 	frappe._from_link = this;
-	mnt.quick_entry("Address", 
-	function(){}, 
-	{ 
+	mnt.quick_entry("Address",
+	function(){},
+	{
 		"address_title":  this.$input.val() || (cur_frm.doc.customer),
 		"address_type": "Billing",
 		"customer": cur_frm.doc.customer
@@ -235,9 +236,9 @@ function quick_entry_service_address() {
 function quick_entry_billing_address() {
 	frappe._from_link = this;
 
-	mnt.quick_entry("Address", 
-	function(){}, 
-	{ 
+	mnt.quick_entry("Address",
+	function(){},
+	{
 		"address_title": this.$input.val() || (cur_frm.doc.customer),
 		"address_type": "Billing",
 		"customer": cur_frm.doc.customer
@@ -246,9 +247,9 @@ function quick_entry_billing_address() {
 
 function quick_entry_vehicle() {
 	frappe._from_link = this;
-	mnt.quick_entry("Vehicle", 
-	function(){}, 
-	{ 
+	mnt.quick_entry("Vehicle",
+	function(){},
+	{
 		"make": this.$input.val().split(" ")[0],
 		"model": this.$input.val().split(" ")[1],
 		"rn_customer": cur_frm.doc.customer,
@@ -259,9 +260,9 @@ function quick_entry_vehicle() {
 
 function quick_entry_contact() {
 	frappe._from_link = this;
-	mnt.quick_entry("Contact", 
-	function(){}, 
-	{ 
+	mnt.quick_entry("Contact",
+	function(){},
+	{
 		"first_name": this.$input.val().split(" ")[0],
 		"last_name": this.$input.val().split(" ")[1] || "",
 		"customer": cur_frm.doc.customer,

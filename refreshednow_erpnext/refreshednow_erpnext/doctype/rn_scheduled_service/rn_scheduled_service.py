@@ -21,7 +21,7 @@ class RNScheduledService(Document):
 	def before_submit(self):
 		if not self.sales_order:
 			self.sales_order = self.create_sales_order()
-		
+
 	def on_submit(self):
 			# frappe.db.set_value("RN Scheduled Service", self.name, "sales_order", so_name)
 			# frappe.db.commit()
