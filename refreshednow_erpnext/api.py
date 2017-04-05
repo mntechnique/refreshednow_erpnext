@@ -438,62 +438,43 @@ def contact_query(doctype, txt, searchfield, start, page_len, filters):
 			'page_len': page_len
 
 		})
+	for x in xrange(1,10):
+		print out
 	return out
-
-	# out = frappe.db.sql("""select A.parent, A.link_name, B.mobile_no, B.phone from `tabDynamic Link` AS A inner join `tabContact` AS B on A.parent=B.name
-	# 	where
-	# 		A.parenttype="contact" and
-	# 		({key} like %(txt)s
-	# 			or A.parent like %(txt)s
-	# 			or A.link_name = '{customer}'
-	# 			or mobile_no like %(txt)s
-	# 			or phone like %(txt)s)
-	# 	order by
-	# 		if(locate(%(_txt)s, B.name), locate(%(_txt)s, B.name), 99999),
-	# 		B.idx desc,
-	# 		B.name
-	# 	limit %(start)s, %(page_len)s""".format(**{
-	# 		"key":"B.name" if  searchfield == "name" else searchfield,
-	# 		'customer': filters.get('customer')
-	# 	}), {
-	# 		'txt': "%%%s%%" % txt,
-	# 		'_txt': txt.replace("%", ""),
-	# 		'start': start,
-	# 		'page_len': page_len
-
-	# 	})
-	# for x in xrange(1,10):
-	# 	print out
-
 
 
 @frappe.whitelist()
 def get_address(doctype, txt, searchfield, start, page_len, filters):
-	out = frappe.db.sql("""select A.link_name, B.customer
-		from `tabDynamic Link` AS A inner join `tabAddress` AS B on A.link_name=B.customer
+	out = frappe.db.sql("""select A.parent, A.link_name, B.address_line1, B.address_line2, B.city, B.country
+		from `tabDynamic Link` AS A inner join `tabAddress` AS B on A.parent = B.name
 		where
-			A.parenttype="Address" and
+			A.parenttype="address" and
 			A.link_name = '{customer}'and
 			B.address_type = '{address_type}' and
 			({key} like %(txt)s
-				or B.Customer like %(txt)s)
+			or A.parent like %(txt)s
+			or B.address_line1 like %(txt)s
+			or B.address_line2 like %(txt)s
+			or B.city like %(txt)s
+			or B.country like %(txt)s)
 		order by
-			if(locate(%(_txt)s, B.customer), locate(%(_txt)s, B.customer), 99999),
+			if(locate(%(_txt)s, B.name), locate(%(_txt)s, B.name), 99999),
 			B.idx desc,
-			B.customer
+			B.name
 		limit %(start)s, %(page_len)s""".format(**{
-			"key":"B.customer" if  searchfield == "customer" else searchfield,
+			"key":"B.name" if  searchfield == "name" else searchfield,
 			'customer': filters.get('customer'),
-			'address_type': filters.get('address_type')
+			'address_type': filters.get('address_type'),
 		}), {
 			'txt': "%%%s%%" % txt,
 			'_txt': txt.replace("%", ""),
 			'start': start,
 			'page_len': page_len
+
 		})
-
+	for x in xrange(1,10):
+		print out
 	return out
-
 
 @frappe.whitelist()
 def print_job_sheet(names):
