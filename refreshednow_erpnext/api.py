@@ -409,6 +409,9 @@ def customer_query(doctype, txt, searchfield, start, page_len, filters):
 		})
 
 
+# select A.parent, A.link_name, B.customer from `tabDynamic Link` AS A inner join `tabAddress` AS B on A.link_name=B.customer where B.address_type="Service";
+
+
 
 @frappe.whitelist()
 def contact_query(doctype, txt, searchfield, start, page_len, filters):
@@ -435,6 +438,7 @@ def contact_query(doctype, txt, searchfield, start, page_len, filters):
 			'page_len': page_len
 
 		})
+	return out
 
 	# out = frappe.db.sql("""select A.parent, A.link_name, B.mobile_no, B.phone from `tabDynamic Link` AS A inner join `tabContact` AS B on A.parent=B.name
 	# 	where
@@ -458,10 +462,38 @@ def contact_query(doctype, txt, searchfield, start, page_len, filters):
 	# 		'page_len': page_len
 
 	# 	})
-	for x in xrange(1,10):
-		print out
+	# for x in xrange(1,10):
+	# 	print out
+
+
+
+@frappe.whitelist()
+def get_address(doctype, txt, searchfield, start, page_len, filters):
+	out = frappe.db.sql("""select A.link_name, B.customer
+		from `tabDynamic Link` AS A inner join `tabAddress` AS B on A.link_name=B.customer
+		where
+			A.parenttype="Address" and
+			A.link_name = '{customer}'and
+			B.address_type = '{address_type}' and
+			({key} like %(txt)s
+				or B.Customer like %(txt)s)
+		order by
+			if(locate(%(_txt)s, B.customer), locate(%(_txt)s, B.customer), 99999),
+			B.idx desc,
+			B.customer
+		limit %(start)s, %(page_len)s""".format(**{
+			"key":"B.customer" if  searchfield == "customer" else searchfield,
+			'customer': filters.get('customer'),
+			'address_type': filters.get('address_type')
+		}), {
+			'txt': "%%%s%%" % txt,
+			'_txt': txt.replace("%", ""),
+			'start': start,
+			'page_len': page_len
+		})
 
 	return out
+
 
 @frappe.whitelist()
 def print_job_sheet(names):
