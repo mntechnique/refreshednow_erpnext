@@ -476,6 +476,29 @@ def get_address(doctype, txt, searchfield, start, page_len, filters):
 		print out
 	return out
 
+
+
+
+# def get_customer_links(customer):
+# 	pass
+
+@frappe.whitelist()
+def get_customer_info(customer):
+	#return {"address": "ABC"}
+	contacts = frappe.get_all("Dynamic Link", filters={"parenttype": "Contact", "link_name": customer}, fields=["*"], order_by="creation DESC")
+	addresses = frappe.get_all("Dynamic Link", filters={"parenttype": "Address", "link_name": customer}, fields=["*"], order_by="creation DESC")
+
+	contact = ""
+	if len(contacts) > 0:
+		contact = contacts[0].parent
+
+	address = ""
+	if len(addresses) > 0:
+		address = addresses[0].parent
+
+	return {"address": address, "contact": contact }
+
+
 @frappe.whitelist()
 def print_job_sheet(names):
 	if not frappe.has_permission("RN Scheduled Service", "write"):
@@ -495,6 +518,7 @@ def print_job_sheet(names):
 	frappe.local.response.filename = "{filename}.pdf".format(filename="job_sheet_list".replace(" ", "-").replace("/", "-"))
 	frappe.local.response.filecontent = rn_get_pdf(final_html, options=pdf_options)
 	frappe.local.response.type = "download"
+
 
 def prepare_bulk_print_html(names):
 	names = names.split(",")

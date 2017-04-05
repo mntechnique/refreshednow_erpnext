@@ -57,7 +57,7 @@ frappe.ui.form.on('RN Scheduled Service', {
                 "query": "refreshednow_erpnext.api.get_address",
                 "filters": {
                     "customer": frm.doc.customer,
-                    "address_type": "Service"
+                    "address_type": "Billing"
                 }
             };
         });
@@ -85,12 +85,10 @@ frappe.ui.form.on('RN Scheduled Service', {
     customer: function(frm) {
         clear_fields_on_customer_change();
         if (frm.doc.customer) {
-            console.log("customer",frm.doc.customer);
             fetch_and_set_linked_fields(frm);
             frm.set_value("bill_to", frm.doc.customer);
         } else {
             frm.doc.customer = undefined; //REQD
-            console.log("customer not found");
         }
     },
     vehicle: function(frm) {
@@ -160,7 +158,6 @@ function render_team_members(frm) {
                 "day_of_week": moment(cur_frm.doc.starts_on).format("dddd")
             },
             callback: function(r) {
-                //console.log(r);
                 $(frm.fields_dict['team_details_html'].wrapper)
                  .html(frappe.render_template("team_details", {"team_name": frm.doc.team, "team_members": r.message}));
             }
@@ -172,12 +169,13 @@ function render_team_members(frm) {
 function fetch_and_set_linked_fields(frm) {
     frappe.call({
         method: "refreshednow_erpnext.api.get_customer_info",
-        args: { customer: frm.doc.customer },
+        args: { 
+            customer: frm.doc.customer 
+        },
         callback: function(r){
             cur_frm.set_value("billing_address", r.message.address);
             cur_frm.set_value("service_address", r.message.address);
             cur_frm.set_value("contact_person", r.message.contact);
-            cur_frm.refresh_fields();
         }
     });
 }
@@ -289,7 +287,6 @@ function quick_entry_contact() {
 }
 
 function clear_fields_on_customer_change() {
-    console.log("Clearing");
     cur_frm.set_value("contact_person", "");
     cur_frm.set_value("contact_display", "");
     cur_frm.set_value("bill_to", "");

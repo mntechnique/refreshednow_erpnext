@@ -149,45 +149,45 @@ class RNScheduledService(Document):
 		if not self.billing_address_same_as_service and not self.billing_address:
 			frappe.throw("Please set the billing address.")
 
-# searches for customer
-@frappe.whitelist()
-def customer_query(doctype, txt, searchfield, start, page_len, filters):
-	# cust_master_name = frappe.defaults.get_user_default("cust_master_name")
+# # searches for customer
+# @frappe.whitelist()
+# def customer_query(doctype, txt, searchfield, start, page_len, filters):
+# 	# cust_master_name = frappe.defaults.get_user_default("cust_master_name")
 
-	# if cust_master_name == "Customer Name":
-	# 	fields = ["name", "customer_group", "territory"]
-	# else:
-	# 	fields = ["name", "customer_name", "customer_group", "territory"]
+# 	# if cust_master_name == "Customer Name":
+# 	# 	fields = ["name", "customer_group", "territory"]
+# 	# else:
+# 	# 	fields = ["name", "customer_name", "customer_group", "territory"]
 
-	# meta = frappe.get_meta("Customer")
-	# fields = fields + [f for f in meta.get_search_fields() if not f in fields]
+# 	# meta = frappe.get_meta("Customer")
+# 	# fields = fields + [f for f in meta.get_search_fields() if not f in fields]
 
-	# fields = ", ".join(fields)
+# 	# fields = ", ".join(fields)
 
-	return frappe.db.sql("""select cust.name, cont.name, cont.phone, cont.mobile_no from `tabCustomer` as cust inner join `tabContact` as cont
-		on cust.name = cont.customer
-		where docstatus < 2
-			and ({key} like %(txt)s
-				or cust.name like %(txt)s
-				or cont.phone like %(txt)s
-				or cont.mobile_no like %(txt)s)
-				and disabled=0
-			{mcond}
-		order by
-			if(locate(%(_txt)s, name), locate(%(_txt)s, name), 99999),
-			if(locate(%(_txt)s, cust.name), locate(%(_txt)s, cust.name), 99999),
-			idx desc,
-			name, cust.name
-		limit %(start)s, %(page_len)s""".format(**{
-			"fields": fields,
-			"key": searchfield,
-			"mcond": get_match_cond(doctype)
-		}), {
-			'txt': "%%%s%%" % txt,
-			'_txt': txt.replace("%", ""),
-			'start': start,
-			'page_len': page_len
-		})
+# 	return frappe.db.sql("""select cust.name, cont.name, cont.phone, cont.mobile_no from `tabCustomer` as cust inner join `tabContact` as cont
+# 		on cust.name = cont.customer
+# 		where docstatus < 2
+# 			and ({key} like %(txt)s
+# 				or cust.name like %(txt)s
+# 				or cont.phone like %(txt)s
+# 				or cont.mobile_no like %(txt)s)
+# 				and disabled=0
+# 			{mcond}
+# 		order by
+# 			if(locate(%(_txt)s, name), locate(%(_txt)s, name), 99999),
+# 			if(locate(%(_txt)s, cust.name), locate(%(_txt)s, cust.name), 99999),
+# 			idx desc,
+# 			name, cust.name
+# 		limit %(start)s, %(page_len)s""".format(**{
+# 			"fields": fields,
+# 			"key": searchfield,
+# 			"mcond": get_match_cond(doctype)
+# 		}), {
+# 			'txt': "%%%s%%" % txt,
+# 			'_txt': txt.replace("%", ""),
+# 			'start': start,
+# 			'page_len': page_len
+# 		})
 
 def fire_sms_on_submit(service_type, starts_on, contact_phone):
 
