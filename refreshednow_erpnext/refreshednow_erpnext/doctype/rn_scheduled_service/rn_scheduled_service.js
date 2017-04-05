@@ -229,7 +229,7 @@ function quick_entry_service_address() {
 	{
 		"address_title":  this.$input.val() || (cur_frm.doc.customer),
 		"address_type": "Billing",
-		"customer": cur_frm.doc.customer
+		"links": [{"link_doctype": "Customer", "link_name": cur_frm.doc.customer}]
 	});
 }
 
@@ -241,7 +241,7 @@ function quick_entry_billing_address() {
 	{
 		"address_title": this.$input.val() || (cur_frm.doc.customer),
 		"address_type": "Billing",
-		"customer": cur_frm.doc.customer
+		"links": [{"link_doctype": "Customer", "link_name": cur_frm.doc.customer}]
 	});
 }
 
@@ -265,7 +265,7 @@ function quick_entry_contact() {
 	{
 		"first_name": this.$input.val().split(" ")[0],
 		"last_name": this.$input.val().split(" ")[1] || "",
-		"customer": cur_frm.doc.customer,
+		"links": [{"link_doctype": "Customer", "link_name": cur_frm.doc.customer}]
 	});
 }
 
