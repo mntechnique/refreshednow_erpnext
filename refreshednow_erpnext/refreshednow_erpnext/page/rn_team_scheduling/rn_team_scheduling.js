@@ -57,7 +57,7 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 			fieldname: "scheduled_date",
 			options: "Item",
 			label: __("Scheduled Date"),
-			//default: frappe.datetime.get_today(),
+			default: frappe.datetime.get_today(),
 			input_css: {"z-index": 1},
 			change: function() {
 				var selected = $(this).val();
