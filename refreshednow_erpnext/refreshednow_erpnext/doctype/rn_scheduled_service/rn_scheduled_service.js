@@ -74,7 +74,7 @@ frappe.ui.form.on('RN Scheduled Service', {
         render_team_members(frm);
         render_timeslot(frm);
 
-        frm.fields_dict.customer.new_doc = quick_entry_customer;
+        //frm.fields_dict.customer.new_doc = quick_entry_customer;
         frm.fields_dict.service_address.new_doc = quick_entry_service_address;
         frm.fields_dict.billing_address.new_doc = quick_entry_billing_address;
         frm.fields_dict.vehicle.new_doc = quick_entry_vehicle;
@@ -227,16 +227,16 @@ function render_timeslot(frm) {
 }
 
 function quick_entry_customer() {
-    frappe._from_link = this;
+    // frappe._from_link = this;
 
-    mnt.quick_entry("Customer",
-    function(){},
-    {
-        "customer_name": this.$input.val(),
-        "customer_group": "All Customer Groups",
-        "customer_type": "Individual",
-        "territory": "All Territories"
-    });
+    // mnt.quick_entry("Customer",
+    // function(){},
+    // {
+    //     "customer_name": this.$input.val(),
+    //     "customer_group": "All Customer Groups",
+    //     "customer_type": "Individual",
+    //     "territory": "All Territories"
+    // });
 }
 
 function quick_entry_service_address() {
