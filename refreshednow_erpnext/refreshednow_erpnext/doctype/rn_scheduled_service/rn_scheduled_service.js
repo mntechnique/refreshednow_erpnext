@@ -226,18 +226,18 @@ function render_timeslot(frm) {
                 .html(timeslot_html);
 }
 
-function quick_entry_customer() {
-    // frappe._from_link = this;
+// function quick_entry_customer() {
+//     frappe._from_link = this;
 
-    // mnt.quick_entry("Customer",
-    // function(){},
-    // {
-    //     "customer_name": this.$input.val(),
-    //     "customer_group": "All Customer Groups",
-    //     "customer_type": "Individual",
-    //     "territory": "All Territories"
-    // });
-}
+//     mnt.quick_entry("Customer",
+//     function(){},
+//     {
+//         "customer_name": this.$input.val(),
+//         "customer_group": "All Customer Groups",
+//         "customer_type": "Lead",
+//         "territory": "All Territories"
+//     });
+// }
 
 function quick_entry_service_address() {
     frappe._from_link = this;
