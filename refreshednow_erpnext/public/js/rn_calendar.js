@@ -3,7 +3,7 @@ refreshednow_erpnext = {}
 frappe.provide("frappe.views.calendar");
 frappe.provide("frappe.views.calendars");
 
-refreshednow_erpnext.RNCalendar = frappe.views.CalendarBase.extend({
+refreshednow_erpnext.RNCalendar = frappe.views.Calendar.extend({
 	init: function(options, page, cal_id) {
 
 		//console.log({"Init": options});
