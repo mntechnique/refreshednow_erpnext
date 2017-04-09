@@ -57,7 +57,6 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 			fieldname: "scheduled_date",
 			options: "Item",
 			label: __("Scheduled Date"),
-			//default: frappe.datetime.get_today(),
 			input_css: {"z-index": 1},
 			change: function() {
 				var selected = $(this).val();
@@ -80,6 +79,10 @@ frappe.pages['rn-team-scheduling'].on_page_load = function(wrapper) {
 		}
 	);
 
+	//Set default scheduled_date
+	if ([undefined, ""].indexOf(page.fields_dict["scheduled_date"].$input.val()) != -1) {
+		page.fields_dict["scheduled_date"].$input.val(frappe.datetime.str_to_user(frappe.datetime.get_today()));
+	}
 }
 
 frappe.pages['rn-team-scheduling'].on_page_show = function(wrapper) {
@@ -204,7 +207,6 @@ function prepare_daily_options(minTime="07:00:00", maxTime="17:00:00", defaultDa
 		},
 	}
 }
-
 
 function render_calendars(wrapper, service_type, scheduled_date, scheduled_time=null) {
 	frappe.require(["assets/refreshednow_erpnext/js/lib/fullcalendar.min.js",
