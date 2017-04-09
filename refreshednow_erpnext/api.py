@@ -326,7 +326,7 @@ def get_team_tool_data(service_type=None, day_of_week=None):
 	if service_type and day_of_week:
 		teams =  frappe.get_all("RN Team", filters={"service_type":service_type})
 
-		designations = frappe.get_all("RN Team Staff Detail", fields=["designation"], distinct=True) 
+		designations = frappe.get_all("RN Team Staff Detail", fields=["designation"], distinct=True)
 		designations = [d.designation for d in designations]
 
 		employees = frappe.get_all("Employee", filters=[["designation", "in", designations]], fields=["name", "employee_name", "designation", "rn_weekly_off"]) #TODO: Filter for On-Field employees.
@@ -382,19 +382,23 @@ def get_availability_for_team_dow(team, day_of_week):
 # searches for customer
 @frappe.whitelist()
 def customer_query(doctype, txt, searchfield, start, page_len, filters):
-	return frappe.db.sql("""select cust.name, cont.phone, cont.mobile_no from `tabCustomer` as cust
-		left outer join (select phone, mobile_no, customer from tabCustomer inner join tabContact on `tabCustomer`.name = customer) as cont
-		on cust.name = cont.customer
+	# return frappe.db.sql(""" select `tabContact`.name from `tabContact`, `tabDynamic Link`
+	# 	where `tabDynamic Link`.link_doctype = 'Supplier' and (`tabDynamic Link`.link_name = %(name)s
+	# 	or `tabDynamic Link`.link_name like %(txt)s) and `tabContact`.name = `tabDynamic Link`.parent
+	# 	limit %(start)s, %(page_len)s""", {"start": start, "page_len":page_len, "txt": "%%%s%%" % txt, "name": filters.get('supplier')})
+
+
+	return frappe.db.sql("""select C.name, D.contact_number from `tabCustomer` AS C left outer join (select A.parent, A.link_name, IFNULL(B.mobile_no, B.phone) AS contact_number from `tabDynamic Link` AS A inner join `tabContact` AS B on A.parent=B.name where A.parenttype = "contact") AS D on C.name = D.link_name
+
 		where
 			({key} like %(txt)s
-				or cust.name like %(txt)s
-				or cont.phone like %(txt)s
-				or cont.mobile_no like %(txt)s)
+				or C.name like %(txt)s
+				or D.contact_number like %(txt)s)
 				and disabled=0
 		order by
-			if(locate(%(_txt)s, cust.name), locate(%(_txt)s, cust.name), 99999),
+			if(locate(%(_txt)s, C.name), locate(%(_txt)s, C.name), 99999),
 			idx desc,
-			cust.name
+			C.name
 		limit %(start)s, %(page_len)s""".format(**{
 			"key": searchfield
 		}), {
@@ -403,6 +407,97 @@ def customer_query(doctype, txt, searchfield, start, page_len, filters):
 			'start': start,
 			'page_len': page_len
 		})
+
+
+# select A.parent, A.link_name, B.customer from `tabDynamic Link` AS A inner join `tabAddress` AS B on A.link_name=B.customer where B.address_type="Service";
+
+
+
+@frappe.whitelist()
+def contact_query(doctype, txt, searchfield, start, page_len, filters):
+	out = frappe.db.sql("""select A.parent, A.link_name, B.mobile_no, B.phone
+		from `tabDynamic Link` AS A inner join `tabContact` AS B on A.parent=B.name
+		where
+			A.parenttype="contact" and
+			A.link_name = '{customer}'and
+			({key} like %(txt)s
+				or A.parent like %(txt)s
+				or mobile_no like %(txt)s
+				or phone like %(txt)s)
+		order by
+			if(locate(%(_txt)s, B.name), locate(%(_txt)s, B.name), 99999),
+			B.idx desc,
+			B.name
+		limit %(start)s, %(page_len)s""".format(**{
+			"key":"B.name" if  searchfield == "name" else searchfield,
+			'customer': filters.get('customer')
+		}), {
+			'txt': "%%%s%%" % txt,
+			'_txt': txt.replace("%", ""),
+			'start': start,
+			'page_len': page_len
+
+		})
+	for x in xrange(1,10):
+		print out
+	return out
+
+
+@frappe.whitelist()
+def get_address(doctype, txt, searchfield, start, page_len, filters):
+	out = frappe.db.sql("""select A.parent, A.link_name, B.address_line1, B.address_line2, B.city, B.country
+		from `tabDynamic Link` AS A inner join `tabAddress` AS B on A.parent = B.name
+		where
+			A.parenttype="address" and
+			A.link_name = '{customer}'and
+			B.address_type = '{address_type}' and
+			({key} like %(txt)s
+			or A.parent like %(txt)s
+			or B.address_line1 like %(txt)s
+			or B.address_line2 like %(txt)s
+			or B.city like %(txt)s
+			or B.country like %(txt)s)
+		order by
+			if(locate(%(_txt)s, B.name), locate(%(_txt)s, B.name), 99999),
+			B.idx desc,
+			B.name
+		limit %(start)s, %(page_len)s""".format(**{
+			"key":"B.name" if  searchfield == "name" else searchfield,
+			'customer': filters.get('customer'),
+			'address_type': filters.get('address_type'),
+		}), {
+			'txt': "%%%s%%" % txt,
+			'_txt': txt.replace("%", ""),
+			'start': start,
+			'page_len': page_len
+
+		})
+	for x in xrange(1,10):
+		print out
+	return out
+
+
+
+
+# def get_customer_links(customer):
+# 	pass
+
+@frappe.whitelist()
+def get_customer_info(customer):
+	#return {"address": "ABC"}
+	contacts = frappe.get_all("Dynamic Link", filters={"parenttype": "Contact", "link_name": customer}, fields=["*"], order_by="creation DESC")
+	addresses = frappe.get_all("Dynamic Link", filters={"parenttype": "Address", "link_name": customer}, fields=["*"], order_by="creation DESC")
+
+	contact = ""
+	if len(contacts) > 0:
+		contact = contacts[0].parent
+
+	address = ""
+	if len(addresses) > 0:
+		address = addresses[0].parent
+
+	return {"address": address, "contact": contact }
+
 
 @frappe.whitelist()
 def print_job_sheet(names):
@@ -423,6 +518,7 @@ def print_job_sheet(names):
 	frappe.local.response.filename = "{filename}.pdf".format(filename="job_sheet_list".replace(" ", "-").replace("/", "-"))
 	frappe.local.response.filecontent = rn_get_pdf(final_html, options=pdf_options)
 	frappe.local.response.type = "download"
+
 
 def prepare_bulk_print_html(names):
 	names = names.split(",")
@@ -511,12 +607,12 @@ def hourly_call():
 		note.content = "Hourly beat. <hr> {0}".format(ex) if ex else "No exception"
 		note.save()
 		frappe.db.commit()
-	
-	
+
+
 def send_service_reminder_sms():
-	
+
 	def get_msg(service, on_day):
-		sms_message = """We look forward to refreshing your car {on_day} at {on_time} using '{service_type}'.
+		sms_message = """We look forward to refreshing your car {on_day}, {on_time} using {service_type}.
 		 Thanks for using Refreshed Car Care.""".format(
 			on_day=on_day,
 			on_time=frappe.utils.data.format_datetime(service.starts_on,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.starts_on, "h:mm a").lower(),
@@ -557,7 +653,7 @@ def send_service_reminder_sms():
 			note = frappe.new_doc("Note")
 			note.title = "SMS Log (Reminder) - "+ frappe.utils.nowdate() + frappe.utils.nowtime()
 			note.public = 1
-			note.content = note_content 
+			note.content = note_content
 			note.save()
 
 			frappe.db.commit()

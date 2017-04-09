@@ -21,7 +21,7 @@ class RNScheduledService(Document):
 	def before_submit(self):
 		if not self.sales_order:
 			self.sales_order = self.create_sales_order()
-		
+
 	def on_submit(self):
 			# frappe.db.set_value("RN Scheduled Service", self.name, "sales_order", so_name)
 			# frappe.db.commit()
@@ -149,54 +149,54 @@ class RNScheduledService(Document):
 		if not self.billing_address_same_as_service and not self.billing_address:
 			frappe.throw("Please set the billing address.")
 
-# searches for customer
-@frappe.whitelist()
-def customer_query(doctype, txt, searchfield, start, page_len, filters):
-	# cust_master_name = frappe.defaults.get_user_default("cust_master_name")
+# # searches for customer
+# @frappe.whitelist()
+# def customer_query(doctype, txt, searchfield, start, page_len, filters):
+# 	# cust_master_name = frappe.defaults.get_user_default("cust_master_name")
 
-	# if cust_master_name == "Customer Name":
-	# 	fields = ["name", "customer_group", "territory"]
-	# else:
-	# 	fields = ["name", "customer_name", "customer_group", "territory"]
+# 	# if cust_master_name == "Customer Name":
+# 	# 	fields = ["name", "customer_group", "territory"]
+# 	# else:
+# 	# 	fields = ["name", "customer_name", "customer_group", "territory"]
 
-	# meta = frappe.get_meta("Customer")
-	# fields = fields + [f for f in meta.get_search_fields() if not f in fields]
+# 	# meta = frappe.get_meta("Customer")
+# 	# fields = fields + [f for f in meta.get_search_fields() if not f in fields]
 
-	# fields = ", ".join(fields)
+# 	# fields = ", ".join(fields)
 
-	return frappe.db.sql("""select cust.name, cont.name, cont.phone, cont.mobile_no from `tabCustomer` as cust inner join `tabContact` as cont
-		on cust.name = cont.customer
-		where docstatus < 2
-			and ({key} like %(txt)s
-				or cust.name like %(txt)s
-				or cont.phone like %(txt)s
-				or cont.mobile_no like %(txt)s)
-				and disabled=0
-			{mcond}
-		order by
-			if(locate(%(_txt)s, name), locate(%(_txt)s, name), 99999),
-			if(locate(%(_txt)s, cust.name), locate(%(_txt)s, cust.name), 99999),
-			idx desc,
-			name, cust.name
-		limit %(start)s, %(page_len)s""".format(**{
-			"fields": fields,
-			"key": searchfield,
-			"mcond": get_match_cond(doctype)
-		}), {
-			'txt': "%%%s%%" % txt,
-			'_txt': txt.replace("%", ""),
-			'start': start,
-			'page_len': page_len
-		})
+# 	return frappe.db.sql("""select cust.name, cont.name, cont.phone, cont.mobile_no from `tabCustomer` as cust inner join `tabContact` as cont
+# 		on cust.name = cont.customer
+# 		where docstatus < 2
+# 			and ({key} like %(txt)s
+# 				or cust.name like %(txt)s
+# 				or cont.phone like %(txt)s
+# 				or cont.mobile_no like %(txt)s)
+# 				and disabled=0
+# 			{mcond}
+# 		order by
+# 			if(locate(%(_txt)s, name), locate(%(_txt)s, name), 99999),
+# 			if(locate(%(_txt)s, cust.name), locate(%(_txt)s, cust.name), 99999),
+# 			idx desc,
+# 			name, cust.name
+# 		limit %(start)s, %(page_len)s""".format(**{
+# 			"fields": fields,
+# 			"key": searchfield,
+# 			"mcond": get_match_cond(doctype)
+# 		}), {
+# 			'txt': "%%%s%%" % txt,
+# 			'_txt': txt.replace("%", ""),
+# 			'start': start,
+# 			'page_len': page_len
+# 		})
 
 def fire_sms_on_submit(service_type, starts_on, contact_phone):
 
 	sms_message = "Thank you for contacting Refreshed Car Care. "
 	sms_message += "We have taken your booking for a "
 	sms_message += service_type
-	sms_message += " for "
-	#sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d 'at' H:mm a")
+	sms_message += " on "
 	sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(starts_on, "h:mm a").lower()
+	#sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d 'at' H:mm a")
 
 	status_msg = ""
 
@@ -211,3 +211,5 @@ def fire_sms_on_submit(service_type, starts_on, contact_phone):
 	note.content = status_msg #"Sending message to {0} <hr> {1}".format(contact_phone or "Contact Phone", sms_message or "Message Content")
 	note.save()
 	frappe.db.commit()
+
+
