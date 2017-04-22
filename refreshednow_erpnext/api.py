@@ -329,7 +329,7 @@ def get_team_tool_data(service_type=None, day_of_week=None):
 		designations = frappe.get_all("RN Team Staff Detail", fields=["designation"], distinct=True)
 		designations = [d.designation for d in designations]
 
-		employees = frappe.get_all("Employee", filters=[["designation", "in", designations]], fields=["name", "employee_name", "designation", "rn_weekly_off"]) #TODO: Filter for On-Field employees.
+		employees = frappe.get_all("Employee", filters=[["designation", "in", designations]], fields=["name", "employee_name", "designation", "rn_weekly_off"],order_by="employee_name") #TODO: Filter for On-Field employees.
 		team_names = [t.name for t in teams]
 		allocations = frappe.get_all("RN Team Day Employee", filters=[["team", "in", team_names], ["day_of_week", "=", day_of_week]], fields=["*"])
 
