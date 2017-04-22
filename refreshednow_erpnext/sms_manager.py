@@ -111,4 +111,3 @@ def get_msg(service, on_day):
         service_type=service.service_type
     )
     return sms_message
-
