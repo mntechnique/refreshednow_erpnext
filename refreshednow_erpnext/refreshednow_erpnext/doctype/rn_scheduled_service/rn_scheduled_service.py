@@ -14,8 +14,9 @@ from refreshednow_erpnext.sms_manager import fire_confirmation_sms
 class RNScheduledService(Document):
     def validate(self):
         self.validate_address()
+        self.validate_reporting_time()
         self.check_overlap()
-        self.validate_schedule_days(allow_scheduling_after_days=0)
+        # self.validate_schedule_days(allow_scheduling_after_days=0)
         self.check_no_of_vehicles()
         self.validate_team_availability()
 
@@ -138,12 +139,12 @@ class RNScheduledService(Document):
                 (starts_on <= ss.starts_on and ends_on >= ss.ends_on):
                 frappe.throw("This service overlaps with {0}".format(ss.name))
 
-    def validate_schedule_days(self, allow_scheduling_after_days=1, allow_scheduling_after_hours=14):
-        #days=1 ---> disallow scheduling of a service before tomorrow.
-        allow_scheduling_after_date = frappe.utils.datetime.datetime.today() + frappe.utils.datetime.timedelta(days=allow_scheduling_after_days)
+    # def validate_schedule_days(self, allow_scheduling_after_days=1, allow_scheduling_after_hours=14):
+    #     #days=1 ---> disallow scheduling of a service before tomorrow.
+    #     allow_scheduling_after_date = frappe.utils.datetime.datetime.today() + frappe.utils.datetime.timedelta(days=allow_scheduling_after_days)
 
-        if frappe.utils.getdate(self.starts_on) < allow_scheduling_after_date.date():
-            frappe.throw("Services can be scheduled after {0}".format(frappe.utils.datetime.datetime.strftime(frappe.utils.data.getdate(allow_scheduling_after_date), "%d %b %Y")))
+    #     if frappe.utils.getdate(self.starts_on) < allow_scheduling_after_date.date():
+    #         frappe.throw("Services can be scheduled after {0}".format(frappe.utils.datetime.datetime.strftime(frappe.utils.data.getdate(allow_scheduling_after_date), "%d %b %Y")))
 
     def check_no_of_vehicles(self):
         if self.vehicle_count <= 0:
@@ -197,8 +198,6 @@ class RNScheduledService(Document):
 #           'start': start,
 #           'page_len': page_len
 #       })
-
-
-
-
-
+    def validate_reporting_time(self):
+        if self.reporting_time<self.starts_on or self.reporting_time>self.ends_on :
+            frappe.throw("Reporting time must be within the selected service slot.")

@@ -130,7 +130,7 @@ frappe.ui.form.on('RN Scheduled Service', {
                 }
             }
         );
-    }
+    }  
 });
 
 function render_vehicles(frm) {

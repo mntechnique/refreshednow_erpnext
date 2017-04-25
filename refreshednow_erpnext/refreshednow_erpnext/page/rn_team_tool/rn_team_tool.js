@@ -81,6 +81,7 @@ function render_allocations(service_type, day_of_week, wrapper) {
 
 			if (r.message.data) {
 				page.main.after(frappe.render_template("team_allocation_view", r.message));
+			    $('.affixed_head').affix({offset: {top: 100} });
 			} else {
 				page.main.after('<div class="alert alert-danger" role="alert">Please select both Service Type and Day of Week.</div>');
 			}
