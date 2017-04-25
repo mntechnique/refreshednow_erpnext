@@ -199,5 +199,5 @@ class RNScheduledService(Document):
 #           'page_len': page_len
 #       })
     def validate_reporting_time(self):
-        if self.reporting_time<self.starts_on or self.reporting_time>self.ends_on :
+        if self.reporting_time < self.starts_on or self.reporting_time>self.ends_on:
             frappe.throw("Reporting time must be within the selected service slot.")

@@ -370,9 +370,9 @@ function on_day_click(date, service_type, team, wrapper) {
 	rnss.scheduled_date = frappe.datetime.obj_to_str(date);
 	rnss.scheduled_time = date.format("HH:mm:ss");
 	rnss.team = team;
-	rnss.starts_on = date.format("Y-M-D HH:mm:ss");
-	rnss.ends_on = date.add(service_item.service_duration,'m').format("Y-M-D HH:mm:ss"); //Replace with service duration.
-
+	
+	rnss.starts_on = date.format("Y-MM-D HH:mm:ss");
+	rnss.ends_on = date.add(service_item.service_duration,'m').format("Y-MM-D HH:mm:ss"); //Replace with service duration.
 	frappe.set_route("Form", "RN Scheduled Service", rnss.name);
 }
 
