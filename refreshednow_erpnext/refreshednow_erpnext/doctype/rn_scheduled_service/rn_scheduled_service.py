@@ -215,6 +215,8 @@ class RNScheduledService(Document):
                                 <div class="col-sm-12">Contact Number:  {6}</div>
                                 <div class="col-sm-12">Comments:  {8}</div>
                                 <div class="col-sm-12">Car:  {9}
+                                <a href="https://api.whatsapp.com/send?phone={6}">Send Message</a></div>
+
                             </div>
                         </div>
                         """.format(self.name, self.customer, self.service_type, frappe.utils.data.format_datetime(self.reporting_time,"EEEE MMM d"), frappe.utils.data.format_datetime(self.reporting_time, "h:mm a").lower(),

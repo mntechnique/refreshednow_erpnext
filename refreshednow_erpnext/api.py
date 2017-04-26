@@ -507,6 +507,7 @@ def print_job_sheet(names):
 	if len(names) == 0:
 		frappe.msgprint("No rows selected.")
 
+
 	final_html = prepare_bulk_print_html(names)
 
 	pdf_options = {
@@ -541,9 +542,12 @@ def prepare_bulk_print_html(names):
 
 
 def rn_get_pdf(html, options=None):
-	fname = os.path.join("/tmp", "refreshed-jobsheet-{0}.pdf".format(frappe.generate_hash()))
-
+	date = frappe.utils.add_days(frappe.utils.getdate(), 1)
+	fname = os.path.join(frappe.get_site_path(), "public","files", "refreshed-jobsheet-{0}.pdf ".format(frappe.utils.data.format_datetime(date,"YYYY-MM-dd")))
+	cleanup(fname)
 	try:
+		for x in xrange(1,10):
+			print "filename", fname
 		pdfkit.from_string(html, fname, options=options or {})
 
 		with open(fname, "rb") as fileobj:
@@ -566,7 +570,7 @@ def rn_get_pdf(html, options=None):
 			raise
 
 	finally:
-		cleanup(fname)
+		pass
 
 	return filedata
 
