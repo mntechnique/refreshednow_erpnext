@@ -6,7 +6,7 @@ import calendar
 from frappe.desk.reportview import get_match_cond
 import json, pdfkit, os
 from frappe.utils.pdf import get_pdf
-
+# from refreshednow_erpnext.sms_manager import fire_reminder_sms
 import datetime
 from dateutil import tz
 
@@ -598,7 +598,8 @@ def cleanup(fname):
 def hourly_call():
 	ex = None
 	try:
-		send_service_reminder_sms()
+		# fire_reminder_sms()
+		pass
 	except Exception as e:
 		ex = e
 		note = frappe.new_doc("Note")
