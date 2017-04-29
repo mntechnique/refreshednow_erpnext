@@ -20,6 +20,7 @@ class RNScheduledService(Document):
         # self.validate_schedule_days(allow_scheduling_after_days=0)
         self.check_no_of_vehicles()
         self.validate_team_availability()
+        self.save_service_summary()
 
     def before_submit(self):
         if not self.sales_order:
@@ -197,3 +198,25 @@ class RNScheduledService(Document):
     def validate_reporting_time(self):
         if self.reporting_time < self.starts_on or self.reporting_time>self.ends_on:
             frappe.throw("Reporting time must be within the selected service slot.")
+
+    def save_service_summary(self):
+        whatsapp_msg = """<div>
+                            <div class="row">
+                                <div class="col-sm-12">Booking Number:  {0}</div>
+                                <div class="col-sm-12">Name:  {1}</div>
+                                <div class="col-sm-12">Type:  {2}</div>
+                                <div class="col-sm-12">Date:   {3}</div>
+                                <div class="col-sm-12">Time:  {4}</div>
+                                <div class="col-sm-12">Address:  {5}</div>
+                                <div class="col-sm-12">Contact Number:  {6}</div>
+                                <div class="col-sm-12">Comments:  {8}</div>
+                                <div class="col-sm-12">Car:  {9}
+                                <a href="https://api.whatsapp.com/send?phone={6}">Send Message</a></div>
+
+                            </div>
+                        </div>
+                        """.format(self.name, self.customer, self.service_type, frappe.utils.data.format_datetime(self.reporting_time,"EEEE MMM d"), frappe.utils.data.format_datetime(self.reporting_time, "h:mm a").lower(),
+                            self.service_address_display, self.contact_phone, "none", self.remarks, self.vehicle)
+
+        self.service_details_summary = whatsapp_msg
+
