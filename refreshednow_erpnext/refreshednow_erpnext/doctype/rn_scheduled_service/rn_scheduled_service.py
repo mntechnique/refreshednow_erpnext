@@ -10,6 +10,7 @@ from frappe.utils import add_days, nowdate
 from frappe import _
 #from refreshednow_erpnext.api import send_sms
 from refreshednow_erpnext.sms_manager import fire_confirmation_sms
+from refreshednow_erpnext.sms_manager import fire_cancellation_sms
 
 class RNScheduledService(Document):
     def validate(self):
@@ -25,16 +26,11 @@ class RNScheduledService(Document):
             self.sales_order = self.create_sales_order()
 
     def on_update_after_submit(self):
-            # frappe.db.set_value("RN Scheduled Service", self.name, "sales_order", so_name)
-            # frappe.db.commit()
-#           if workflow_state = Stopped, fire_cancellation_sms,
-# elif workflow_state = To Dispatch, fire_confirmation_sms
             if self.workflow_state == "Stopped":
-                #fire_cancellation_sms()
+                fire_cancellation_sms()
                 pass
             elif self.workflow_state == "To Dispatch":
                 fire_confirmation_sms(self)
-                #pass
             else:
                 pass
 
