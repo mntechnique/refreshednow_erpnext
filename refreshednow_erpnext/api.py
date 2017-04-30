@@ -1,15 +1,14 @@
 import frappe
 from frappe import _
-import json
-import calendar
-#from datetime import date, datetime, timedelta
-from frappe.desk.reportview import get_match_cond
-import json, pdfkit, os
-from frappe.utils.pdf import get_pdf
-# from refreshednow_erpnext.sms_manager import fire_reminder_sms
-import datetime
-from dateutil import tz
 
+import json, pdfkit, os
+import calendar
+
+from frappe.utils.pdf import get_pdf
+from frappe.desk.reportview import get_match_cond
+from dateutil import tz
+from refreshednow_erpnext.sms_manager import fire_reminder_sms
+# reload(refreshednow_erpnext.)
 # @frappe.whitelist()
 # def rn_events_test(start, end, filters=None):
 # 	events = [
@@ -509,6 +508,8 @@ def print_job_sheet(names):
 
 
 	final_html = prepare_bulk_print_html(names)
+	for x in xrange(1,10):
+		print "names", names
 
 	pdf_options = {
 					"no-outline": None,
@@ -602,8 +603,8 @@ def cleanup(fname):
 def hourly_call():
 	ex = None
 	try:
-		# fire_reminder_sms()
-		pass
+		fire_reminder_sms()
+		send_jobsheet()
 	except Exception as e:
 		ex = e
 		note = frappe.new_doc("Note")
@@ -613,3 +614,6 @@ def hourly_call():
 		note.save()
 		frappe.db.commit()
 
+
+def send_jobsheet():
+	frappe.sendmail("vishaldhayagude@mntechnique.com","vishaldhayagude09@gmail.com",subject="Hello World", message="Hello World")

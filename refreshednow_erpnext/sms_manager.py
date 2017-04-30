@@ -60,29 +60,30 @@ def log_sms(sms_sender_name, mobile_no,message,response):
 
 
 
-def fire_reminder_sms(service):
+def fire_reminder_sms():
 
     # get_msg(service, service_name)
-    sms_block = frappe.db.get_value("Customer",filters={"name":servie.customer},fieldname="rn_unsubscribe_sms");
-    print "sms", sms_block
-    if not sms_block:
+    # sms_block = frappe.db.get_value("Customer",filters={"name":service.customer},fieldname="rn_unsubscribe_sms")
+    # print "sms", sms_block
+    # if not sms_block:
 
-        nowtime_utc = frappe.utils.datetime.datetime.utcnow()
-        nowtime_utc = nowtime_utc.replace(tzinfo=tz.gettz("UTC"))
-        nowtime_ak = nowtime_utc.astimezone(tz.gettz("Asia/Kolkata"))
+    nowtime_utc = frappe.utils.datetime.datetime.utcnow()
+    nowtime_utc = nowtime_utc.replace(tzinfo=tz.gettz("UTC"))
+    nowtime_ak = nowtime_utc.astimezone(tz.gettz("Asia/Kolkata"))
 
-        #Comparison times are adjusted for SF time.
-        get_msg(service, "reminder_msg")
-        if nowtime_ak.hour in [20,21,22]:
-            tomorrow = frappe.utils.data.add_to_date(frappe.utils.today(), days=1)
-            services = frappe.db.sql("""SELECT * FROM `tabRN Scheduled Service`
-                            WHERE date(starts_on) = '{starts_on_date}'
-                            AND docstatus = 1
-                            AND sms_checkbox != 1""".format(
-                                starts_on_date=tomorrow
-                            ), as_dict=1)
-
-            for service in services:
+    #Comparison times are adjusted for SF time.
+    if nowtime_ak.hour in [20,21,22]:
+        tomorrow = frappe.utils.data.add_to_date(frappe.utils.today(), days=1)
+        services = frappe.db.sql("""SELECT * FROM `tabRN Scheduled Service`
+                        WHERE date(starts_on) = '{starts_on_date}'
+                        AND docstatus = 1
+                        AND sms_checkbox != 1""".format(
+                            starts_on_date=tomorrow
+                        ), as_dict=1)
+        get_msg(services, "reminder_msg")
+        for service in services:
+            sms_block = frappe.db.get_value("Customer",filters={"name":service.customer},fieldname="rn_unsubscribe_sms")
+            if not sms_block:
                 msg = get_msg(service, "tomorrow")
                 send_sms(service.contact_phone, msg)
                 frappe.db.set_value("RN Scheduled Service", service.name, "sms_checkbox", 1)
@@ -111,3 +112,5 @@ def get_msg(service, msg_type):
 
     msg_dict = {"reminder_msg":reminder_msg,"confirmation_msg":confirmation_msg}
     return msg_dict[msg_type]
+
+
