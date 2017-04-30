@@ -1,11 +1,12 @@
 {% if (data) { %}
 <div id="team-daily-allocation">
-	<table class="table table-bordered table-striped table-condensed table-hover">
-		<thead class="affixed_head">
-			<tr>
+	<table class="table table-bordered table-striped table-condensed table-hover table-fixed">
+		<thead>
+			<tr class="affixed_head">
 				<th id="staff_col">Staff</th>
-				{% for (var i=0, l=data.teams.length; i<l; i++) { %}
-					<th style="text-align:center;"> {%= data.teams[i].name %}
+				{%	
+					for (var i=0, l=data.teams.length; i<l; i++) { %}
+					<th id="checkbox_row" style="text-align:center;"> {%= data.teams[i].name %}
 					</th>
 				{% } %}
 			</tr>
@@ -34,11 +35,11 @@
 						%}
 
 						{% if (rn_weekly_off == dow) { %}
-							<td id="checkbox_row" style="text-align:center; background-color: #ea4335" title="Weekly Off">
+							<td style="text-align:center; background-color: #ea4335" title="Weekly Off">
 								<input disabled="True" type="checkbox"/>
 							</td>
 						{% } else { %}
-							<td id="checkbox_row" style="text-align:center;">
+							<td style="text-align:center;">
 
 								{% if (found_alloc.length > 0) { %}
 									<input type="checkbox" data-team="{%= team_name %}" data-employee="{%= emp_name %}" data-dow="{%= dow %}" onclick="checkbox_clicked(this)" checked/>

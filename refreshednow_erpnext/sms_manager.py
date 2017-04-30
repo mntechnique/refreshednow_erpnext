@@ -48,6 +48,20 @@ def fire_confirmation_sms(service):
         except Exception as e:
             status_msg = "SMS was not sent to '{0}'. <hr> {1}".format(service.contact_phone, e)
 
+def fire_cancellation_sms(service):
+    sms_block = frappe.db.get_value("Customer",filters={"name":servie.customer},fieldname="rn_unsubscribe_sms");
+    print "sms", sms_block
+    if not sms_block:
+        get_msg(service, "cancellation_msg")
+        #sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d 'at' H:mm a")
+        #sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(starts_on, "ha").lower()
+        status_msg = ""
+
+        try:
+            status_msg = send_sms(service.contact_phone, service.sms_message)
+        except Exception as e:
+            status_msg = "SMS was not sent to '{0}'. <hr> {1}".format(service.contact_phone, e)
+
 
 def log_sms(sms_sender_name, mobile_no,message,response):
     print "inside log_sms"
@@ -104,6 +118,12 @@ def get_msg(service, msg_type):
         on_time=frappe.utils.data.format_datetime(service.reporting_time,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.reporting_time, "h:mm a").lower(),
         service_type=service.service_type
     )
+    confirmation_msg = """Thank you for contacting Refreshed Car Care. We have taken your booking for a {service_type} on {on_time}.
+    """.format(
+         on_time=frappe.utils.data.format_datetime(service.reporting_time,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.reporting_time, "h:mm a").lower(),
+        service_type=service.service_type
+        )
+
     confirmation_msg = """Thank you for contacting Refreshed Car Care. We have taken your booking for a {service_type} on {on_time}.
     """.format(
          on_time=frappe.utils.data.format_datetime(service.reporting_time,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.reporting_time, "h:mm a").lower(),
