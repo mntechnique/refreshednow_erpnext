@@ -9,3 +9,64 @@
 	padding-top: 25%;
 }
 
+/*
+.table-condensed > thead > tr > th, 
+.table-condensed > tbody > tr > th, 
+.table-condensed > tfoot > tr > th, 
+.table-condensed > thead > tr > td, 
+.table-condensed > tbody > tr > td, 
+.table-condensed > tfoot > tr > td {
+    padding: 5px;
+}
+
+.table > thead > tr > th, 
+.table > tbody > tr > th, 
+.table > tfoot > tr > th, 
+.table > thead > tr > td, 
+.table > tbody > tr > td, 
+.table > tfoot > tr > td {
+    padding: 8px;
+    line-height: 1.42857143;
+    vertical-align: top;
+    border-top: 1px solid #d1d8dd;
+}*/
+
+
+#team-daily-allocation .affix{
+	top:16%;
+	display:table-row;
+	width:87%;
+	background:#ffffff;
+	border:1px solid rgb(206,216,221);
+}
+
+#team-daily-allocation #staff_col,
+#team-daily-allocation #staff_col_td{
+	width:20%;
+}
+
+#team-daily-allocation .affix #staff_col{
+	width:31.5%;
+	padding: 8px;
+    line-height: 1.42857143;
+    vertical-align: top;
+    border-top: 1px solid #d1d8dd;
+}
+
+#team-daily-allocation .affix #checkbox_row{
+	padding: 5px;
+    display: table-cell;
+    line-height: 1.42857143;
+}
+
+/*#team-daily-allocation .affix #staff_col{
+    padding: 5px;	
+}
+
+#team-daily-allocation .affix #staff_col{
+	padding: 8px;
+    line-height: 1.42857143;
+    vertical-align: top;
+    border-top: 1px solid #d1d8dd;
+}
+*/
