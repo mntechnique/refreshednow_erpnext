@@ -438,8 +438,7 @@ def contact_query(doctype, txt, searchfield, start, page_len, filters):
 			'page_len': page_len
 
 		})
-	for x in xrange(1,10):
-		print out
+
 	return out
 
 
@@ -472,8 +471,7 @@ def get_address(doctype, txt, searchfield, start, page_len, filters):
 			'page_len': page_len
 
 		})
-	for x in xrange(1,10):
-		print out
+
 	return out
 
 

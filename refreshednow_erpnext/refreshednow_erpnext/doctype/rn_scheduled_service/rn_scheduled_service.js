@@ -12,10 +12,6 @@ frappe.ui.form.on('RN Scheduled Service', {
             frappe.set_route("rn-team-scheduling");
         });
 
-        if (frm.doc.starts_on) {
-            frm.set_value("reporting_time", frm.doc.starts_on);
-        }
-
         //Show service items only.
         frappe.db.get_value("RN Settings", "RN Settings", "rn_service_item_group", function(r) {
             cur_frm.set_query("service_type", function() {

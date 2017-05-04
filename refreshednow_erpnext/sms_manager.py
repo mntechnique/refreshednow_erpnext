@@ -63,8 +63,10 @@ def fire_cancellation_sms(service):
             status_msg = "SMS was not sent to '{0}'. <hr> {1}".format(service.contact_phone, e)
 
 
-def log_sms(sms_sender_name, mobile_no,message,response):
-    print "inside log_sms"
+def log_sms(sms_sender_name, mobile_no, message,response):
+    for x in xrange(1,10):
+        print "inside log_sms", sms_sender_name, mobile_no, message, response
+        
     note = frappe.new_doc("Note")
     note.title = "SMS Log (Confirmation) - "+ frappe.utils.nowdate() + frappe.utils.nowtime()
     note.public = 1

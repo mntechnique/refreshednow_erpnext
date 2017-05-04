@@ -26,14 +26,14 @@ class RNScheduledService(Document):
         if not self.sales_order:
             self.sales_order = self.create_sales_order()
 
-    def on_update_after_submit(self):
-            if self.workflow_state == "Stopped":
-                fire_cancellation_sms()
-                pass
-            elif self.workflow_state == "To Dispatch":
-                fire_confirmation_sms(self)
-            else:
-                pass
+    def on_submit(self):    
+        if self.workflow_state == "Stopped":
+            fire_cancellation_sms()
+            pass
+        elif self.workflow_state == "Confirmed":
+            fire_confirmation_sms(self)
+        else:
+            pass
 
     def on_cancel(self):
         linked_so = frappe.db.get_value("Sales Order", filters={"rn_scheduled_service": self.name}, fieldname="name")
