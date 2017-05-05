@@ -72,6 +72,10 @@ frappe.ui.form.on('RN Scheduled Service', {
 
         render_vehicles(frm);
         render_team_members(frm);
+
+        console.log("Pre RS From", frm.doc.starts_on);
+        console.log("Pre RS To", frm.doc.ends_on);
+
         render_timeslot(frm);
 
         //frm.fields_dict.customer.new_doc = quick_entry_customer;
@@ -219,6 +223,10 @@ function render_timeslot(frm) {
     var starts_on = moment(frm.doc.starts_on).format("h:mm a");
     var ends_on = moment(frm.doc.ends_on).format("h:mm a");
     var timeslot = moment(frm.doc.starts_on).format("DD MMM Y") + ", " + starts_on + " - " + ends_on;
+
+    console.log("Render Timeslot SO", frm.doc.starts_on);
+    console.log("Render Timeslot Eo", frm.doc.ends_on);
+    console.log("Timeslot", timeslot);
 
     var timeslot_html = '<div class="form-group"><div class="clearfix"><label class="control-label" style="padding-right: 0px;">Time Slot</label> </div> <div class="control-input-wrapper"> <div class="control-input-static"> <div class="link-field ui-front" style="position: relative;">' + timeslot + '</div> </div> </div> </div>';
 
