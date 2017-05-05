@@ -67,6 +67,8 @@ function build_route_team_tool(wrapper) { //, show_daily="daily") {
 function render_allocations(service_type, day_of_week, wrapper) {
 	page = wrapper.page;
 
+	console.log("DOW", day_of_week);
+
 	frappe.call({
 		method: "refreshednow_erpnext.api.get_team_tool_data",
 		args: {
@@ -76,6 +78,9 @@ function render_allocations(service_type, day_of_week, wrapper) {
 		freeze: true,
 		freeze_message: __("Retrieving..."),
 		callback: function(r) {
+
+			console.log("Team tool data:", r);
+
 			page.wrapper.find("#team-daily-allocation").remove();
 			page.wrapper.find(".alert-danger").remove();
 

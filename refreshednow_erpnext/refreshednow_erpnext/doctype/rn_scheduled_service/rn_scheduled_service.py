@@ -26,14 +26,14 @@ class RNScheduledService(Document):
         if not self.sales_order:
             self.sales_order = self.create_sales_order()
 
-    def on_update_after_submit(self):
-            if self.workflow_state == "Stopped":
-                fire_cancellation_sms()
-                pass
-            elif self.workflow_state == "To Dispatch":
-                fire_confirmation_sms(self)
-            else:
-                pass
+    def on_submit(self):    
+        if self.workflow_state == "Stopped":
+            fire_cancellation_sms()
+            pass
+        elif self.workflow_state == "Confirmed":
+            fire_confirmation_sms(self)
+        else:
+            pass
 
     def on_cancel(self):
         linked_so = frappe.db.get_value("Sales Order", filters={"rn_scheduled_service": self.name}, fieldname="name")
@@ -156,45 +156,7 @@ class RNScheduledService(Document):
         if not self.billing_address_same_as_service and not self.billing_address:
             frappe.throw("Please set the billing address.")
 
-# # searches for customer
-# @frappe.whitelist()
-# def customer_query(doctype, txt, searchfield, start, page_len, filters):
-#   # cust_master_name = frappe.defaults.get_user_default("cust_master_name")
 
-#   # if cust_master_name == "Customer Name":
-#   #   fields = ["name", "customer_group", "territory"]
-#   # else:
-#   #   fields = ["name", "customer_name", "customer_group", "territory"]
-
-#   # meta = frappe.get_meta("Customer")
-#   # fields = fields + [f for f in meta.get_search_fields() if not f in fields]
-
-#   # fields = ", ".join(fields)
-
-#   return frappe.db.sql("""select cust.name, cont.name, cont.phone, cont.mobile_no from `tabCustomer` as cust inner join `tabContact` as cont
-#       on cust.name = cont.customer
-#       where docstatus < 2
-#           and ({key} like %(txt)s
-#               or cust.name like %(txt)s
-#               or cont.phone like %(txt)s
-#               or cont.mobile_no like %(txt)s)
-#               and disabled=0
-#           {mcond}
-#       order by
-#           if(locate(%(_txt)s, name), locate(%(_txt)s, name), 99999),
-#           if(locate(%(_txt)s, cust.name), locate(%(_txt)s, cust.name), 99999),
-#           idx desc,
-#           name, cust.name
-#       limit %(start)s, %(page_len)s""".format(**{
-#           "fields": fields,
-#           "key": searchfield,
-#           "mcond": get_match_cond(doctype)
-#       }), {
-#           'txt': "%%%s%%" % txt,
-#           '_txt': txt.replace("%", ""),
-#           'start': start,
-#           'page_len': page_len
-#       })
     def validate_reporting_time(self):
         if self.reporting_time < self.starts_on or self.reporting_time>self.ends_on:
             frappe.throw("Reporting time must be within the selected service slot.")
