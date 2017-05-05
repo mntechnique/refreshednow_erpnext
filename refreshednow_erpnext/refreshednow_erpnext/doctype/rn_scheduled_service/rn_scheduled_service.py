@@ -30,7 +30,7 @@ class RNScheduledService(Document):
         if self.workflow_state == "Stopped":
             fire_cancellation_sms()
             pass
-        elif self.workflow_state == "Confirmed":
+        elif self.workflow_state == "To Dispatch":
             fire_confirmation_sms(self)
         else:
             pass
