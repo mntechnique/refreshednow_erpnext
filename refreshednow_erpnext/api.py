@@ -524,18 +524,23 @@ def print_job_sheet(names):
 def prepare_bulk_print_html(names):
 	names = names.split(",")
 	html = ""
-	ss_list = []
+	ss_rn_golist = []
+	ss_rn_prolist = []
 
 	for name in names:
 		ss = frappe.get_doc("RN Scheduled Service", name)
 		employee = frappe.db.get_value("RN Team Day Employee", {"team":ss.team,"day_of_week":calendar.day_name[ss.starts_on.weekday()]},"employee")
 		cleaner_name = frappe.db.get_value("Employee", employee, "employee_name")
 		ss.update({"cleaner":cleaner_name})
-		ss_list.append(ss)
+		if ss.service_type=="Refreshed Go":
+			ss_rn_golist.append(ss)
+		else:
+			ss_rn_prolist.append(ss)	
 
-	ss_list = sorted(ss_list, key=lambda v:v.get("starts_on"))
+	ss_rn_golist = sorted(ss_rn_golist, key=lambda v:v.get("starts_on"))	
+	ss_rn_prolist = sorted(ss_rn_prolist, key=lambda v:v.get("starts_on"))
 
-	html_params = { "ss_list": ss_list }
+	html_params = { "ss_rn_golist": ss_rn_golist or [], "ss_rn_prolist": ss_rn_prolist or []}
 	final_html = frappe.render_template("refreshednow_erpnext/templates/includes/refreshed_jobsheet.html", html_params)
 
 	return final_html
