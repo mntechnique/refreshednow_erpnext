@@ -18,6 +18,9 @@ def send_sms(mobile_no, message):
 
     sms_settings = frappe.get_doc("SMS Settings")
 
+    for x in xrange(1,5):
+        print "SMS Settings", sms_settings
+
     querystring = {}
 
     for p in sms_settings.parameters:
@@ -33,34 +36,46 @@ def send_sms(mobile_no, message):
     # response = requests.request("GET", sms_settings.sms_gateway_url, params=querystring)
     response = frappe._dict({"text": "SMS Gateway Invoked"})
 
-    log_sms(sms_sender_name, mobile_no,message,response)
+    log_sms(sms_settings.sms_sender_name, mobile_no,message,response)
     return response.text
 
 def fire_confirmation_sms(service):
+    for x in xrange(1,5):
+        print "in confirmation sms"
+
     sms_block = frappe.db.get_value("Customer",filters={"name":service.customer},fieldname="rn_unsubscribe_sms");
-    print "sms", sms_block
-    if not sms_block:
-        get_msg(service, "confirmation_msg")
+    
+    if sms_block != 1:
+        for x in xrange(1,5):
+            print "User has not unsubscribed."
+        
+        message = get_msg(service, "confirmation_msg")
         #sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d 'at' H:mm a")
         #sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(starts_on, "ha").lower()
         status_msg = ""
 
+        for x in xrange(1,10):
+            print "SMS Message Content: ", message
+
         try:
-            status_msg = send_sms(service.contact_phone, service.sms_message)
+            status_msg = send_sms(service.contact_phone, message)
         except Exception as e:
             status_msg = "SMS was not sent to '{0}'. <hr> {1}".format(service.contact_phone, e)
+
+        for x in xrange(1,10):
+            print "SMS Message Content", status_msg
 
 def fire_cancellation_sms(service):
     sms_block = frappe.db.get_value("Customer",filters={"name":service.customer},fieldname="rn_unsubscribe_sms");
     print "sms", sms_block
     if not sms_block:
-        get_msg(service, "cancellation_msg")
+        message = get_msg(service, "cancellation_msg")
         #sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d 'at' H:mm a")
         #sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(starts_on, "ha").lower()
         status_msg = ""
 
         try:
-            status_msg = send_sms(service.contact_phone, service.sms_message)
+            status_msg = send_sms(service.contact_phone, message)
         except Exception as e:
             status_msg = "SMS was not sent to '{0}'. <hr> {1}".format(service.contact_phone, e)
 
@@ -98,11 +113,11 @@ def fire_reminder_sms():
                         AND sms_checkbox != 1""".format(
                             starts_on_date=tomorrow
                         ), as_dict=1)
-        get_msg(services, "reminder_msg")
+        #get_msg(services, "reminder_msg")
         for service in services:
             sms_block = frappe.db.get_value("Customer",filters={"name":service.customer},fieldname="rn_unsubscribe_sms")
             if not sms_block:
-                msg = get_msg(service, "tomorrow")
+                msg = get_msg(service, "reminder_msg")
                 send_sms(service.contact_phone, msg)
                 frappe.db.set_value("RN Scheduled Service", service.name, "sms_checkbox", 1)
                 frappe.db.commit()

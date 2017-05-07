@@ -7,7 +7,7 @@ import calendar
 from frappe.utils.pdf import get_pdf
 from frappe.desk.reportview import get_match_cond
 from dateutil import tz
-from refreshednow_erpnext.sms_manager import fire_reminder_sms
+from .sms_manager import fire_reminder_sms
 # reload(refreshednow_erpnext.)
 # @frappe.whitelist()
 # def rn_events_test(start, end, filters=None):
