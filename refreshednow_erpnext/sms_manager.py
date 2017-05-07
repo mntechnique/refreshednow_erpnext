@@ -61,6 +61,7 @@ def fire_confirmation_sms(service):
             status_msg = send_sms(service.contact_phone, message)
         except Exception as e:
             status_msg = "SMS was not sent to '{0}'. <hr> {1}".format(service.contact_phone, e)
+            frappe.msgprint(status_msg)
 
         for x in xrange(1,10):
             print "SMS Message Content", status_msg
@@ -78,9 +79,9 @@ def fire_cancellation_sms(service):
             status_msg = send_sms(service.contact_phone, message)
         except Exception as e:
             status_msg = "SMS was not sent to '{0}'. <hr> {1}".format(service.contact_phone, e)
+            frappe.msgprint(status_msg)    
 
-
-def log_sms(sms_sender_name, mobile_no, message,response):
+def log_sms(sms_sender_name, mobile_no, message,response={"text":"~"}):
     for x in xrange(1,10):
         print "inside log_sms", sms_sender_name, mobile_no, message, response
         
@@ -143,13 +144,11 @@ def get_msg(service, msg_type):
         service_type=service.service_type
         )
 
-    confirmation_msg = """Thank you for contacting Refreshed Car Care. We have taken your booking for a {service_type} on {on_time}.
+    cancellation_msg = """According to your request, service for {service_type} on {on_time} has been cancelled. Thank you for contacting Refreshed Car Care.
     """.format(
-         on_time=frappe.utils.data.format_datetime(service.reporting_time,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.reporting_time, "h:mm a").lower(),
+        on_time=frappe.utils.data.format_datetime(service.reporting_time,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.reporting_time, "h:mm a").lower(),
         service_type=service.service_type
         )
 
-    msg_dict = {"reminder_msg":reminder_msg,"confirmation_msg":confirmation_msg}
+    msg_dict = {"reminder_msg":reminder_msg,"confirmation_msg":confirmation_msg,"cancellation_msg":cancellation_msg}
     return msg_dict[msg_type]
-
-
