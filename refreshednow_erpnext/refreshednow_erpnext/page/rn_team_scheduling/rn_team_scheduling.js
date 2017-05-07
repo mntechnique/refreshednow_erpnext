@@ -376,7 +376,6 @@ function on_day_click(date, service_type, team, wrapper) {
 	rnss.starts_on = date.format("Y-MM-DD HH:mm:ss");
 	rnss.reporting_time = date.format("Y-MM-DD HH:mm:ss");
 	rnss.ends_on = date.add(service_item.service_duration,'m').format("Y-MM-DD HH:mm:ss"); //Replace with service duration.
-
 	frappe.set_route("Form", "RN Scheduled Service", rnss.name);
 }
 

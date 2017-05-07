@@ -128,6 +128,7 @@ fixtures = [{"dt":"Custom Script", "filters": [["name", "in", ["Customer-Client"
         "Customer-customer_vehicles_",
         "Customer-car_make_model",
         "Customer-car_registration_number",
+        "Customer-rn_unsubscribe_sms",
         "Vehicle-rn_customer",
         "Vehicle-rn_model_make",
         "Sales Invoice-rn_scheduled_service",
