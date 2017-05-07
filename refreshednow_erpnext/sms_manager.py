@@ -2,7 +2,6 @@ import frappe
 from frappe import _
 import json
 import calendar
-#from datetime import date, datetime, timedelta
 from frappe.desk.reportview import get_match_cond
 import json, pdfkit, os
 from frappe.utils.pdf import get_pdf
@@ -17,10 +16,6 @@ def send_sms(mobile_no, message):
     import requests
 
     sms_settings = frappe.get_doc("SMS Settings")
-
-    for x in xrange(1,5):
-        print "SMS Settings", sms_settings
-
     querystring = {}
 
     for p in sms_settings.parameters:
@@ -32,7 +27,6 @@ def send_sms(mobile_no, message):
         sms_settings.message_parameter:message
     })
 
-    #print sms_settings.sms_gateway_url, querystring
     # response = requests.request("GET", sms_settings.sms_gateway_url, params=querystring)
     response = frappe._dict({"text": "SMS Gateway Invoked"})
 
@@ -40,22 +34,11 @@ def send_sms(mobile_no, message):
     return response.text
 
 def fire_confirmation_sms(service):
-    for x in xrange(1,5):
-        print "in confirmation sms"
-
     sms_block = frappe.db.get_value("Customer",filters={"name":service.customer},fieldname="rn_unsubscribe_sms");
     
     if sms_block != 1:
-        for x in xrange(1,5):
-            print "User has not unsubscribed."
-        
         message = get_msg(service, "confirmation_msg")
-        #sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d 'at' H:mm a")
-        #sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(starts_on, "ha").lower()
         status_msg = ""
-
-        for x in xrange(1,10):
-            print "SMS Message Content: ", message
 
         try:
             status_msg = send_sms(service.contact_phone, message)
@@ -63,16 +46,11 @@ def fire_confirmation_sms(service):
             status_msg = "SMS was not sent to '{0}'. <hr> {1}".format(service.contact_phone, e)
             frappe.msgprint(status_msg)
 
-        for x in xrange(1,10):
-            print "SMS Message Content", status_msg
-
 def fire_cancellation_sms(service):
     sms_block = frappe.db.get_value("Customer",filters={"name":service.customer},fieldname="rn_unsubscribe_sms");
-    print "sms", sms_block
+
     if not sms_block:
         message = get_msg(service, "cancellation_msg")
-        #sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d 'at' H:mm a")
-        #sms_message += frappe.utils.data.format_datetime(starts_on,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(starts_on, "ha").lower()
         status_msg = ""
 
         try:
@@ -81,10 +59,7 @@ def fire_cancellation_sms(service):
             status_msg = "SMS was not sent to '{0}'. <hr> {1}".format(service.contact_phone, e)
             frappe.msgprint(status_msg)    
 
-def log_sms(sms_sender_name, mobile_no, message,response={"text":"~"}):
-    for x in xrange(1,10):
-        print "inside log_sms", sms_sender_name, mobile_no, message, response
-        
+def log_sms(sms_sender_name, mobile_no, message,response):
     note = frappe.new_doc("Note")
     note.title = "SMS Log (Confirmation) - "+ frappe.utils.nowdate() + frappe.utils.nowtime()
     note.public = 1
@@ -92,15 +67,7 @@ def log_sms(sms_sender_name, mobile_no, message,response={"text":"~"}):
     note.save()
     frappe.db.commit()
 
-
-
 def fire_reminder_sms():
-
-    # get_msg(service, service_name)
-    # sms_block = frappe.db.get_value("Customer",filters={"name":service.customer},fieldname="rn_unsubscribe_sms")
-    # print "sms", sms_block
-    # if not sms_block:
-
     nowtime_utc = frappe.utils.datetime.datetime.utcnow()
     nowtime_utc = nowtime_utc.replace(tzinfo=tz.gettz("UTC"))
     nowtime_ak = nowtime_utc.astimezone(tz.gettz("Asia/Kolkata"))
@@ -114,7 +81,7 @@ def fire_reminder_sms():
                         AND sms_checkbox != 1""".format(
                             starts_on_date=tomorrow
                         ), as_dict=1)
-        #get_msg(services, "reminder_msg")
+        
         for service in services:
             sms_block = frappe.db.get_value("Customer",filters={"name":service.customer},fieldname="rn_unsubscribe_sms")
             if not sms_block:
