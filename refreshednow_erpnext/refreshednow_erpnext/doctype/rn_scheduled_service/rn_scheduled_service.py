@@ -27,9 +27,6 @@ class RNScheduledService(Document):
             self.sales_order = self.create_sales_order()
 
     def on_submit(self):
-        for x in xrange(1,10):
-            print "Workflow State", self.workflow_state
-
         if self.workflow_state == "Stopped":
             fire_cancellation_sms()
 
@@ -91,6 +88,13 @@ class RNScheduledService(Document):
     #       frappe.throw(_("Sales Invoice was not saved. <br/> %s" % (e)))
     #   else:
     #       return si.name
+    def add_contact_to_customer(self, values):
+        dsi = frappe.new_doc("Contact")
+        dsi.first_name = values.get("customer")
+        dsi.phone = values.get("phone")
+        dsi.mobile_no = values.get("mobile_no")
+        dsi.insert()
+        frappe.db.commit()
 
     def create_sales_order(self):
         defaults_temp = frappe.defaults.get_defaults()

@@ -8,6 +8,7 @@ from frappe.utils.pdf import get_pdf
 from frappe.desk.reportview import get_match_cond
 from dateutil import tz
 from .sms_manager import fire_reminder_sms
+
 # reload(refreshednow_erpnext.)
 # @frappe.whitelist()
 # def rn_events_test(start, end, filters=None):
@@ -534,9 +535,9 @@ def prepare_bulk_print_html(names):
 		if ss.service_type=="Refreshed Go":
 			ss_rn_golist.append(ss)
 		else:
-			ss_rn_prolist.append(ss)	
+			ss_rn_prolist.append(ss)
 
-	ss_rn_golist = sorted(ss_rn_golist, key=lambda v:v.get("starts_on"))	
+	ss_rn_golist = sorted(ss_rn_golist, key=lambda v:v.get("starts_on"))
 	ss_rn_prolist = sorted(ss_rn_prolist, key=lambda v:v.get("starts_on"))
 
 	html_params = { "ss_rn_golist": ss_rn_golist or [], "ss_rn_prolist": ss_rn_prolist or []}
