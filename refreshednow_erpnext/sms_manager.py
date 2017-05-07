@@ -31,6 +31,8 @@ def send_sms(mobile_no, message):
 
     #print sms_settings.sms_gateway_url, querystring
     # response = requests.request("GET", sms_settings.sms_gateway_url, params=querystring)
+    response = frappe._dict({"text": "SMS Gateway Invoked"})
+
     log_sms(sms_sender_name, mobile_no,message,response)
     return response.text
 
@@ -49,7 +51,7 @@ def fire_confirmation_sms(service):
             status_msg = "SMS was not sent to '{0}'. <hr> {1}".format(service.contact_phone, e)
 
 def fire_cancellation_sms(service):
-    sms_block = frappe.db.get_value("Customer",filters={"name":servie.customer},fieldname="rn_unsubscribe_sms");
+    sms_block = frappe.db.get_value("Customer",filters={"name":service.customer},fieldname="rn_unsubscribe_sms");
     print "sms", sms_block
     if not sms_block:
         get_msg(service, "cancellation_msg")
