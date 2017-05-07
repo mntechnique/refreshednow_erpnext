@@ -35,7 +35,7 @@ def send_sms(mobile_no, message):
     return response.text
 
 def fire_confirmation_sms(service):
-    sms_block = frappe.db.get_value("Customer",filters={"name":servie.customer},fieldname="rn_unsubscribe_sms");
+    sms_block = frappe.db.get_value("Customer",filters={"name":service.customer},fieldname="rn_unsubscribe_sms");
     print "sms", sms_block
     if not sms_block:
         get_msg(service, "confirmation_msg")
