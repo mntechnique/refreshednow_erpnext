@@ -86,7 +86,14 @@ function render_allocations(service_type, day_of_week, wrapper) {
 
 			if (r.message.data) {
 				page.main.after(frappe.render_template("team_allocation_view", r.message));
-			    $('.affixed_head').affix({offset: {top: 100} });
+			    $(document).scroll(function(){
+					if ($(window).scrollTop() > 100) {
+						$("#fixed-table").addClass("onscroll_fixed");
+					}
+					if ($(window).scrollTop() < 100) {
+						$("#fixed-table").removeClass("onscroll_fixed");
+					}
+				});
 			} else {
 				page.main.after('<div class="alert alert-danger" role="alert">Please select both Service Type and Day of Week.</div>');
 			}
