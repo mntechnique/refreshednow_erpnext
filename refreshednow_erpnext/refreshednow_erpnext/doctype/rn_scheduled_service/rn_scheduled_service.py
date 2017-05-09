@@ -89,12 +89,28 @@ class RNScheduledService(Document):
     #   else:
     #       return si.name
     def add_contact_to_customer(self, values):
-        dsi = frappe.new_doc("Contact")
-        dsi.first_name = values.get("customer")
-        dsi.phone = values.get("phone")
-        dsi.mobile_no = values.get("mobile_no")
-        dsi.insert()
+        existing_cust = frappe.db.get_value("Customer", values.get("customer"))
+        cust = None
+
+        print "Existing Cust", existing_cust
+
+        if not existing_cust:
+            cust = frappe.new_doc("Customer")
+            cust.customer_name = values.get("customer")
+            cust.save()
+            frappe.db.commit()
+
+        contact = frappe.new_doc("Contact")
+        contact.first_name = values.get("customer")
+        contact.phone = values.get("phone")
+        contact.append("links",{
+                "link_doctype": "Customer",
+                "link_name": values.get("customer")
+                })
+        contact.insert()
         frappe.db.commit()
+
+        return contact.name
 
     def create_sales_order(self):
         defaults_temp = frappe.defaults.get_defaults()
@@ -190,3 +206,12 @@ class RNScheduledService(Document):
 
         self.service_details_summary = whatsapp_msg
 
+@frappe.whitelist()
+def get_contact_info(contact_name):
+    customer = frappe.db.get_value("Dynamic Link", filters={"parent":contact_name}, fieldname="link_name")
+    phone = frappe.db.get_value("Contact", contact_name, "phone")
+
+    for x in xrange(1,10):
+        print "Customer", customer, "Phone", phone
+
+    return {"customer": customer, "phone": phone}

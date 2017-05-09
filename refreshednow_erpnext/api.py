@@ -621,3 +621,13 @@ def hourly_call():
 
 def send_jobsheet():
 	frappe.sendmail("vishaldhayagude@mntechnique.com","vishaldhayagude09@gmail.com",subject="Hello World", message="Hello World")
+
+@frappe.whitelist()
+def get_contact_info(contact_name):
+    customer = frappe.db.get_value("Dynamic Link", filters={"parent":contact_name}, fieldname="link_name")
+    phone = frappe.db.get_value("Contact", contact_name, "phone")
+    
+    for x in xrange(1,10):
+        print "Customer", customer, "Phone", phone
+
+    return {"customer": customer, "phone": phone}

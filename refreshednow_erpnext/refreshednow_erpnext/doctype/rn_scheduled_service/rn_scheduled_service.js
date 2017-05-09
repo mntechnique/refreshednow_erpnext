@@ -12,6 +12,14 @@ frappe.ui.form.on('RN Scheduled Service', {
             frappe.set_route("rn-team-scheduling");
         });
 
+         frm.add_custom_button(__("Add Contact with New Customer"), function() {
+            new_contact_dialog(true)
+        }, __("Add Contact"));
+
+        frm.add_custom_button(__("Add Contact with existing Customer"), function() {
+            new_contact_dialog(false)
+        }, __("Add Contact"));
+
         //Show service items only.
         frappe.db.get_value("RN Settings", "RN Settings", "rn_service_item_group", function(r) {
             cur_frm.set_query("service_type", function() {
@@ -136,26 +144,41 @@ frappe.ui.form.on('RN Scheduled Service', {
             }
         });
     }*/
-        cust = frappe.db.get_value("Dynamic Link", filters={"parent":frm.doc.contact_person}, fieldname="link_name",function(r){
-            if(r){
-                frm.set_value("customer",r.link_name);
-                frm.set_df_property("customer", "read_only",1);
-            }
-        });
+        // cust = frappe.db.get_value("Dynamic Link", filters={"parent":frm.doc.contact_person}, fieldname="link_name",function(r){
+        //     if(r){
+        //         frm.set_value("customer",r.link_name);
+        //         frm.set_df_property("customer", "read_only",1);
+        //     }
+        // });
 
-        frappe.db.get_value(
-            "Contact",
-            frm.doc.contact_person,
-            "phone",
-            function(r) {
-                if (r) {
-                    frm.set_value("contact_phone", r.phone);
-                }else {
-                new_contact_dialog(frm);
+        // frappe.db.get_value(
+        //     "Contact",
+        //     frm.doc.contact_person,
+        //     "phone",
+        //     function(r) {
+        //         if (r) {
+        //             frm.set_value("contact_phone", r.phone);
+        //         }else {
+        //         new_contact_dialog(frm);
+        //         }
+        //     }
+        // );
+
+        frappe.call({
+            method: "refreshednow_erpnext.api.get_contact_info",
+            args: {
+                contact_name: frm.doc.contact_person
+            },
+            callback: function(r) {
+                console.log("Retval", r);
+                if (r || r.message) {
+                    console.log("Setting values", r);
+                    cur_frm.set_value("contact_phone", r.message.phone);
+                    cur_frm.set_value("customer", r.messsage.customer);
+                    //cur_frm.refresh_fields();
                 }
             }
-        );
-
+        });
     }
 });
 
@@ -333,14 +356,15 @@ function quick_entry_vehicle() {
 }
 
 function quick_entry_contact() {
-    frappe._from_link = this;
-    mnt.quick_entry("Contact",
-    function(){},
-    {
-        "first_name": this.$input.val().split(" ")[0],
-        "last_name": this.$input.val().split(" ")[1] || "",
-        "links": [{"link_doctype": "Customer", "link_name": cur_frm.doc.customer}]
-    });
+    frappe.msgprint("Please use the Add Contact button to add contacts (top-right)");
+    // frappe._from_link = this;
+    // mnt.quick_entry("Contact",
+    // function(){},
+    // {
+    //     "first_name": this.$input.val().split(" ")[0],
+    //     "last_name": this.$input.val().split(" ")[1] || "",
+    //     "links": [{"link_doctype": "Customer", "link_name": cur_frm.doc.customer}]
+    // });
 }
 
 function clear_fields_on_customer_change() {
@@ -351,4 +375,40 @@ function clear_fields_on_customer_change() {
     cur_frm.set_value("contact_email", "");
     cur_frm.set_value("service_address", "");
     cur_frm.set_value("billing_address", "");
+}
+
+function new_contact_dialog(new_customer=true) {
+    var frm = cur_frm;
+
+    var dialog = new frappe.ui.Dialog({
+        title: __("Quick Customer Entry"),
+        fields: [
+            {
+                fieldtype: new_customer ? "Data": "Link", 
+                fieldname: "customer", 
+                label: __("New Customer Name"), 
+                options: new_customer ? "" : "Customer", 
+                reqd: 1},
+            {fieldtype: "Data", fieldname: "contact_person", label: __("New Contact Name"), reqd: 1},
+            {fieldtype: "Data", fieldname: "phone", label: __("Contact Number")}
+        ]
+    });
+
+    dialog.set_primary_action(__("Save"), function() {
+        var btn = this;
+        var values = dialog.get_values();
+        frappe.call({
+            doc: frm.doc,
+            method: "add_contact_to_customer",
+            args: {
+                "values": values
+            },
+            callback: function(r) {
+                cur_frm.set_value("contact_person", r.message);
+                dialog.clear(); dialog.hide();
+            }
+        })
+    });
+
+    dialog.show();
 }
