@@ -107,7 +107,7 @@ def get_msg(service, msg_type):
     )
     confirmation_msg = """Thank you for contacting Refreshed Car Care. We have taken your booking for a {service_type} on {on_time}.
     """.format(
-         on_time=frappe.utils.data.format_datetime(service.reporting_time,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.reporting_time, "h:mm a").lower(),
+        on_time=frappe.utils.data.format_datetime(service.reporting_time,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.reporting_time, "h:mm a").lower(),
         service_type=service.service_type
         )
 
