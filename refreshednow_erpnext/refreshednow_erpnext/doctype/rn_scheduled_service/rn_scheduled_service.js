@@ -30,11 +30,11 @@ frappe.ui.form.on('RN Scheduled Service', {
                 };
             });
         })
-        cur_frm.set_query("customer", function() {
-            return {
-                "query": "refreshednow_erpnext.api.customer_query"
-            };
-        });
+        // cur_frm.set_query("customer", function() {
+        //     return {
+        //         "query": "refreshednow_erpnext.api.customer_query"
+        //     };
+        // });
        /* cur_frm.set_query("contact_person", function() {
             return {
                 "query": "refreshednow_erpnext.api.contact_query",
@@ -215,32 +215,32 @@ function render_team_members(frm) {
 }
 
 
-function  new_contact_dialog(frm) {
-    var dialog = new frappe.ui.Dialog({
-        title: __("Quick Customer Entry"),
-        fields: [
-            {fieldtype: "Link", fieldname: "customer", options: "Customer", label: __("Customer")},
-            {fieldtype: "Data", fieldname: "contact_person", label: __("Contact")},
-            {fieldtype: "Data", fieldname: "mobile_no", label: __("Mobile Number")},
-            {fieldtype: "Data", fieldname: "phone", label: __("Phone Number")}
-        ]
-    });
+// function  new_contact_dialog(frm) {
+//     var dialog = new frappe.ui.Dialog({
+//         title: __("Quick Customer Entry"),
+//         fields: [
+//             {fieldtype: "Link", fieldname: "customer", options: "Customer", label: __("Customer")},
+//             {fieldtype: "Data", fieldname: "contact_person", label: __("Contact")},
+//             {fieldtype: "Data", fieldname: "mobile_no", label: __("Mobile Number")},
+//             {fieldtype: "Data", fieldname: "phone", label: __("Phone Number")}
+//         ]
+//     });
 
-    dialog.set_primary_action(__("Save"), function() {
-        var btn = this;
-        var values = dialog.get_values();
-        frappe.call({
-            doc: cur_frm.doc,
-            method: "refreshednow_erpnext.api.add_contact_to_customer",
-            args: {
-                "values": values
-            },
-            callback: function(r) {
-                dialog.clear(); dialog.hide();
-            }
-        })
-    });
-}
+//     dialog.set_primary_action(__("Save"), function() {
+//         var btn = this;
+//         var values = dialog.get_values();
+//         frappe.call({
+//             doc: cur_frm.doc,
+//             method: "refreshednow_erpnext.api.add_contact_to_customer",
+//             args: {
+//                 "values": values
+//             },
+//             callback: function(r) {
+//                 dialog.clear(); dialog.hide();
+//             }
+//         })
+//     });
+// }
 
 function fetch_and_set_linked_fields(frm) {
     frappe.call({
@@ -368,8 +368,8 @@ function quick_entry_contact() {
 }
 
 function clear_fields_on_customer_change() {
-    cur_frm.set_value("contact_person", "");
-    cur_frm.set_value("contact_display", "");
+    // cur_frm.set_value("contact_person", "");
+    // cur_frm.set_value("contact_display", "");
     cur_frm.set_value("bill_to", "");
     cur_frm.set_value("contact_phone", "");
     cur_frm.set_value("contact_email", "");

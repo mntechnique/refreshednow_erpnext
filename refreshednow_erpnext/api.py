@@ -627,7 +627,4 @@ def get_contact_info(contact_name):
     customer = frappe.db.get_value("Dynamic Link", filters={"parent":contact_name}, fieldname="link_name")
     phone = frappe.db.get_value("Contact", contact_name, "phone")
     
-    for x in xrange(1,10):
-        print "Customer", customer, "Phone", phone
-
     return {"customer": customer, "phone": phone}
