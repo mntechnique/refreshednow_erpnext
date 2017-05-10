@@ -480,22 +480,21 @@ def get_address(doctype, txt, searchfield, start, page_len, filters):
 # def get_customer_links(customer):
 # 	pass
 
-@frappe.whitelist()
-def get_customer_info(customer):
-	#return {"address": "ABC"}
-	contacts = frappe.get_all("Dynamic Link", filters={"parenttype": "Contact", "link_name": customer}, fields=["*"], order_by="creation DESC")
-	addresses = frappe.get_all("Dynamic Link", filters={"parenttype": "Address", "link_name": customer}, fields=["*"], order_by="creation DESC")
+# @frappe.whitelist()
+# def get_customer_info(customer):
+# 	#return {"address": "ABC"}
+# 	contacts = frappe.get_all("Dynamic Link", filters={"parenttype": "Contact", "link_name": customer}, fields=["*"], order_by="creation DESC")
+# 	addresses = frappe.get_all("Dynamic Link", filters={"parenttype": "Address", "link_name": customer}, fields=["*"], order_by="creation DESC")
 
-	contact = ""
-	if len(contacts) > 0:
-		contact = contacts[0].parent
+# 	contact = ""
+# 	if len(contacts) > 0:
+# 		contact = contacts[0].parent
 
-	address = ""
-	if len(addresses) > 0:
-		address = addresses[0].parent
+# 	address = ""
+# 	if len(addresses) > 0:
+# 		address = addresses[0].parent
 
-	return {"address": address, "contact": contact }
-
+# 	return {"address": address, "contact": contact }
 
 @frappe.whitelist()
 def print_job_sheet(names):
@@ -624,7 +623,12 @@ def send_jobsheet():
 
 @frappe.whitelist()
 def get_contact_info(contact_name):
-    customer = frappe.db.get_value("Dynamic Link", filters={"parent":contact_name}, fieldname="link_name")
-    phone = frappe.db.get_value("Contact", contact_name, "phone")
-    
-    return {"customer": customer, "phone": phone}
+	customer = frappe.db.get_value("Dynamic Link", filters={"parent":contact_name}, fieldname="link_name")
+	phone = frappe.db.get_value("Contact", contact_name, "phone")
+	addresses = frappe.get_all("Dynamic Link", filters={"parenttype": "Address", "link_doctype": "Customer", "link_name": customer }, fields=["*"], order_by="creation DESC")
+
+	address = ""
+	if len(addresses) > 0:
+		address = addresses
+
+	return {"customer": customer, "phone": phone, "address": address}

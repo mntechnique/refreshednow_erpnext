@@ -48,6 +48,7 @@ frappe.ui.form.on('RN Scheduled Service', {
             };
         });
         //Filter dropdowns by Customer and pertinent criteria.
+
         cur_frm.set_query("billing_address", function() {
             return {
                 "query": "refreshednow_erpnext.api.get_address",
@@ -73,8 +74,6 @@ frappe.ui.form.on('RN Scheduled Service', {
                 }
             };
         });
-
-
         render_vehicles(frm);
         render_team_members(frm);
 
@@ -92,9 +91,7 @@ frappe.ui.form.on('RN Scheduled Service', {
         if (!frm.doc.vehicle_count) { frm.set_value("vehicle_count", 1); }
     },
     customer: function(frm) {
-        clear_fields_on_customer_change();
         if (frm.doc.customer) {
-            fetch_and_set_linked_fields(frm);
             frm.set_value("bill_to", frm.doc.customer);
         } else {
             frm.doc.customer = undefined; //REQD
@@ -116,6 +113,7 @@ frappe.ui.form.on('RN Scheduled Service', {
         if (frm.doc.billing_address_same_as_service) frm.set_value("billing_address", "");
     },
     contact_person: function(frm) {
+        clear_fields_on_contactperson_change();
     //  if(!frm.doc.contact_person) {
     //      cur_frm.set_value("customer", undefined);
     //  } else {
@@ -163,22 +161,24 @@ frappe.ui.form.on('RN Scheduled Service', {
         //         }
         //     }
         // );
-
-        frappe.call({
-            method: "refreshednow_erpnext.api.get_contact_info",
-            args: {
-                contact_name: frm.doc.contact_person
-            },
-            callback: function(r) {
-                console.log("Retval", r);
-                if (r || r.message) {
-                    console.log("Setting values", r);
-                    cur_frm.set_value("contact_phone", r.message.phone);
-                    cur_frm.set_value("customer", r.messsage.customer);
-                    //cur_frm.refresh_fields();
+        if(frm.doc.contact_person != ""){
+            frappe.call({
+                method: "refreshednow_erpnext.api.get_contact_info",
+                args: {
+                    contact_name: frm.doc.contact_person
+                },
+                callback: function(r) {
+                    console.log("Retval", r);
+                    if (r || r.message) {
+                        console.log("Setting values", r);
+                        cur_frm.set_value("customer", r.message.customer);
+                        cur_frm.set_value("contact_phone", r.message.phone);
+                        cur_frm.set_value("billing_address", r.message.address[0].parent);
+                        cur_frm.set_value("service_address", r.message.address[0].parent);
+                    }
                 }
-            }
-        });
+            });
+        }    
     }
 });
 
@@ -242,55 +242,41 @@ function render_team_members(frm) {
 //     });
 // }
 
-function fetch_and_set_linked_fields(frm) {
-    frappe.call({
-        method: "refreshednow_erpnext.api.get_customer_info",
-        args: {
-            customer: frm.doc.customer
-        },
-        callback: function(r){
-            cur_frm.set_value("billing_address", r.message.address);
-            cur_frm.set_value("service_address", r.message.address);
-            cur_frm.set_value("contact_person", r.message.contact);
-        }
-    });
-}
+// function fetch_and_set_linked_fields(frm) {
+//     frappe.db.get_value(
+//         "Address",
+//         { "customer":frm.doc.customer, "address_type":"Billing", "is_primary_address":true },
+//         "name",
+//         function(r) {
+//             if (r) {
+//                 console.log(r);
+//                 frm.set_value("billing_address", r.name);
+//             }
+//         }
+//     );
+//     frappe.db.get_value(
+//         "Address",
+//         { "customer":frm.doc.customer, "address_type":"Service" },
+//         "name",
+//         function(r) {
+//             if (r) {
+//                 console.log(r);
+//                 frm.set_value("service_address", r.name);
+//             }
+//         }
+//     );
+//     frappe.db.get_value(
+//         "Contact",
+//         { "customer":frm.doc.customer, "is_primary_contact": 1 },
+//         "name",
+//         function(r) {
+//             if (r) {
+//                 frm.set_value("contact_person", r.name);
+//             }
+//         }
+//     );
+// }
 
-/*function fetch_and_set_linked_fields(frm) {
-    frappe.db.get_value(
-        "Address",
-        { "customer":frm.doc.customer, "address_type":"Billing", "is_primary_address":true },
-        "name",
-        function(r) {
-            if (r) {
-                console.log(r);
-                frm.set_value("billing_address", r.name);
-            }
-        }
-    );
-    frappe.db.get_value(
-        "Address",
-        { "customer":frm.doc.customer, "address_type":"Service" },
-        "name",
-        function(r) {
-            if (r) {
-                console.log(r);
-                frm.set_value("service_address", r.name);
-            }
-        }
-    );
-    frappe.db.get_value(
-        "Contact",
-        { "customer":frm.doc.customer, "is_primary_contact": 1 },
-        "name",
-        function(r) {
-            if (r) {
-                frm.set_value("contact_person", r.name);
-            }
-        }
-    );
-}
-*/
 function render_timeslot(frm) {
     var starts_on = moment(frm.doc.starts_on).format("h:mm a");
     var ends_on = moment(frm.doc.ends_on).format("h:mm a");
@@ -367,14 +353,14 @@ function quick_entry_contact() {
     // });
 }
 
-function clear_fields_on_customer_change() {
-    // cur_frm.set_value("contact_person", "");
-    // cur_frm.set_value("contact_display", "");
+function clear_fields_on_contactperson_change() {
+    cur_frm.set_value("customer", "");
     cur_frm.set_value("bill_to", "");
     cur_frm.set_value("contact_phone", "");
     cur_frm.set_value("contact_email", "");
     cur_frm.set_value("service_address", "");
     cur_frm.set_value("billing_address", "");
+    cur_frm.set_value("vehicle_count", "");
 }
 
 function new_contact_dialog(new_customer=true) {
