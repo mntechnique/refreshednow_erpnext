@@ -386,7 +386,7 @@ function new_contact_dialog(new_customer=true) {
             {
                 fieldtype: new_customer ? "Data": "Link", 
                 fieldname: "customer", 
-                label: __("New Customer Name"), 
+                label: new_customer ? __("New Customer Name") : __("Customer"), 
                 options: new_customer ? "" : "Customer", 
                 reqd: 1},
             {fieldtype: "Data", fieldname: "contact_person", label: __("New Contact Name"), reqd: 1},
