@@ -87,8 +87,6 @@ frappe.ui.form.on('RN Scheduled Service', {
         frm.fields_dict.billing_address.new_doc = quick_entry_billing_address;
         frm.fields_dict.vehicle.new_doc = quick_entry_vehicle;
         frm.fields_dict.contact_person.new_doc = quick_entry_contact;
-
-        if (!frm.doc.vehicle_count) { frm.set_value("vehicle_count", 1); }
     },
     customer: function(frm) {
         if (frm.doc.customer) {
@@ -175,6 +173,7 @@ frappe.ui.form.on('RN Scheduled Service', {
                         cur_frm.set_value("contact_phone", r.message.phone);
                         cur_frm.set_value("billing_address", r.message.address[0].parent);
                         cur_frm.set_value("service_address", r.message.address[0].parent);
+                        cur_frm.set_value("vehicle_count", 1);
                     }
                 }
             });
