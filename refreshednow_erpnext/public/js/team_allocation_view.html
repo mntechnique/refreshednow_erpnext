@@ -41,12 +41,12 @@
 								<!--#f5f5ef-->
 							</td>
 						{% } else { %}
-							<td style="text-align:center;background-color:#ffffff;">
+							<td title="{%= team_name %}" style="text-align:center;background-color:#ffffff;">
 
 								{% if (found_alloc.length > 0) { %}
-									<input type="checkbox" data-team="{%= team_name %}" data-employee="{%= emp_name %}" data-dow="{%= dow %}" onclick="checkbox_clicked(this)" title="{%= team_name %}" checked/ >
+									<input type="checkbox" data-team="{%= team_name %}" data-employee="{%= emp_name %}" data-dow="{%= dow %}" onclick="checkbox_clicked(this)" checked/ >
 								{% } else { %}
-									<input type="checkbox" data-team="{%= team_name %}" data-employee="{%= emp_name %}" data-dow="{%= dow %}" onclick="checkbox_clicked(this)" title="{%= team_name %}"/>
+									<input type="checkbox" data-team="{%= team_name %}" data-employee="{%= emp_name %}" data-dow="{%= dow %}" onclick="checkbox_clicked(this)"/>
 								{% } %}
 							</td>
 						{% } %}
