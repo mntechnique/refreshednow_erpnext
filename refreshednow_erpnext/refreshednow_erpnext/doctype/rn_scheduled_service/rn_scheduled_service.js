@@ -166,13 +166,14 @@ frappe.ui.form.on('RN Scheduled Service', {
                     contact_name: frm.doc.contact_person
                 },
                 callback: function(r) {
-                    console.log("Retval", r);
                     if (r || r.message) {
                         console.log("Setting values", r);
                         cur_frm.set_value("customer", r.message.customer);
                         cur_frm.set_value("contact_phone", r.message.phone);
-                        cur_frm.set_value("billing_address", r.message.address[0].parent);
-                        cur_frm.set_value("service_address", r.message.address[0].parent);
+                        if (r.message.address) {
+                            cur_frm.set_value("billing_address", r.message.address[0].parent);
+                            cur_frm.set_value("service_address", r.message.address[0].parent);
+                        }
                         cur_frm.set_value("vehicle_count", 1);
                     }
                 }
@@ -281,10 +282,6 @@ function render_timeslot(frm) {
     var ends_on = moment(frm.doc.ends_on).format("h:mm a");
     var timeslot = moment(frm.doc.starts_on).format("DD MMM Y") + ", " + starts_on + " - " + ends_on;
 
-    console.log("Render Timeslot SO", frm.doc.starts_on);
-    console.log("Render Timeslot Eo", frm.doc.ends_on);
-    console.log("Timeslot", timeslot);
-
     var timeslot_html = '<div class="form-group"><div class="clearfix"><label class="control-label" style="padding-right: 0px;">Time Slot</label> </div> <div class="control-input-wrapper"> <div class="control-input-static"> <div class="link-field ui-front" style="position: relative;">' + timeslot + '</div> </div> </div> </div>';
 
     $(frm.fields_dict['timeslot_html'].wrapper)
@@ -340,17 +337,6 @@ function quick_entry_vehicle() {
     });
 }
 
-function quick_entry_contact() {
-    frappe.msgprint("Please use the Add Contact button to add contacts (top-right)");
-    // frappe._from_link = this;
-    // mnt.quick_entry("Contact",
-    // function(){},
-    // {
-    //     "first_name": this.$input.val().split(" ")[0],
-    //     "last_name": this.$input.val().split(" ")[1] || "",
-    //     "links": [{"link_doctype": "Customer", "link_name": cur_frm.doc.customer}]
-    // });
-}
 
 function clear_fields_on_contactperson_change() {
     cur_frm.set_value("customer", "");
@@ -365,19 +351,26 @@ function clear_fields_on_contactperson_change() {
 function new_contact_dialog() {
     var frm = cur_frm;
 
+    var contact_person_value = frm.fields_dict["contact_person"].$input.val();
+
     var dialog = new frappe.ui.Dialog({
         title: __("New Contact"),
         fields: [
-            {
-                fieldtype: "Link", 
-                fieldname: "customer", 
-                label:__("Customer"), 
-                options: "Customer", 
-                reqd: 1},
+            {fieldtype: "Link", fieldname: "customer", label:__("Customer"), options: "Customer", reqd: 1},
             {fieldtype: "Data", fieldname: "contact_person", label: __("New Contact Name"), reqd: 1},
             {fieldtype: "Data", fieldname: "phone", label: __("Contact Number")}
         ]
     });
+
+    if (isNaN(contact_person_value)) {
+        dialog.set_value("contact_person", contact_person_value);
+    } else {
+        dialog.set_value("phone", contact_person_value);
+    }
+
+    dialog.get_field("customer").new_doc = function() { 
+        frappe.msgprint("No need to click here. Just type in the name in the Customer field and the dialog will handle the rest.");
+    };
 
     dialog.set_primary_action(__("Save"), function() {
         var btn = this;
@@ -394,6 +387,5 @@ function new_contact_dialog() {
             }
         })
     });
-
     dialog.show();
 }
