@@ -12,13 +12,13 @@ frappe.ui.form.on('RN Scheduled Service', {
             frappe.set_route("rn-team-scheduling");
         });
 
-         frm.add_custom_button(__("Add Contact with New Customer"), function() {
-            new_contact_dialog(true)
-        }, __("Add Contact"));
+        // frm.add_custom_button(__("Add Contact with New Customer"), function() {
+        //     new_contact_dialog(true)
+        // }, __("Add Contact"));
 
-        frm.add_custom_button(__("Add Contact with existing Customer"), function() {
-            new_contact_dialog(false)
-        }, __("Add Contact"));
+        // frm.add_custom_button(__("Add Contact with existing Customer"), function() {
+        //     new_contact_dialog(false)
+        // }, __("Add Contact"));
 
         //Show service items only.
         frappe.db.get_value("RN Settings", "RN Settings", "rn_service_item_group", function(r) {
@@ -86,7 +86,7 @@ frappe.ui.form.on('RN Scheduled Service', {
         frm.fields_dict.service_address.new_doc = quick_entry_service_address;
         frm.fields_dict.billing_address.new_doc = quick_entry_billing_address;
         frm.fields_dict.vehicle.new_doc = quick_entry_vehicle;
-        frm.fields_dict.contact_person.new_doc = quick_entry_contact;
+        frm.fields_dict.contact_person.new_doc = new_contact_dialog; //quick_entry_contact;
     },
     customer: function(frm) {
         if (frm.doc.customer) {
@@ -362,17 +362,17 @@ function clear_fields_on_contactperson_change() {
     cur_frm.set_value("vehicle_count", "");
 }
 
-function new_contact_dialog(new_customer=true) {
+function new_contact_dialog() {
     var frm = cur_frm;
 
     var dialog = new frappe.ui.Dialog({
-        title: __("Quick Customer Entry"),
+        title: __("New Contact"),
         fields: [
             {
-                fieldtype: new_customer ? "Data": "Link", 
+                fieldtype: "Link", 
                 fieldname: "customer", 
-                label: new_customer ? __("New Customer Name") : __("Customer"), 
-                options: new_customer ? "" : "Customer", 
+                label:__("Customer"), 
+                options: "Customer", 
                 reqd: 1},
             {fieldtype: "Data", fieldname: "contact_person", label: __("New Contact Name"), reqd: 1},
             {fieldtype: "Data", fieldname: "phone", label: __("Contact Number")}

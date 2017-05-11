@@ -99,7 +99,7 @@ class RNScheduledService(Document):
             frappe.db.commit()
 
         contact = frappe.new_doc("Contact")
-        contact.first_name = values.get("customer")
+        contact.first_name = values.get("contact_person")
         contact.phone = values.get("phone")
         contact.append("links",{
                 "link_doctype": "Customer",
