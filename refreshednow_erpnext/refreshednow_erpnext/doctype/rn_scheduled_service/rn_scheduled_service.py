@@ -32,6 +32,10 @@ class RNScheduledService(Document):
         else:
             pass
 
+    def before_cancel(self):
+        for x in xrange(1,10):
+            print("BEFORE CANCEL") 
+
     def on_cancel(self):
         if self.workflow_state == "Stopped":
             fire_cancellation_sms(self)
@@ -184,23 +188,16 @@ class RNScheduledService(Document):
             frappe.throw("Reporting time must be within the selected service slot.")
 
     def save_service_summary(self):
-        whatsapp_msg = """<div>
-                            <div class="row">
-                                <div class="col-sm-12">Booking Number:  {0}</div>
-                                <div class="col-sm-12">Name:  {1}</div>
-                                <div class="col-sm-12">Type:  {2}</div>
-                                <div class="col-sm-12">Date:   {3}</div>
-                                <div class="col-sm-12">Time:  {4}</div>
-                                <div class="col-sm-12">Address:  {5}</div>
-                                <div class="col-sm-12">Contact Number:  {6}</div>
-                                <div class="col-sm-12">Comments:  {8}</div>
-                                <div class="col-sm-12">Car:  {9}
-                                <a href="https://api.whatsapp.com/send?phone={6}">Send Message</a></div>
-
-                            </div>
-                        </div>
-                        """.format(self.name, self.customer, self.service_type, frappe.utils.data.format_datetime(self.reporting_time,"EEEE MMM d"), frappe.utils.data.format_datetime(self.reporting_time, "h:mm a").lower(),
-                            self.service_address_display, self.contact_phone, "none", self.remarks, self.vehicle)
+        whatsapp_msg = """
+            Booking Number:{0}</br>
+            Name:{1}</br>
+            Type:{2}</br>
+            Date:{3}</br>
+            Time:{4}</br>
+            Address:{5}</br>
+            Contact Number:{6}</br>
+            Comments:{8}""".format(self.name, self.customer, self.service_type, frappe.utils.data.format_datetime(self.reporting_time,"EEEE MMM d"), frappe.utils.data.format_datetime(self.reporting_time, "h:mm a").lower(),
+                            self.service_address_display, self.contact_phone, "none", self.remarks)
 
         self.service_details_summary = whatsapp_msg
 
