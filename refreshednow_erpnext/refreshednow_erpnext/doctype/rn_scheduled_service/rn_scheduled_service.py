@@ -99,7 +99,7 @@ class RNScheduledService(Document):
             frappe.db.commit()
 
         contact = frappe.new_doc("Contact")
-        contact.first_name = values.get("customer")
+        contact.first_name = values.get("contact_person")
         contact.phone = values.get("phone")
         contact.append("links",{
                 "link_doctype": "Customer",
@@ -180,7 +180,7 @@ class RNScheduledService(Document):
 
 
     def validate_reporting_time(self):
-        if self.reporting_time < self.starts_on or self.reporting_time>self.ends_on:
+        if (self.reporting_time < frappe.utils.add_to_date(self.starts_on,hours=-1)) or (self.reporting_time>self.ends_on):
             frappe.throw("Reporting time must be within the selected service slot.")
 
     def save_service_summary(self):
