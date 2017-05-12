@@ -519,7 +519,6 @@ def print_job_sheet(names):
 	frappe.local.response.filecontent = rn_get_pdf(final_html, options=pdf_options)
 	frappe.local.response.type = "download"
 
-
 def prepare_bulk_print_html(names):
 	names = names.split(",")
 	html = ""
@@ -619,7 +618,17 @@ def hourly_call():
 
 
 def send_jobsheet():
-	frappe.sendmail("vishaldhayagude@mntechnique.com","vishaldhayagude09@gmail.com",subject="Hello World", message="Hello World")
+	nowtime_utc = frappe.utils.datetime.datetime.utcnow()
+	nowtime_utc = nowtime_utc.replace(tzinfo=tz.gettz("UTC"))
+	nowtime_ak = nowtime_utc.astimezone(tz.gettz("Asia/Kolkata"))
+
+	#Comparison times are adjusted for SF time.
+	if nowtime_ak.hour in [22]:
+		try:
+			frappe.sendmail(recipients=["hello@refreshednow"], subject="Daily Sheet", message="[Test Message] PFA Job Sheet for tomorrow.")
+		except Exception as e:
+			raise
+
 
 @frappe.whitelist()
 def get_contact_info(contact_name):

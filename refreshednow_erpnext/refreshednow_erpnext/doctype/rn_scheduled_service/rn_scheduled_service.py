@@ -32,9 +32,13 @@ class RNScheduledService(Document):
         else:
             pass
 
+    def on_update_after_submit(self):
+        self.save_service_summary()
+
     def before_cancel(self):
-        for x in xrange(1,10):
-            print("BEFORE CANCEL") 
+        pass
+        # for x in xrange(1,10):
+        #     print("BEFORE CANCEL") 
 
     def on_cancel(self):
         if self.workflow_state == "Stopped":
@@ -189,15 +193,15 @@ class RNScheduledService(Document):
 
     def save_service_summary(self):
         whatsapp_msg = """
-            Booking Number:{0}</br>
-            Name:{1}</br>
-            Type:{2}</br>
-            Date:{3}</br>
-            Time:{4}</br>
-            Address:{5}</br>
-            Contact Number:{6}</br>
-            Comments:{8}""".format(self.name, self.customer, self.service_type, frappe.utils.data.format_datetime(self.reporting_time,"EEEE MMM d"), frappe.utils.data.format_datetime(self.reporting_time, "h:mm a").lower(),
-                            self.service_address_display, self.contact_phone, "none", self.remarks)
+            Booking Number:  {0}</br>
+            Name:  {1}</br>
+            Type:  {2}</br>
+            Date:  {3}</br>
+            Reporting Time:  {4}</br>
+            Address:  {5}
+            Contact Number:  {6}</br>
+            Notes:  {7}""".format(self.name, self.customer, self.service_type, frappe.utils.data.format_datetime(self.reporting_time,"EEEE MMM d"), frappe.utils.data.format_datetime(self.reporting_time, "h:mm a").lower(),
+                            self.service_address_display, self.contact_phone, self.notes)
 
         self.service_details_summary = whatsapp_msg
 
