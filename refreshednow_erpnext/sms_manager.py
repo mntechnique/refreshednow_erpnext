@@ -11,27 +11,27 @@ from dateutil import tz
 
 
 
-@frappe.whitelist()
-def send_sms(mobile_no, message):
-    import requests
+# @frappe.whitelist()
+# def send_sms(mobile_no, message):
+#     import requests
 
-    sms_settings = frappe.get_doc("SMS Settings")
-    querystring = {}
+#     sms_settings = frappe.get_doc("SMS Settings")
+#     querystring = {}
 
-    for p in sms_settings.parameters:
-        querystring.update({p.parameter:p.value})
+#     for p in sms_settings.parameters:
+#         querystring.update({p.parameter:p.value})
 
-    querystring.update({
-        "sendername":sms_settings.sms_sender_name,
-        sms_settings.receiver_parameter:mobile_no,
-        sms_settings.message_parameter:message
-    })
+#     querystring.update({
+#         "sendername":sms_settings.sms_sender_name,
+#         sms_settings.receiver_parameter:mobile_no,
+#         sms_settings.message_parameter:message
+#     })
 
-    response = requests.request("GET", sms_settings.sms_gateway_url, params=querystring)
-    #response = frappe._dict({"text": "SMS Gateway Invoked"})
+#     response = requests.request("GET", sms_settings.sms_gateway_url, params=querystring)
+#     #response = frappe._dict({"text": "SMS Gateway Invoked"})
 
-    log_sms(sms_settings.sms_sender_name, mobile_no,message,response)
-    return response.text
+#     log_sms(sms_settings.sms_sender_name, mobile_no,message,response)
+#     return response.text
 
 def fire_confirmation_sms(service):
     sms_block = frappe.db.get_value("Customer",filters={"name":service.customer},fieldname="rn_unsubscribe_sms");
@@ -146,8 +146,11 @@ def send_service_sms(service, purpose):
         sms_settings.message_parameter:message
     })
 
-    # response = requests.request("GET", sms_settings.sms_gateway_url, params=querystring)
-    response = frappe._dict({"text": "SMS Gateway Invoked"})
+    #Until cancellation is approved
+    if purpose == "cancellation":
+        response = frappe._dict({"text": "SMS Gateway Invoked"})
+    else:
+        response = requests.request("GET", sms_settings.sms_gateway_url, params=querystring)
 
     for x in xrange(1,10):
         print ("sender:", sms_settings.sms_sender_name, ", mobile:", service.contact_phone, ", message", message, ", response:", response, ", purpose:", purpose)
