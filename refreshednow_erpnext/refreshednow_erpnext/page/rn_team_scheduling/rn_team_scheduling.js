@@ -362,6 +362,8 @@ function build_route(wrapper, rn_view) { //, show_daily="daily") {
 
 
 function on_day_click(date, service_type, team, wrapper) {
+	console.log("ONDAYCLICK Date", date);
+
 	var service_item = wrapper.page.service_item_data.filter(function(item) { return item.item_code == service_type})[0]
 
 	var rnss = frappe.model.make_new_doc_and_get_name('RN Scheduled Service');
@@ -370,9 +372,10 @@ function on_day_click(date, service_type, team, wrapper) {
 	rnss.scheduled_date = frappe.datetime.obj_to_str(date);
 	rnss.scheduled_time = date.format("HH:mm:ss");
 	rnss.team = team;
-	rnss.starts_on = date.format("Y-M-D HH:mm:ss");
-	rnss.ends_on = date.add(service_item.service_duration,'m').format("Y-M-D HH:mm:ss"); //Replace with service duration.
-
+	
+	rnss.starts_on = date.format("Y-MM-DD HH:mm:ss");
+	rnss.reporting_time = date.format("Y-MM-DD HH:mm:ss");
+	rnss.ends_on = date.add(service_item.service_duration,'m').format("Y-MM-DD HH:mm:ss"); //Replace with service duration.
 	frappe.set_route("Form", "RN Scheduled Service", rnss.name);
 }
 

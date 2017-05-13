@@ -9,3 +9,19 @@
 	padding-top: 25%;
 }
 
+#team-daily-allocation .table #staff_col,
+#team-daily-allocation .table #staff_col_td{
+	width:20%;
+}
+
+.onscroll_fixed{
+    /*-moz-width:86%;
+    -ms-width:87%;
+    -o-width:87%;
+    -webkit-width:87%;*/
+    position:fixed;
+    width:87%;
+    top:13%;
+    z-index:100;
+    background-color: white;
+}

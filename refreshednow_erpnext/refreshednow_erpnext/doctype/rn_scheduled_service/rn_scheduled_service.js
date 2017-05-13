@@ -12,6 +12,14 @@ frappe.ui.form.on('RN Scheduled Service', {
             frappe.set_route("rn-team-scheduling");
         });
 
+        // frm.add_custom_button(__("Add Contact with New Customer"), function() {
+        //     new_contact_dialog(true)
+        // }, __("Add Contact"));
+
+        // frm.add_custom_button(__("Add Contact with existing Customer"), function() {
+        //     new_contact_dialog(false)
+        // }, __("Add Contact"));
+
         //Show service items only.
         frappe.db.get_value("RN Settings", "RN Settings", "rn_service_item_group", function(r) {
             cur_frm.set_query("service_type", function() {
@@ -22,19 +30,16 @@ frappe.ui.form.on('RN Scheduled Service', {
                 };
             });
         })
-        cur_frm.set_query("customer", function() {
-            return {
-                "query": "refreshednow_erpnext.api.customer_query"
-            };
-        });
-        cur_frm.set_query("contact_person", function() {
+        // cur_frm.set_query("customer", function() {
+        //     return {
+        //         "query": "refreshednow_erpnext.api.customer_query"
+        //     };
+        // });
+       /* cur_frm.set_query("contact_person", function() {
             return {
                 "query": "refreshednow_erpnext.api.contact_query",
-                "filters": {
-                    "customer": frm.doc.customer
-                }
             };
-        });
+        });*/
         cur_frm.set_query("team", function() {
             return {
                 "filters": {
@@ -43,6 +48,7 @@ frappe.ui.form.on('RN Scheduled Service', {
             };
         });
         //Filter dropdowns by Customer and pertinent criteria.
+
         cur_frm.set_query("billing_address", function() {
             return {
                 "query": "refreshednow_erpnext.api.get_address",
@@ -68,24 +74,22 @@ frappe.ui.form.on('RN Scheduled Service', {
                 }
             };
         });
-
-
         render_vehicles(frm);
         render_team_members(frm);
+
+        // console.log("Pre RS From", frm.doc.starts_on);
+        // console.log("Pre RS To", frm.doc.ends_on);
+
         render_timeslot(frm);
 
         //frm.fields_dict.customer.new_doc = quick_entry_customer;
         frm.fields_dict.service_address.new_doc = quick_entry_service_address;
         frm.fields_dict.billing_address.new_doc = quick_entry_billing_address;
         frm.fields_dict.vehicle.new_doc = quick_entry_vehicle;
-        frm.fields_dict.contact_person.new_doc = quick_entry_contact;
-
-        if (!frm.doc.vehicle_count) { frm.set_value("vehicle_count", 1); }
+        frm.fields_dict.contact_person.new_doc = new_contact_dialog; //quick_entry_contact;
     },
     customer: function(frm) {
-        clear_fields_on_customer_change();
         if (frm.doc.customer) {
-            fetch_and_set_linked_fields(frm);
             frm.set_value("bill_to", frm.doc.customer);
         } else {
             frm.doc.customer = undefined; //REQD
@@ -107,6 +111,7 @@ frappe.ui.form.on('RN Scheduled Service', {
         if (frm.doc.billing_address_same_as_service) frm.set_value("billing_address", "");
     },
     contact_person: function(frm) {
+        clear_fields_on_contactperson_change();
     //  if(!frm.doc.contact_person) {
     //      cur_frm.set_value("customer", undefined);
     //  } else {
@@ -120,16 +125,60 @@ frappe.ui.form.on('RN Scheduled Service', {
     //      });
     //      erpnext.utils.get_contact_details(frm);
     //  }
-        frappe.db.get_value(
-            "Contact",
-            frm.doc.contact_person,
-            "phone",
-            function(r) {
-                if (r) {
-                    frm.set_value("contact_phone", r.phone);
+      /*  var customer = frappe.get_all("Dynamic Link",filters={"parent":frm.doc.contact_person},fields=["*"])
+        frm.set_value("customer",customer[0].link_name)*/
+      /*  if (frm.doc.contact_person) {
+        frappe.call({
+            method: "refreshednow_erpnext.api.set_customer",
+            args: {
+                "contact_person": frm.doc.contact_person,
+            },
+            callback: function(r) {
+                if(r){
+                    frm.set_value("customer",r.link_n);
                 }
             }
-        );
+        });
+    }*/
+        // cust = frappe.db.get_value("Dynamic Link", filters={"parent":frm.doc.contact_person}, fieldname="link_name",function(r){
+        //     if(r){
+        //         frm.set_value("customer",r.link_name);
+        //         frm.set_df_property("customer", "read_only",1);
+        //     }
+        // });
+
+        // frappe.db.get_value(
+        //     "Contact",
+        //     frm.doc.contact_person,
+        //     "phone",
+        //     function(r) {
+        //         if (r) {
+        //             frm.set_value("contact_phone", r.phone);
+        //         }else {
+        //         new_contact_dialog(frm);
+        //         }
+        //     }
+        // );
+        if(frm.doc.contact_person != ""){
+            frappe.call({
+                method: "refreshednow_erpnext.api.get_contact_info",
+                args: {
+                    contact_name: frm.doc.contact_person
+                },
+                callback: function(r) {
+                    if (r || r.message) {
+                        console.log("Setting values", r);
+                        cur_frm.set_value("customer", r.message.customer);
+                        cur_frm.set_value("contact_phone", r.message.phone);
+                        if (r.message.address) {
+                            cur_frm.set_value("billing_address", r.message.address[0].parent);
+                            cur_frm.set_value("service_address", r.message.address[0].parent);
+                        }
+                        cur_frm.set_value("vehicle_count", 1);
+                    }
+                }
+            });
+        }    
     }
 });
 
@@ -166,55 +215,68 @@ function render_team_members(frm) {
 }
 
 
-function fetch_and_set_linked_fields(frm) {
-    frappe.call({
-        method: "refreshednow_erpnext.api.get_customer_info",
-        args: { 
-            customer: frm.doc.customer 
-        },
-        callback: function(r){
-            cur_frm.set_value("billing_address", r.message.address);
-            cur_frm.set_value("service_address", r.message.address);
-            cur_frm.set_value("contact_person", r.message.contact);
-        }
-    });
-}
+// function  new_contact_dialog(frm) {
+//     var dialog = new frappe.ui.Dialog({
+//         title: __("Quick Customer Entry"),
+//         fields: [
+//             {fieldtype: "Link", fieldname: "customer", options: "Customer", label: __("Customer")},
+//             {fieldtype: "Data", fieldname: "contact_person", label: __("Contact")},
+//             {fieldtype: "Data", fieldname: "mobile_no", label: __("Mobile Number")},
+//             {fieldtype: "Data", fieldname: "phone", label: __("Phone Number")}
+//         ]
+//     });
 
-/*function fetch_and_set_linked_fields(frm) {
-    frappe.db.get_value(
-        "Address",
-        { "customer":frm.doc.customer, "address_type":"Billing", "is_primary_address":true },
-        "name",
-        function(r) {
-            if (r) {
-                console.log(r);
-                frm.set_value("billing_address", r.name);
-            }
-        }
-    );
-    frappe.db.get_value(
-        "Address",
-        { "customer":frm.doc.customer, "address_type":"Service" },
-        "name",
-        function(r) {
-            if (r) {
-                console.log(r);
-                frm.set_value("service_address", r.name);
-            }
-        }
-    );
-    frappe.db.get_value(
-        "Contact",
-        { "customer":frm.doc.customer, "is_primary_contact": 1 },
-        "name",
-        function(r) {
-            if (r) {
-                frm.set_value("contact_person", r.name);
-            }
-        }
-    );
-}
-*/
+//     dialog.set_primary_action(__("Save"), function() {
+//         var btn = this;
+//         var values = dialog.get_values();
+//         frappe.call({
+//             doc: cur_frm.doc,
+//             method: "refreshednow_erpnext.api.add_contact_to_customer",
+//             args: {
+//                 "values": values
+//             },
+//             callback: function(r) {
+//                 dialog.clear(); dialog.hide();
+//             }
+//         })
+//     });
+// }
+
+// function fetch_and_set_linked_fields(frm) {
+//     frappe.db.get_value(
+//         "Address",
+//         { "customer":frm.doc.customer, "address_type":"Billing", "is_primary_address":true },
+//         "name",
+//         function(r) {
+//             if (r) {
+//                 console.log(r);
+//                 frm.set_value("billing_address", r.name);
+//             }
+//         }
+//     );
+//     frappe.db.get_value(
+//         "Address",
+//         { "customer":frm.doc.customer, "address_type":"Service" },
+//         "name",
+//         function(r) {
+//             if (r) {
+//                 console.log(r);
+//                 frm.set_value("service_address", r.name);
+//             }
+//         }
+//     );
+//     frappe.db.get_value(
+//         "Contact",
+//         { "customer":frm.doc.customer, "is_primary_contact": 1 },
+//         "name",
+//         function(r) {
+//             if (r) {
+//                 frm.set_value("contact_person", r.name);
+//             }
+//         }
+//     );
+// }
+
 function render_timeslot(frm) {
     var starts_on = moment(frm.doc.starts_on).format("h:mm a");
     var ends_on = moment(frm.doc.ends_on).format("h:mm a");
@@ -275,23 +337,55 @@ function quick_entry_vehicle() {
     });
 }
 
-function quick_entry_contact() {
-    frappe._from_link = this;
-    mnt.quick_entry("Contact",
-    function(){},
-    {
-        "first_name": this.$input.val().split(" ")[0],
-        "last_name": this.$input.val().split(" ")[1] || "",
-        "links": [{"link_doctype": "Customer", "link_name": cur_frm.doc.customer}]
-    });
-}
 
-function clear_fields_on_customer_change() {
-    cur_frm.set_value("contact_person", "");
-    cur_frm.set_value("contact_display", "");
+function clear_fields_on_contactperson_change() {
+    cur_frm.set_value("customer", "");
     cur_frm.set_value("bill_to", "");
     cur_frm.set_value("contact_phone", "");
     cur_frm.set_value("contact_email", "");
     cur_frm.set_value("service_address", "");
     cur_frm.set_value("billing_address", "");
+    cur_frm.set_value("vehicle_count", "");
+}
+
+function new_contact_dialog() {
+    var frm = cur_frm;
+
+    var contact_person_value = frm.fields_dict["contact_person"].$input.val();
+
+    var dialog = new frappe.ui.Dialog({
+        title: __("New Contact"),
+        fields: [
+            {fieldtype: "Link", fieldname: "customer", label:__("Customer"), options: "Customer", reqd: 1},
+            {fieldtype: "Data", fieldname: "contact_person", label: __("New Contact Name"), reqd: 1},
+            {fieldtype: "Data", fieldname: "phone", label: __("Contact Number")}
+        ]
+    });
+
+    if (isNaN(contact_person_value)) {
+        dialog.set_value("contact_person", contact_person_value);
+    } else {
+        dialog.set_value("phone", contact_person_value);
+    }
+
+    dialog.get_field("customer").new_doc = function() { 
+        frappe.msgprint("No need to click here. Just type in the name in the Customer field and the dialog will handle the rest.");
+    };
+
+    dialog.set_primary_action(__("Save"), function() {
+        var btn = this;
+        var values = dialog.get_values();
+        frappe.call({
+            doc: frm.doc,
+            method: "add_contact_to_customer",
+            args: {
+                "values": values
+            },
+            callback: function(r) {
+                cur_frm.set_value("contact_person", r.message);
+                dialog.clear(); dialog.hide();
+            }
+        })
+    });
+    dialog.show();
 }

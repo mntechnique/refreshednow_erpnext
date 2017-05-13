@@ -1,15 +1,15 @@
 import frappe
 from frappe import _
-import json
-import calendar
-#from datetime import date, datetime, timedelta
-from frappe.desk.reportview import get_match_cond
+
 import json, pdfkit, os
+import calendar
+
 from frappe.utils.pdf import get_pdf
-
-import datetime
+from frappe.desk.reportview import get_match_cond
 from dateutil import tz
+from .sms_manager import fire_reminder_sms
 
+# reload(refreshednow_erpnext.)
 # @frappe.whitelist()
 # def rn_events_test(start, end, filters=None):
 # 	events = [
@@ -329,7 +329,7 @@ def get_team_tool_data(service_type=None, day_of_week=None):
 		designations = frappe.get_all("RN Team Staff Detail", fields=["designation"], distinct=True)
 		designations = [d.designation for d in designations]
 
-		employees = frappe.get_all("Employee", filters=[["designation", "in", designations]], fields=["name", "employee_name", "designation", "rn_weekly_off"]) #TODO: Filter for On-Field employees.
+		employees = frappe.get_all("Employee", filters=[["designation", "in", designations]], fields=["name", "employee_name", "designation", "rn_weekly_off"],order_by="employee_name") #TODO: Filter for On-Field employees.
 		team_names = [t.name for t in teams]
 		allocations = frappe.get_all("RN Team Day Employee", filters=[["team", "in", team_names], ["day_of_week", "=", day_of_week]], fields=["*"])
 
@@ -438,8 +438,7 @@ def contact_query(doctype, txt, searchfield, start, page_len, filters):
 			'page_len': page_len
 
 		})
-	for x in xrange(1,10):
-		print out
+
 	return out
 
 
@@ -472,8 +471,7 @@ def get_address(doctype, txt, searchfield, start, page_len, filters):
 			'page_len': page_len
 
 		})
-	for x in xrange(1,10):
-		print out
+
 	return out
 
 
@@ -482,22 +480,21 @@ def get_address(doctype, txt, searchfield, start, page_len, filters):
 # def get_customer_links(customer):
 # 	pass
 
-@frappe.whitelist()
-def get_customer_info(customer):
-	#return {"address": "ABC"}
-	contacts = frappe.get_all("Dynamic Link", filters={"parenttype": "Contact", "link_name": customer}, fields=["*"], order_by="creation DESC")
-	addresses = frappe.get_all("Dynamic Link", filters={"parenttype": "Address", "link_name": customer}, fields=["*"], order_by="creation DESC")
+# @frappe.whitelist()
+# def get_customer_info(customer):
+# 	#return {"address": "ABC"}
+# 	contacts = frappe.get_all("Dynamic Link", filters={"parenttype": "Contact", "link_name": customer}, fields=["*"], order_by="creation DESC")
+# 	addresses = frappe.get_all("Dynamic Link", filters={"parenttype": "Address", "link_name": customer}, fields=["*"], order_by="creation DESC")
 
-	contact = ""
-	if len(contacts) > 0:
-		contact = contacts[0].parent
+# 	contact = ""
+# 	if len(contacts) > 0:
+# 		contact = contacts[0].parent
 
-	address = ""
-	if len(addresses) > 0:
-		address = addresses[0].parent
+# 	address = ""
+# 	if len(addresses) > 0:
+# 		address = addresses[0].parent
 
-	return {"address": address, "contact": contact }
-
+# 	return {"address": address, "contact": contact }
 
 @frappe.whitelist()
 def print_job_sheet(names):
@@ -507,7 +504,10 @@ def print_job_sheet(names):
 	if len(names) == 0:
 		frappe.msgprint("No rows selected.")
 
+
 	final_html = prepare_bulk_print_html(names)
+	for x in xrange(1,10):
+		print "names", names
 
 	pdf_options = {
 					"no-outline": None,
@@ -519,31 +519,38 @@ def print_job_sheet(names):
 	frappe.local.response.filecontent = rn_get_pdf(final_html, options=pdf_options)
 	frappe.local.response.type = "download"
 
-
 def prepare_bulk_print_html(names):
 	names = names.split(",")
 	html = ""
-	ss_list = []
+	ss_rn_golist = []
+	ss_rn_prolist = []
 
 	for name in names:
 		ss = frappe.get_doc("RN Scheduled Service", name)
 		employee = frappe.db.get_value("RN Team Day Employee", {"team":ss.team,"day_of_week":calendar.day_name[ss.starts_on.weekday()]},"employee")
 		cleaner_name = frappe.db.get_value("Employee", employee, "employee_name")
 		ss.update({"cleaner":cleaner_name})
-		ss_list.append(ss)
+		if ss.service_type=="Refreshed Go":
+			ss_rn_golist.append(ss)
+		else:
+			ss_rn_prolist.append(ss)
 
-	ss_list = sorted(ss_list, key=lambda v:v.get("starts_on"))
+	ss_rn_golist = sorted(ss_rn_golist, key=lambda v:v.get("starts_on"))
+	ss_rn_prolist = sorted(ss_rn_prolist, key=lambda v:v.get("starts_on"))
 
-	html_params = { "ss_list": ss_list }
+	html_params = { "ss_rn_golist": ss_rn_golist or [], "ss_rn_prolist": ss_rn_prolist or []}
 	final_html = frappe.render_template("refreshednow_erpnext/templates/includes/refreshed_jobsheet.html", html_params)
 
 	return final_html
 
 
 def rn_get_pdf(html, options=None):
-	fname = os.path.join("/tmp", "refreshed-jobsheet-{0}.pdf".format(frappe.generate_hash()))
-
+	date = frappe.utils.add_days(frappe.utils.getdate(), 1)
+	fname = os.path.join(frappe.get_site_path(), "public","files", "refreshed-jobsheet-{0}.pdf ".format(frappe.utils.data.format_datetime(date,"YYYY-MM-dd")))
+	cleanup(fname)
 	try:
+		for x in xrange(1,10):
+			print "filename", fname
 		pdfkit.from_string(html, fname, options=options or {})
 
 		with open(fname, "rb") as fileobj:
@@ -566,7 +573,7 @@ def rn_get_pdf(html, options=None):
 			raise
 
 	finally:
-		cleanup(fname)
+		pass
 
 	return filedata
 
@@ -574,31 +581,32 @@ def cleanup(fname):
 	if os.path.exists(fname):
 		os.remove(fname)
 
-@frappe.whitelist()
-def send_sms(mobile_no, message):
-	import requests
+# @frappe.whitelist()
+# def send_sms(mobile_no, message):
+# 	import requests
 
-	sms_settings = frappe.get_doc("SMS Settings")
+# 	sms_settings = frappe.get_doc("SMS Settings")
 
-	querystring = {}
+# 	querystring = {}
 
-	for p in sms_settings.parameters:
-		querystring.update({p.parameter:p.value})
+# 	for p in sms_settings.parameters:
+# 		querystring.update({p.parameter:p.value})
 
-	querystring.update({
-		"sendername":sms_settings.sms_sender_name,
-		sms_settings.receiver_parameter:mobile_no,
-		sms_settings.message_parameter:message
-	})
+# 	querystring.update({
+# 		"sendername":sms_settings.sms_sender_name,
+# 		sms_settings.receiver_parameter:mobile_no,
+# 		sms_settings.message_parameter:message
+# 	})
 
-	#print sms_settings.sms_gateway_url, querystring
-	response = requests.request("GET", sms_settings.sms_gateway_url, params=querystring)
-	return response.text
+# 	#print sms_settings.sms_gateway_url, querystring
+# 	response = requests.request("GET", sms_settings.sms_gateway_url, params=querystring)
+# 	return response.text
 
 def hourly_call():
 	ex = None
 	try:
-		send_service_reminder_sms()
+		fire_reminder_sms()
+		send_jobsheet()
 	except Exception as e:
 		ex = e
 		note = frappe.new_doc("Note")
@@ -609,51 +617,27 @@ def hourly_call():
 		frappe.db.commit()
 
 
-def send_service_reminder_sms():
-
-	def get_msg(service, on_day):
-		sms_message = """We look forward to refreshing your car {on_day}, {on_time} using {service_type}.
-		 Thanks for using Refreshed Car Care.""".format(
-			on_day=on_day,
-			on_time=frappe.utils.data.format_datetime(service.starts_on,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.starts_on, "h:mm a").lower(),
-			service_type=service.service_type
-		)
-		return sms_message
-
-
-
+def send_jobsheet():
 	nowtime_utc = frappe.utils.datetime.datetime.utcnow()
 	nowtime_utc = nowtime_utc.replace(tzinfo=tz.gettz("UTC"))
 	nowtime_ak = nowtime_utc.astimezone(tz.gettz("Asia/Kolkata"))
 
 	#Comparison times are adjusted for SF time.
-
-	if nowtime_ak.hour in [20,21,22]:
-		tomorrow = frappe.utils.data.add_to_date(frappe.utils.today(), days=1)
-		services = frappe.db.sql("""SELECT * FROM `tabRN Scheduled Service`
-						WHERE date(starts_on) = '{starts_on_date}'
-						AND docstatus = 1
-						AND sms_checkbox != 1""".format(
-							starts_on_date=tomorrow
-						), as_dict=1)
-
-		for service in services:
-			msg = get_msg(service, "tomorrow")
-
-			note_content = ""
-			try:
-				send_sms(service.contact_phone, msg)
-				note_content = "Sent message to {0} on {1} <hr> {2} <hr> {3}".format(service.customer or "'No Cust'", service.contact_phone or "'Phone No'",  msg or "'Message'", service.name or "'Service Name'")
-				frappe.db.set_value("RN Scheduled Service", service.name, "sms_checkbox", 1)
-				frappe.db.commit()
-			except Exception as e:
-				note_content = "Unable to send message to {0} on {1} <hr> {2} <hr> {3} <hr> {4}".format(service.customer or "'No Cust'", service.contact_phone or "'Phone No'",  msg or "'Message'", service.name or "'Service Name'", ex)
+	if nowtime_ak.hour in [22]:
+		try:
+			frappe.sendmail(recipients=["hello@refreshednow"], subject="Daily Sheet", message="[Test Message] PFA Job Sheet for tomorrow.")
+		except Exception as e:
+			raise
 
 
-			note = frappe.new_doc("Note")
-			note.title = "SMS Log (Reminder) - "+ frappe.utils.nowdate() + frappe.utils.nowtime()
-			note.public = 1
-			note.content = note_content
-			note.save()
+@frappe.whitelist()
+def get_contact_info(contact_name):
+	customer = frappe.db.get_value("Dynamic Link", filters={"parent":contact_name}, fieldname="link_name")
+	phone = frappe.db.get_value("Contact", contact_name, "phone")
+	addresses = frappe.get_all("Dynamic Link", filters={"parenttype": "Address", "link_doctype": "Customer", "link_name": customer }, fields=["*"], order_by="creation DESC")
 
-			frappe.db.commit()
+	address = ""
+	if len(addresses) > 0:
+		address = addresses
+
+	return {"customer": customer, "phone": phone, "address": address}
