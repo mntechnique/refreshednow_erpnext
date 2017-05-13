@@ -27,8 +27,8 @@ def send_sms(mobile_no, message):
         sms_settings.message_parameter:message
     })
 
-    # response = requests.request("GET", sms_settings.sms_gateway_url, params=querystring)
-    response = frappe._dict({"text": "SMS Gateway Invoked"})
+    response = requests.request("GET", sms_settings.sms_gateway_url, params=querystring)
+    #response = frappe._dict({"text": "SMS Gateway Invoked"})
 
     log_sms(sms_settings.sms_sender_name, mobile_no,message,response)
     return response.text

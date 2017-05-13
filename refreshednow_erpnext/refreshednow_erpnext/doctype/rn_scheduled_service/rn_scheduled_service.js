@@ -77,8 +77,8 @@ frappe.ui.form.on('RN Scheduled Service', {
         render_vehicles(frm);
         render_team_members(frm);
 
-        console.log("Pre RS From", frm.doc.starts_on);
-        console.log("Pre RS To", frm.doc.ends_on);
+        // console.log("Pre RS From", frm.doc.starts_on);
+        // console.log("Pre RS To", frm.doc.ends_on);
 
         render_timeslot(frm);
 
