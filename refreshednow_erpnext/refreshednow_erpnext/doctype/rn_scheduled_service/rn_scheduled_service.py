@@ -11,6 +11,7 @@ from frappe import _
 #from refreshednow_erpnext.api import send_sms
 from refreshednow_erpnext.sms_manager import fire_confirmation_sms
 from refreshednow_erpnext.sms_manager import fire_cancellation_sms
+import datetime
 
 class RNScheduledService(Document):
     def validate(self):
@@ -188,7 +189,10 @@ class RNScheduledService(Document):
 
 
     def validate_reporting_time(self):
-        if (self.reporting_time < frappe.utils.add_to_date(self.starts_on,hours=-1)) or (self.reporting_time>self.ends_on):
+        starts_on = frappe.utils.get_datetime(self.starts_on)
+        reporting_time = frappe.utils.get_datetime(self.reporting_time)
+
+        if (reporting_time < (starts_on + datetime.timedelta(hours=-1))) or (self.reporting_time>self.ends_on):
             frappe.throw("Reporting time must be within the selected service slot.")
 
     def save_service_summary(self):
