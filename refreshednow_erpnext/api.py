@@ -633,6 +633,8 @@ def send_jobsheet():
 @frappe.whitelist()
 def get_contact_info(contact_name):
 	customer = frappe.db.get_value("Dynamic Link", filters={"parent":contact_name}, fieldname="link_name")
+
+	sms_check = frappe.db.get_value("Customer",customer, "rn_unsubscribe_sms")
 	phone = frappe.db.get_value("Contact", contact_name, "phone")
 	addresses = frappe.get_all("Dynamic Link", filters={"parenttype": "Address", "link_doctype": "Customer", "link_name": customer }, fields=["*"], order_by="creation DESC")
 
@@ -640,4 +642,4 @@ def get_contact_info(contact_name):
 	if len(addresses) > 0:
 		address = addresses
 
-	return {"customer": customer, "phone": phone, "address": address}
+	return {"customer": customer, "sms_check": sms_check, "phone": phone, "address": address}

@@ -23,6 +23,14 @@ class RNScheduledService(Document):
         self.validate_team_availability()
         self.save_service_summary()
 
+    def on_update(self):
+        if self.rn_unsubscribe_sms == 1:
+            frappe.db.set_value("Customer", self.customer, "rn_unsubscribe_sms", 1)
+            frappe.msgprint("Unsubscribed SMS service for this customer", alert=True)
+        elif self.rn_unsubscribe_sms == 0:
+            frappe.db.set_value("Customer", self.customer, "rn_unsubscribe_sms", 0)    
+            frappe.msgprint("Subscribed SMS service for this customer", alert=True)
+
     def before_submit(self):
         if not self.sales_order:
             self.sales_order = self.create_sales_order()
