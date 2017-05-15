@@ -62,7 +62,7 @@ def get_msg(service, msg_type):
     on_day = frappe.utils.data.date_diff(frappe.utils.data.format_datetime(service.starts_on,"EEEE MM dd"), datetime.date.today())
 
     confirmation_msg = """Your {service_type} is confirmed for {on_time} ({service_no}). To cancel or reschedule, please call us at least 2 hour prior. Thanks, Refreshed Car Care.""".format(service_type=service.service_type,
-                on_time=frappe.utils.data.format_datetime(service.reporting_time,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.reporting_time, "h:mm a").lower(),
+                on_time=frappe.utils.data.format_datetime(service.reporting_time,"d MMM") + " at " + frappe.utils.data.format_datetime(service.reporting_time, "h:mm a").lower(),
                 service_no=service.name)
 
 
