@@ -67,5 +67,19 @@ def get_data():
 					"description": _("Tool for settings."),
 				},
 			]
+		},
+		{
+			"label": _("Reports"),
+			"icon": "icon-star",
+			"items": [
+				{
+					"type": "report",
+					"name": "Jobsheet",
+					"label": "Jobsheet",
+					"description": _("Jobsheet"),
+					"route": "query-report/Jobsheet",
+					"doctype": "DocType"
+				},
+			]
 		}
 	]

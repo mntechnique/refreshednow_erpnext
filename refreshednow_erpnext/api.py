@@ -514,8 +514,10 @@ def print_job_sheet(names):
 				}
 
 	#frappe.local.response.filename = "{filename}.pdf".format(filename="job_sheet_list".replace(" ", "-").replace("/", "-"))
-	frappe.local.response.filecontent, filename = rn_get_pdf(final_html, options=pdf_options)
-	frappe.local.response.filename = filename.replace(" ", "-").replace("/", "-")
+	filecontent, filename = rn_get_pdf(final_html, options=pdf_options)
+
+	frappe.local.response.filecontent = filecontent
+	frappe.local.response.filename = "{filename}.pdf".format(filename=filename).replace(" ", "-").replace("/", "-")
 	frappe.local.response.type = "download"
 
 def prepare_bulk_print_html(names):
