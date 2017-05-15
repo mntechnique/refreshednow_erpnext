@@ -125,11 +125,11 @@ def send_service_sms(service, purpose):
     try:
         response = requests.request("GET", sms_settings.sms_gateway_url, params=querystring)
     except Exception as e:
-        response = {"text": "Error: SMS was not sent to {0} <br> Reason: {1}".format(service.contact_phone, e.message)}
+        response = frappe._dict({"text":"Error: SMS was not sent to {0} <br> Reason: {1}".format(service.contact_phone, e.message)})
 
   #  log_sms(sms_settings.sms_sender_name, service.contact_phone, message, response, purpose)
 
-    return response.get("text"), message
+    return response.text, message
 
 def log_service_sms(purpose, service, message, response):
     note = frappe.new_doc("Note")
