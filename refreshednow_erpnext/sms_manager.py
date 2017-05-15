@@ -10,38 +10,11 @@ import datetime
 from dateutil import tz
 
 
-
-# @frappe.whitelist()
-# def send_sms(mobile_no, message):
-#     import requests
-
-#     sms_settings = frappe.get_doc("SMS Settings")
-#     querystring = {}
-
-#     for p in sms_settings.parameters:
-#         querystring.update({p.parameter:p.value})
-
-#     querystring.update({
-#         "sendername":sms_settings.sms_sender_name,
-#         sms_settings.receiver_parameter:mobile_no,
-#         sms_settings.message_parameter:message
-#     })
-
-#     response = requests.request("GET", sms_settings.sms_gateway_url, params=querystring)
-#     #response = frappe._dict({"text": "SMS Gateway Invoked"})
-
-#     log_sms(sms_settings.sms_sender_name, mobile_no,message,response)
-#     return response.text
-
 def fire_confirmation_sms(service):
     sms_block = frappe.db.get_value("Customer",filters={"name":service.customer},fieldname="rn_unsubscribe_sms");
     
     if sms_block != 1:
-        # message = get_msg(service, "confirmation")
-        # status_msg = ""
-
         try:
-            #status_msg = send_sms(service.contact_phone, message)
             status_msg = send_service_sms(service, "confirmation")
         except Exception as e:
             status_msg = "SMS was not sent to '{0}'. <hr> {1}".format(service.contact_phone, e)
@@ -51,11 +24,7 @@ def fire_cancellation_sms(service):
     sms_block = frappe.db.get_value("Customer",filters={"name":service.customer},fieldname="rn_unsubscribe_sms");
 
     if sms_block != 1:
-        # message = get_msg(service, "cancellation")
-        # status_msg = ""
-
         try:
-            #status_msg = send_sms(service.contact_phone, message)
             status_msg = send_service_sms(service, "cancellation")
         except Exception as e:
             status_msg = "SMS was not sent to '{0}'. <hr> {1}".format(service.contact_phone, e)
@@ -87,8 +56,6 @@ def fire_reminder_sms():
         for service in services:
             sms_block = frappe.db.get_value("Customer",filters={"name":service.customer},fieldname="rn_unsubscribe_sms")
             if sms_block != 1:
-                #msg = get_msg(service, "reminder")
-                #send_sms(service.contact_phone, msg)
                 send_service_sms(service, "reminder")
                 frappe.db.set_value("RN Scheduled Service", service.name, "sms_checkbox", 1)
                 frappe.db.commit()
@@ -97,32 +64,23 @@ def fire_reminder_sms():
 def get_msg(service, msg_type):
     on_day = frappe.utils.data.date_diff(frappe.utils.data.format_datetime(service.starts_on,"EEEE MM dd"), datetime.date.today())
 
-    if on_day == 0:
-        day_string = "today"
-    elif on_day == 1:
-        day_string = "tomorrow"
-    else:
-        day_string = ""
-
-
-    confirmation_msg = """Your {service_type} is confirmed for {on_time} ({service_no}). To cancel or reschedule, please call us at least 2 hour prior. Thanks, Refreshed Car Care. 
-    """.format(service_type=service.service_type,
+    confirmation_msg = """Your {service_type} is confirmed for {on_time} ({service_no}). To cancel or reschedule, please call us at least 2 hour prior. Thanks, Refreshed Car Care.""".format(service_type=service.service_type,
                 on_time=frappe.utils.data.format_datetime(service.reporting_time,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.reporting_time, "h:mm a").lower(),
                 service_no=service.name)
 
-    reminder_msg = """Reminder: Your {service_type} ({service_no}) is scheduled tomorrow at {on_time}. To cancel or reschedule, please call us at least 2 hour prior. Thanks, Refreshed Car Care.
-    """.format(
+
+    reminder_msg = """Reminder: Your {service_type} ({service_no}) is scheduled tomorrow at {on_time}. To cancel or reschedule, please call us at least 2 hour prior. Thanks, Refreshed Car Care.""".format(
         service_type=service.service_type,
-        service_no=service.service.name,
+        service_no=service.name,
         on_time=frappe.utils.data.format_datetime(service.reporting_time, "h:mm a").lower()
     )
     
-    cancellation_msg = """We have cancelled your {service_type} for {on_time} ({service_no}). To reschedule, please call us. Thanks, Refreshed Car Care. 
-    """.format(
+    cancellation_msg = """We have cancelled your {service_type} for {on_time} ({service_no}). To reschedule, please call us. Thanks, Refreshed Car Care.""".format(
         service_type=service.service_type,
         on_time=frappe.utils.data.format_datetime(service.reporting_time,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.reporting_time, "h:mm a").lower(),
         service_no=service.name
         )
+
 
     # reminder_msg = """We look forward to refreshing your car {on_day}, {on_time} using {service_type}.
     #  Thanks for using Refreshed Car Care.""".format(
@@ -166,11 +124,8 @@ def send_service_sms(service, purpose):
         sms_settings.message_parameter:message
     })
 
-    #Until cancellation is approved
-    if purpose == "cancellation":
-        response = frappe._dict({"text": "SMS Gateway Invoked"})
-    else:
-        response = requests.request("GET", sms_settings.sms_gateway_url, params=querystring)
+    #response = frappe._dict({"text": "SMS Gateway Invoked"})
+    response = requests.request("GET", sms_settings.sms_gateway_url, params=querystring)
 
     for x in xrange(1,10):
         print ("sender:", sms_settings.sms_sender_name, ", mobile:", service.contact_phone, ", message", message, ", response:", response, ", purpose:", purpose)
