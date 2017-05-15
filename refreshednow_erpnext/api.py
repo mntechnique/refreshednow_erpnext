@@ -498,6 +498,7 @@ def get_address(doctype, txt, searchfield, start, page_len, filters):
 
 @frappe.whitelist()
 def print_job_sheet(names):
+	print "JOBSHEET FUNCTION"
 	if not frappe.has_permission("RN Scheduled Service", "write"):
 		frappe.throw(_("Not permitted"), frappe.PermissionError)
 
@@ -506,9 +507,6 @@ def print_job_sheet(names):
 
 
 	final_html = prepare_bulk_print_html(names)
-	for x in xrange(1,10):
-		print "names", names
-
 	pdf_options = {
 					"no-outline": None,
 					"encoding": "UTF-8",
@@ -520,6 +518,7 @@ def print_job_sheet(names):
 	frappe.local.response.type = "download"
 
 def prepare_bulk_print_html(names):
+	print "BULK PRINT HTML"
 	names = names.split(",")
 	html = ""
 	ss_rn_golist = []
@@ -545,12 +544,11 @@ def prepare_bulk_print_html(names):
 
 
 def rn_get_pdf(html, options=None):
+	print "RN GET PDF"
 	date = frappe.utils.add_days(frappe.utils.getdate(), 1)
 	fname = os.path.join(frappe.get_site_path(), "public","files", "refreshed-jobsheet-{0}.pdf ".format(frappe.utils.data.format_datetime(date,"YYYY-MM-dd")))
 	cleanup(fname)
 	try:
-		for x in xrange(1,10):
-			print "filename", fname
 		pdfkit.from_string(html, fname, options=options or {})
 
 		with open(fname, "rb") as fileobj:
@@ -576,6 +574,21 @@ def rn_get_pdf(html, options=None):
 		pass
 
 	return filedata
+
+def get_tomorrows_servicelist():
+	print "GET SERVICELIST CALLED"
+	tomorrow = frappe.utils.data.add_to_date(frappe.utils.today(), days=1)
+	names = frappe.db.sql("""SELECT name FROM `tabRN Scheduled Service`
+					WHERE date(starts_on) = '{starts_on_date}'
+					AND docstatus = 1""".format(
+						starts_on_date=tomorrow
+					), as_dict=1)
+	names = ",".join([ss.name for ss in names])
+
+	print names
+	print "length", len(names) 
+	return print_job_sheet(names)
+	print "JOBSHEET FUNC CALLED"
 
 def cleanup(fname):
 	if os.path.exists(fname):
@@ -625,7 +638,9 @@ def send_jobsheet():
 	#Comparison times are adjusted for SF time.
 	if nowtime_ak.hour in [22]:
 		try:
-			frappe.sendmail(recipients=["hello@refreshednow"], subject="Daily Sheet", message="[Test Message] PFA Job Sheet for tomorrow.")
+			attachment = get_tomorrows_servicelist()
+
+			frappe.sendmail(recipients=["hello@refreshednow"], subject="Daily Sheet", message="[Test Message] PFA Job Sheet for tomorrow.",attachments = attachment)
 		except Exception as e:
 			raise
 
