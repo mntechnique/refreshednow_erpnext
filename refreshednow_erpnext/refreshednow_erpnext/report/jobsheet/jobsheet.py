@@ -15,19 +15,42 @@ def execute(filters=None):
 def get_columns(filters):
 	"""return columns based on filters"""
 
-	columns = [_("Type")] + [_("Time")] + [_("ID")] + \
-	[_("Name")] + [_("Contact")] + [_("Address")] + \
-	[_("Comments")] + [_("Car")] + [_("Cleaner Name")] + [_("Payment")]
+	return [
+		_("Type") + "::90",
+		_("Time") + ":Datetime:150",
+		_("ID") + "::75",
+		_("Name") + "::150",
+		_("Contact No") + "::150",
+		_("Address") + "::200",
+		_("Notes") + "::150",
+		_("Car") + "::75",
+		_("Cleaner Name") + "::75",
+		_("Payment") + "::75",
+	]
 
-	return columns
 
 def get_service_data(filters):
-	item_map = {}
+	data = []
+	services = frappe.get_all("RN Scheduled Service", fields=["*"], order_by="service_type, starts_on")
 
-	servicelist = frappe.db.sql("""SELECT service_type,starts_on,name,customer,contact,service_address_display,notes FROM `tabRN Scheduled Service`
-				WHERE docstatus = 1""".format(
-				), as_dict=1)
+	if filters:
+		if "starts_on" in filters:
+			services = [ss for ss in services if frappe.utils.getdate(ss.starts_on) == frappe.utils.getdate(filters["starts_on"])]
+		if "service_type" in filters:
+			services = [ss for ss in services if ss.service_type == filters["service_type"]]
 
-	print servicelist
-
-	return servicelist	
+	for service in services:
+		row = []
+		row.append(service.service_type)
+		row.append(service.starts_on)
+		row.append(service.name)
+		row.append(service.customer)
+		row.append(service.contact_phone)
+		row.append(service.service_address_display)
+		row.append(service.notes)
+		row.append(" ")
+		row.append(" ")
+		row.append(" ")
+		data.append(row)
+			
+	return data	
