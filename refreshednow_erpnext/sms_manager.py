@@ -104,23 +104,43 @@ def get_msg(service, msg_type):
     else:
         day_string = ""
 
-    reminder_msg = """We look forward to refreshing your car {on_day}, {on_time} using {service_type}.
-     Thanks for using Refreshed Car Care.""".format(
-        on_day= day_string,
-        on_time=frappe.utils.data.format_datetime(service.reporting_time,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.reporting_time, "h:mm a").lower(),
-        service_type=service.service_type
-    )
-    confirmation_msg = """Thank you for contacting Refreshed Car Care. We have taken your booking for a {service_type} on {on_time}.
+
+    confirmation_msg = """Your {service_type} is confirmed for {on_time} ({service_no}). To cancel or reschedule, please call us at least 2 hour prior. Thanks, Refreshed Car Care. 
+    """.format(service_type=service.service_type,
+                on_time=frappe.utils.data.format_datetime(service.reporting_time,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.reporting_time, "h:mm a").lower(),
+                service_no=service.name)
+
+    reminder_msg = """Reminder: Your {service_type} ({service_no}) is scheduled tomorrow at {on_time}. To cancel or reschedule, please call us at least 2 hour prior. Thanks, Refreshed Car Care.
     """.format(
+        service_type=service.service_type,
+        service_no=service.service.name,
+        on_time=frappe.utils.data.format_datetime(service.reporting_time, "h:mm a").lower()
+    )
+    
+    cancellation_msg = """We have cancelled your {service_type} for {on_time} ({service_no}). To reschedule, please call us. Thanks, Refreshed Car Care. 
+    """.format(
+        service_type=service.service_type,
         on_time=frappe.utils.data.format_datetime(service.reporting_time,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.reporting_time, "h:mm a").lower(),
-        service_type=service.service_type
+        service_no=service.name
         )
 
-    cancellation_msg = """According to your request, service for {service_type} on {on_time} has been cancelled. Thank you for contacting Refreshed Car Care.
-    """.format(
-        on_time=frappe.utils.data.format_datetime(service.reporting_time,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.reporting_time, "h:mm a").lower(),
-        service_type=service.service_type
-        )
+    # reminder_msg = """We look forward to refreshing your car {on_day}, {on_time} using {service_type}.
+    #  Thanks for using Refreshed Car Care.""".format(
+    #     on_day= day_string,
+    #     on_time=frappe.utils.data.format_datetime(service.reporting_time,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.reporting_time, "h:mm a").lower(),
+    #     service_type=service.service_type
+    # )
+    # confirmation_msg = """Thank you for contacting Refreshed Car Care. We have taken your booking for a {service_type} on {on_time}.
+    # """.format(
+    #     on_time=frappe.utils.data.format_datetime(service.reporting_time,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.reporting_time, "h:mm a").lower(),
+    #     service_type=service.service_type
+    #     )
+
+    # cancellation_msg = """According to your request, service for {service_type} on {on_time} has been cancelled. Thank you for contacting Refreshed Car Care.
+    # """.format(
+    #     on_time=frappe.utils.data.format_datetime(service.reporting_time,"EEEE MMM d") + " at " + frappe.utils.data.format_datetime(service.reporting_time, "h:mm a").lower(),
+    #     service_type=service.service_type
+    #     )
 
     msg_dict = {"reminder":reminder_msg,"confirmation":confirmation_msg,"cancellation":cancellation_msg}
     return msg_dict[msg_type]
