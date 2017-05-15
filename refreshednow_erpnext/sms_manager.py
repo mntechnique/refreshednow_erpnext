@@ -14,29 +14,23 @@ def fire_confirmation_sms(service):
     sms_block = frappe.db.get_value("Customer",filters={"name":service.customer},fieldname="rn_unsubscribe_sms");
     
     if sms_block != 1:
-        try:
-            status_msg = send_service_sms(service, "confirmation")
-        except Exception as e:
-            status_msg = "SMS was not sent to '{0}'. <hr> {1}".format(service.contact_phone, e)
-            frappe.msgprint(status_msg)
+        response, sms_msg = send_service_sms(service, "confirmation")
+        log_service_sms("confirmation", service, sms_msg, response)
 
 def fire_cancellation_sms(service):
     sms_block = frappe.db.get_value("Customer",filters={"name":service.customer},fieldname="rn_unsubscribe_sms");
 
     if sms_block != 1:
-        try:
-            status_msg = send_service_sms(service, "cancellation")
-        except Exception as e:
-            status_msg = "SMS was not sent to '{0}'. <hr> {1}".format(service.contact_phone, e)
-            frappe.msgprint(status_msg)    
+        response, sms_msg = send_service_sms(service, "cancellation")
+        log_service_sms("cancellation", service, sms_msg, response)
 
-def log_sms(sms_sender_name, mobile_no, message, response, purpose):
-    note = frappe.new_doc("Note")
-    note.title = "SMS Log ({0}) - {1} {2}".format(purpose.title(), frappe.utils.nowdate(), frappe.utils.nowtime())
-    note.public = 1
-    note.content = "<ul><li>Sender name: '{0}'</li><li>Mobile Number:'{1}'</li><li>Message: '{2}'</li><li>Response: '{3}'</li></ul>".format(sms_sender_name, mobile_no,message,response) #"Sending message to {0} <hr> {1}".format(contact_phone or "Contact Phone", sms_message or "Message Content")
-    note.save()
-    frappe.db.commit()
+# def log_sms(sms_sender_name, mobile_no, message, response, purpose):
+#     note = frappe.new_doc("Note")
+#     note.title = "SMS Log ({0}) - {1} {2}".format(purpose.title(), frappe.utils.nowdate(), frappe.utils.nowtime())
+#     note.public = 1
+#     note.content = "<ul><li>Sender name: '{0}'</li><li>Mobile Number:'{1}'</li><li>Message: '{2}'</li><li>Response: '{3}'</li></ul>".format(sms_sender_name, mobile_no,message,response) #"Sending message to {0} <hr> {1}".format(contact_phone or "Contact Phone", sms_message or "Message Content")
+#     note.save()
+#     frappe.db.commit()
 
 def fire_reminder_sms():
     nowtime_utc = frappe.utils.datetime.datetime.utcnow()
@@ -56,9 +50,12 @@ def fire_reminder_sms():
         for service in services:
             sms_block = frappe.db.get_value("Customer",filters={"name":service.customer},fieldname="rn_unsubscribe_sms")
             if sms_block != 1:
-                send_service_sms(service, "reminder")
-                frappe.db.set_value("RN Scheduled Service", service.name, "sms_checkbox", 1)
-                frappe.db.commit()
+                response, sms_msg = send_service_sms(service, "reminder")
+                log_service_sms("reminder", service, sms_msg, response)
+
+                if not "Error" in response:
+                    frappe.db.set_value("RN Scheduled Service", service.name, "sms_checkbox", 1)
+                    frappe.db.commit()
 
 
 def get_msg(service, msg_type):
@@ -125,11 +122,22 @@ def send_service_sms(service, purpose):
     })
 
     #response = frappe._dict({"text": "SMS Gateway Invoked"})
-    response = requests.request("GET", sms_settings.sms_gateway_url, params=querystring)
+    try:
+        response = requests.request("GET", sms_settings.sms_gateway_url, params=querystring)
+    except Exception as e:
+        response = {"text": "Error: SMS was not sent to {0} <br> Reason: {1}".format(service.contact_phone, e.message)}
 
-    for x in xrange(1,10):
-        print ("sender:", sms_settings.sms_sender_name, ", mobile:", service.contact_phone, ", message", message, ", response:", response, ", purpose:", purpose)
+  #  log_sms(sms_settings.sms_sender_name, service.contact_phone, message, response, purpose)
 
-    log_sms(sms_settings.sms_sender_name, service.contact_phone, message, response, purpose)
+    return response.get("text"), message
 
-    return response.text
+def log_service_sms(purpose, service, message, response):
+    note = frappe.new_doc("Note")
+    note.title = "SMS Log ({purpose}{error}) - {nowdate} {nowtime}".format(purpose=purpose.title(), 
+            nowdate=frappe.utils.nowdate(), 
+            nowtime=frappe.utils.nowtime(),
+            error= ", Error" if "Error" in response else "")
+    note.public = 1
+    note.content = "<ul><li>Mobile Number:'{0}'</li><li>Message: '{1}'</li><li>Response: '{2}'</li></ul>".format(service.contact_phone, message, response)
+    note.save()
+    frappe.db.commit()

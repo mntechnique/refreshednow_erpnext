@@ -28,8 +28,9 @@ class RNScheduledService(Document):
             frappe.db.set_value("Customer", self.customer, "rn_unsubscribe_sms", 1)
             frappe.msgprint("Unsubscribed SMS service for this customer", alert=True)
         elif self.rn_unsubscribe_sms == 0:
-            frappe.db.set_value("Customer", self.customer, "rn_unsubscribe_sms", 0)    
-            frappe.msgprint("Subscribed SMS service for this customer", alert=True)
+            if frappe.db.get_value("Customer", self.customer, "rn_unsubscribe_sms") == 1:
+                frappe.db.set_value("Customer", self.customer, "rn_unsubscribe_sms", 0)
+                frappe.msgprint("Subscribed SMS service for this customer", alert=True)
 
     def before_submit(self):
         if not self.sales_order:
@@ -50,6 +51,10 @@ class RNScheduledService(Document):
         #     print("BEFORE CANCEL") 
 
     def on_cancel(self):
+
+        for x in xrange(1,10):
+            print ("WORKFLOW STATE: ", self.workflow_state)
+
         if self.workflow_state == "Stopped":
             fire_cancellation_sms(self)
         linked_so = frappe.db.get_value("Sales Order", filters={"rn_scheduled_service": self.name}, fieldname="name")
