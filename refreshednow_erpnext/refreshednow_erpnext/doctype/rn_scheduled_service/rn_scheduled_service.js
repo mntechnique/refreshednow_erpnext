@@ -169,6 +169,7 @@ frappe.ui.form.on('RN Scheduled Service', {
                     if (r || r.message) {
                         console.log("Setting values", r);
                         cur_frm.set_value("customer", r.message.customer);
+                        cur_frm.set_value("rn_unsubscribe_sms", r.message.sms_check);
                         cur_frm.set_value("contact_phone", r.message.phone);
                         if (r.message.address) {
                             cur_frm.set_value("billing_address", r.message.address[0].parent);

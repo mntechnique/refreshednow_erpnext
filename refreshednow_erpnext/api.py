@@ -498,6 +498,7 @@ def get_address(doctype, txt, searchfield, start, page_len, filters):
 
 @frappe.whitelist()
 def print_job_sheet(names):
+	print "JOBSHEET FUNCTION"
 	if not frappe.has_permission("RN Scheduled Service", "write"):
 		frappe.throw(_("Not permitted"), frappe.PermissionError)
 
@@ -506,20 +507,21 @@ def print_job_sheet(names):
 
 
 	final_html = prepare_bulk_print_html(names)
-	for x in xrange(1,10):
-		print "names", names
-
 	pdf_options = {
 					"no-outline": None,
 					"encoding": "UTF-8",
 					"title": "Job Sheet"
 				}
 
-	frappe.local.response.filename = "{filename}.pdf".format(filename="job_sheet_list".replace(" ", "-").replace("/", "-"))
-	frappe.local.response.filecontent = rn_get_pdf(final_html, options=pdf_options)
+	#frappe.local.response.filename = "{filename}.pdf".format(filename="job_sheet_list".replace(" ", "-").replace("/", "-"))
+	filecontent, filename = rn_get_pdf(final_html, options=pdf_options)
+
+	frappe.local.response.filecontent = filecontent
+	frappe.local.response.filename = "{filename}.pdf".format(filename=filename).replace(" ", "-").replace("/", "-")
 	frappe.local.response.type = "download"
 
 def prepare_bulk_print_html(names):
+	print "BULK PRINT HTML"
 	names = names.split(",")
 	html = ""
 	ss_rn_golist = []
@@ -545,12 +547,11 @@ def prepare_bulk_print_html(names):
 
 
 def rn_get_pdf(html, options=None):
+	print "RN GET PDF"
 	date = frappe.utils.add_days(frappe.utils.getdate(), 1)
 	fname = os.path.join(frappe.get_site_path(), "public","files", "refreshed-jobsheet-{0}.pdf ".format(frappe.utils.data.format_datetime(date,"YYYY-MM-dd")))
 	cleanup(fname)
 	try:
-		for x in xrange(1,10):
-			print "filename", fname
 		pdfkit.from_string(html, fname, options=options or {})
 
 		with open(fname, "rb") as fileobj:
@@ -575,7 +576,30 @@ def rn_get_pdf(html, options=None):
 	finally:
 		pass
 
-	return filedata
+	return filedata, fname
+
+def get_tomorrows_servicelist():
+	print "GET SERVICELIST CALLED"
+	tomorrow = frappe.utils.data.add_to_date(frappe.utils.today(), days=1)
+	names = frappe.db.sql("""SELECT name FROM `tabRN Scheduled Service`
+					WHERE date(starts_on) = '{starts_on_date}'
+					AND docstatus = 1""".format(
+						starts_on_date=tomorrow
+					), as_dict=1)
+	names = ",".join([ss.name for ss in names])
+
+	print names
+	print "length", len(names) 
+	
+	final_html = prepare_bulk_print_html(names)
+	pdf_options = {
+					"no-outline": None,
+					"encoding": "UTF-8",
+					"title": "Job Sheet"
+				}
+	pdf_data, pdf_fname = rn_get_pdf(final_html, pdf_options)
+
+	return pdf_data, pdf_fname
 
 def cleanup(fname):
 	if os.path.exists(fname):
@@ -606,7 +630,7 @@ def hourly_call():
 	ex = None
 	try:
 		fire_reminder_sms()
-		send_jobsheet()
+		#send_jobsheet()
 	except Exception as e:
 		ex = e
 		note = frappe.new_doc("Note")
@@ -623,16 +647,21 @@ def send_jobsheet():
 	nowtime_ak = nowtime_utc.astimezone(tz.gettz("Asia/Kolkata"))
 
 	#Comparison times are adjusted for SF time.
-	if nowtime_ak.hour in [22]:
-		try:
-			frappe.sendmail(recipients=["hello@refreshednow"], subject="Daily Sheet", message="[Test Message] PFA Job Sheet for tomorrow.")
-		except Exception as e:
-			raise
+	#if nowtime_ak.hour in [22]:
+	try:
+		pdf_file, pdf_fname = get_tomorrows_servicelist()
+		attachment = frappe._dict({"fname": pdf_fname, "fcontent":pdf_file})
+		frappe.sendmail(sender="notifications@mntechnique.com", recipients=["gaurav@mntechnique.com", "gauravnaik6288@gmail.com"], subject="Daily Sheet", message="[Test Message] PFA Job Sheet for tomorrow.", attachments=attachment)
+	except Exception as e:
+		print "Email exception: ", e.message
+		raise
 
 
 @frappe.whitelist()
 def get_contact_info(contact_name):
 	customer = frappe.db.get_value("Dynamic Link", filters={"parent":contact_name}, fieldname="link_name")
+
+	sms_check = frappe.db.get_value("Customer",customer, "rn_unsubscribe_sms")
 	phone = frappe.db.get_value("Contact", contact_name, "phone")
 	addresses = frappe.get_all("Dynamic Link", filters={"parenttype": "Address", "link_doctype": "Customer", "link_name": customer }, fields=["*"], order_by="creation DESC")
 
@@ -640,4 +669,4 @@ def get_contact_info(contact_name):
 	if len(addresses) > 0:
 		address = addresses
 
-	return {"customer": customer, "phone": phone, "address": address}
+	return {"customer": customer, "sms_check": sms_check, "phone": phone, "address": address}

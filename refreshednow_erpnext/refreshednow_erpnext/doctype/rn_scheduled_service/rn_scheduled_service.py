@@ -11,6 +11,7 @@ from frappe import _
 #from refreshednow_erpnext.api import send_sms
 from refreshednow_erpnext.sms_manager import fire_confirmation_sms
 from refreshednow_erpnext.sms_manager import fire_cancellation_sms
+import datetime
 
 class RNScheduledService(Document):
     def validate(self):
@@ -21,6 +22,15 @@ class RNScheduledService(Document):
         self.check_no_of_vehicles()
         self.validate_team_availability()
         self.save_service_summary()
+
+    def on_update(self):
+        if self.rn_unsubscribe_sms == 1:
+            frappe.db.set_value("Customer", self.customer, "rn_unsubscribe_sms", 1)
+            frappe.msgprint("Unsubscribed SMS service for this customer", alert=True)
+        elif self.rn_unsubscribe_sms == 0:
+            if frappe.db.get_value("Customer", self.customer, "rn_unsubscribe_sms") == 1:
+                frappe.db.set_value("Customer", self.customer, "rn_unsubscribe_sms", 0)
+                frappe.msgprint("Subscribed SMS service for this customer", alert=True)
 
     def before_submit(self):
         if not self.sales_order:
@@ -41,6 +51,10 @@ class RNScheduledService(Document):
         #     print("BEFORE CANCEL") 
 
     def on_cancel(self):
+
+        for x in xrange(1,10):
+            print ("WORKFLOW STATE: ", self.workflow_state)
+
         if self.workflow_state == "Stopped":
             fire_cancellation_sms(self)
         linked_so = frappe.db.get_value("Sales Order", filters={"rn_scheduled_service": self.name}, fieldname="name")
@@ -188,7 +202,10 @@ class RNScheduledService(Document):
 
 
     def validate_reporting_time(self):
-        if (self.reporting_time < frappe.utils.add_to_date(self.starts_on,hours=-1)) or (self.reporting_time>self.ends_on):
+        starts_on = frappe.utils.get_datetime(self.starts_on)
+        reporting_time = frappe.utils.get_datetime(self.reporting_time)
+
+        if (reporting_time < (starts_on + datetime.timedelta(hours=-1))) or (self.reporting_time>self.ends_on):
             frappe.throw("Reporting time must be within the selected service slot.")
 
     def save_service_summary(self):
