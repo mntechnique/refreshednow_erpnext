@@ -66,7 +66,7 @@ def get_msg(service, msg_type):
                 service_no=service.name)
 
 
-    reminder_msg = """Reminder: Your {service_type} ({service_no}) is scheduled tomorrow at {on_time}. To cancel or reschedule, please call us at least 2 hours prior. Thanks, Refreshed Car Care.""".format(
+    reminder_msg = """Your {service_type} ({service_no}) is scheduled tomorrow at {on_time}. To cancel or reschedule, please call us at least 2 hours prior. Thanks, Refreshed Car Care.""".format(
         service_type=service.service_type,
         service_no=service.name,
         on_time=frappe.utils.data.format_datetime(service.reporting_time, "h:mm a").lower()
