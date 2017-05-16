@@ -151,7 +151,7 @@ class RNScheduledService(Document):
 
         so.append("items", {
             "item_code": self.service_type,
-            "qty": 1.0,
+            "qty": self.vehicle_count or 1.0,
             "rate": frappe.db.get_value("Item Price", filters={"price_list":so.selling_price_list, "item_code": self.service_type}, fieldname="price_list_rate"),
             "conversion_factor": 1.0
         })
