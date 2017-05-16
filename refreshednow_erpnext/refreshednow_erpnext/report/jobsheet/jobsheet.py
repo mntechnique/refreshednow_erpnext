@@ -19,9 +19,9 @@ def get_columns(filters):
 		_("Type") + "::90",
 		_("Time") + ":Datetime:150",
 		_("ID") + "::75",
-		_("Name") + "::150",
-		_("Contact No") + "::150",
-		_("Address") + "::200",
+		_("Name") + "::120",
+		_("Contact No") + "::100",
+		_("Address") + "::300",
 		_("Notes") + "::150",
 		_("Car") + "::75",
 		_("Cleaner Name") + "::75",
@@ -46,7 +46,10 @@ def get_service_data(filters):
 		row.append(service.name)
 		row.append(service.customer)
 		row.append(service.contact_phone)
-		row.append(service.service_address_display)
+		addr = service.service_address_display.replace(",<br>", ",")
+		addr = addr.replace("<br>", ",", 5)
+		addr = addr.replace("<br>", ".")
+		row.append(addr)
 		row.append(service.notes)
 		row.append(" ")
 		row.append(" ")

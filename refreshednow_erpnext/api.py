@@ -630,7 +630,7 @@ def hourly_call():
 	ex = None
 	try:
 		fire_reminder_sms()
-		#send_jobsheet()
+		send_jobsheet()
 	except Exception as e:
 		ex = e
 		note = frappe.new_doc("Note")
@@ -646,16 +646,26 @@ def send_jobsheet():
 	nowtime_utc = nowtime_utc.replace(tzinfo=tz.gettz("UTC"))
 	nowtime_ak = nowtime_utc.astimezone(tz.gettz("Asia/Kolkata"))
 
+	msg = ""
 	#Comparison times are adjusted for SF time.
-	#if nowtime_ak.hour in [22]:
-	try:
-		pdf_file, pdf_fname = get_tomorrows_servicelist()
-		attachment = frappe._dict({"fname": pdf_fname, "fcontent":pdf_file})
-		frappe.sendmail(sender="notifications@mntechnique.com", recipients=["gaurav@mntechnique.com", "gauravnaik6288@gmail.com"], subject="Daily Sheet", message="[Test Message] PFA Job Sheet for tomorrow.", attachments=attachment)
-	except Exception as e:
-		print "Email exception: ", e.message
-		raise
-
+	if nowtime_ak.hour in [20]:
+		try:
+			pdf_file, pdf_fname = get_tomorrows_servicelist()
+			attachment = frappe._dict({"fname": pdf_fname, "fcontent":pdf_file})
+			frappe.sendmail(sender="hello@refreshednow.com", recipients=["hello@refreshednow.com", "manish@refreshednow.com"], subject="Refreshed Now Job Sheet", message="[Test Message] PFA Job Sheet for tomorrow.", attachments=attachment)
+		except Exception as e:
+			msg = "Job sheet was not sent. <br> Reason: {0}".format(e.message)
+		else:
+			msg = "Job sheet dispatched to " + "hello@refreshednow.com"
+			
+	note = frappe.new_doc("Note")
+	note.title = "Refreshed Email Log - {nowdate} {nowtime}".format( 
+			nowdate=frappe.utils.nowdate(), 
+			nowtime=frappe.utils.nowtime())
+	note.public = 1
+	note.content = msg
+	note.save()
+	frappe.db.commit()
 
 @frappe.whitelist()
 def get_contact_info(contact_name):
