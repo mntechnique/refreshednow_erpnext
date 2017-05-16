@@ -22,6 +22,7 @@ class RNScheduledService(Document):
         self.check_no_of_vehicles()
         self.validate_team_availability()
         self.save_service_summary()
+        self.trim_contactphone_spaces()
 
     def on_update(self):
         if self.rn_unsubscribe_sms == 1:
@@ -221,6 +222,10 @@ class RNScheduledService(Document):
                             self.service_address_display, self.contact_phone, self.notes)
 
         self.service_details_summary = whatsapp_msg
+
+    def trim_contactphone_spaces(self):
+        # self.contact_phone = self.contact_phone.strip()
+        self.contact_phone = self.contact_phone.replace(" ","")
 
 @frappe.whitelist()
 def get_contact_info(contact_name):
