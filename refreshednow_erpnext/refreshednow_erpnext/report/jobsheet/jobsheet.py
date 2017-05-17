@@ -18,7 +18,7 @@ def get_columns(filters):
 	return [
 		_("Type") + "::90",
 		_("Time") + ":Datetime:150",
-		_("ID") + "::75",
+		_("ID") + ":Link/RN Scheduled Service:75",
 		_("Name") + "::120",
 		_("Contact No") + "::100",
 		_("Address") + "::300",
@@ -31,7 +31,7 @@ def get_columns(filters):
 
 def get_service_data(filters):
 	data = []
-	services = frappe.get_all("RN Scheduled Service", fields=["*"], order_by="service_type, starts_on")
+	services = frappe.get_all("RN Scheduled Service", filters=[["docstatus", "=", "1"]], fields=["*"], order_by="service_type, starts_on")
 
 	if filters:
 		if "starts_on" in filters:
