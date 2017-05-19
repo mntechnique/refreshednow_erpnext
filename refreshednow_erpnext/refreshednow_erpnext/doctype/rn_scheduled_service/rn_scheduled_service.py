@@ -227,8 +227,7 @@ class RNScheduledService(Document):
 		if unsubscribe_val != self.rn_unsubscribe_sms:
 			frappe.db.set_value("Customer", self.customer, "rn_unsubscribe_sms", self.rn_unsubscribe_sms)
 			frappe.msgprint("SMS will {0} sent to {1}."
-				.format("be" if self.rn_unsubscribe_sms == 1 else "not be", self.customer))
-
+				.format("not be" if self.rn_unsubscribe_sms == 1 else "be", self.customer))
 
 @frappe.whitelist()
 def get_contact_info(contact_name):
