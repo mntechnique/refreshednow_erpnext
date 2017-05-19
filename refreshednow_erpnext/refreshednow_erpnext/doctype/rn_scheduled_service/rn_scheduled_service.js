@@ -181,6 +181,19 @@ frappe.ui.form.on('RN Scheduled Service', {
                 }
             });
         }    
+    },
+    rn_unsubscribe_sms: function(frm) {
+        frappe.call({
+            method: "set_unsubscribe_sms",
+            doc: frm.doc,
+            callback:function(r) {
+                if (r.message == 1) {
+                    frappe.show_alert("SMS alerts will not be sent to " + frm.doc.customer);
+                } else {
+                    frappe.show_alert("SMS alerts will be sent to " + frm.doc.customer);
+                }
+            }
+        });
     }
 });
 
