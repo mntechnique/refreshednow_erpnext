@@ -169,7 +169,6 @@ frappe.ui.form.on('RN Scheduled Service', {
                     if (r || r.message) {
                         console.log("Setting values", r);
                         cur_frm.set_value("customer", r.message.customer);
-                        cur_frm.set_value("rn_unsubscribe_sms", r.message.sms_check);
                         var phone = r.message.phone.replace(" ", "");
                         cur_frm.set_value("contact_phone", phone);
                         if (r.message.address) {
@@ -177,6 +176,7 @@ frappe.ui.form.on('RN Scheduled Service', {
                             cur_frm.set_value("service_address", r.message.address[0].parent);
                         }
                         cur_frm.set_value("vehicle_count", 1);
+                        cur_frm.set_value("rn_unsubscribe_sms", r.message.sms_check);
                     }
                 }
             });
