@@ -513,7 +513,8 @@ def print_job_sheet(names):
 	pdf_options = {
 		"no-outline": None,
 		"encoding": "UTF-8",
-		"title": "Job Sheet"
+		"title": "Job Sheet",
+		"orientation": "landscape"
 	}
 
 	#frappe.local.response.filename = "{filename}.pdf".format(filename="job_sheet_list".replace(" ", "-").replace("/", "-"))
@@ -599,7 +600,8 @@ def get_tomorrows_servicelist():
 	pdf_options = {
 					"no-outline": None,
 					"encoding": "UTF-8",
-					"title": "Job Sheet"
+					"title": "Job Sheet",
+					"orientation": "landscape"
 				}
 	pdf_data, pdf_fname = rn_get_pdf(final_html, pdf_options)
 
