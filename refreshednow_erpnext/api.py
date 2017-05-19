@@ -367,11 +367,14 @@ def cancel_all_allocations(employee, day_of_week):
 	frappe.db.commit()
 
 def item_validate(self, method):
-	if (self.rn_break_duration % 15 != 0):
-		frappe.throw("Break duration must be in intervals of 15 minutes.")
+	if self.is_stock_item == 0:
+		if (self.rn_break_duration % 15 != 0):
+			frappe.throw("Break duration must be in intervals of 15 minutes.")
 
-	if (self.rn_service_duration % 15 != 0):
-		frappe.throw("Service duration must be in intervals of 15 minutes.")
+		if (self.rn_service_duration % 15 != 0):
+			frappe.throw("Service duration must be in intervals of 15 minutes.")
+	else:
+		pass		
 
 @frappe.whitelist()
 def get_availability_for_team_dow(team, day_of_week):
