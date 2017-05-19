@@ -4,67 +4,77 @@
 .tg th{font-family:Arial, sans-serif;font-weight:normal;padding:5px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
 .tg .tg-yw4l{vertical-align:top}
 </style>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="pdfkit-page-size" content="Legal"/>
+    <meta name="pdfkit-orientation" content="Landscape"/>
+  </head>
 
-<h1>Service Schedule</h1>
+  <body>
+    <h4>Job Sheet for {{ date_for_title }}</h4>
+    <!-- {{ss_rn_golist[0].starts_on.strftime("%d-%MMM")}} -->
 
-{%  if ss_rn_golist|length >0 %}
-  <table class="tg" style="text-align:left;vertical-align:middle;">
-    <tr>
-      <th class="tg-yw4l">Type</th>
-      <th class="tg-yw4l">Time</th>
-      <th class="tg-yw4l">ID</th>
-      <th class="tg-yw4l">Name</th>
-      <th class="tg-yw4l">Contact</th>
-      <th class="tg-yw4l">Address</th>            
-      <th class="tg-yw4l">Comments</th>
-      <th class="tg-yw4l">Car</th>
-      <th class="tg-yw4l">Cleaner/ Cleaner Sign</th>
-      <th class="tg-yw4l">Payment</th>
-    </tr>
-{% for ss in ss_rn_golist %}
-    <tr>
-      <td class="tg-yw4l">{{ss.service_type}}</td>
-      <td class="tg-yw4l">{{ss.starts_on.strftime("%H:%M")}}</td>
-      <td class="tg-yw4l">{{ss.name}}</td>
-      <td class="tg-yw4l">{{ss.customer}}</td>
-      <td class="tg-yw4l">{{ss.contact_phone or "-"}}</td>
-      <td class="tg-yw4l">{{ss.service_address_display}}</th>          
-      <td class="tg-yw4l">{{ss.notes or "-"}}</td>
-      <td class="tg-yw4l"></td>
-      <td class="tg-yw4l">{{ss.cleaner}}</td>
-      <td class="tg-yw4l"></td>
-    </tr>
-{% endfor %}
-  </table>
-{% endif %}  
+    {%  if ss_rn_golist|length >0 %}
+      <table class="tg" style="text-align:left;vertical-align:middle;">
+        <tr>
+          <th class="tg-yw4l">Type</th>
+          <th class="tg-yw4l">Time</th>
+          <th class="tg-yw4l">ID</th>
+          <th class="tg-yw4l">Name</th>
+          <th class="tg-yw4l">Contact</th>
+          <th class="tg-yw4l">Address</th>            
+          <th class="tg-yw4l">Comments</th>
+          <th class="tg-yw4l">Car</th>
+          <th class="tg-yw4l">Cleaner/ Cleaner Sign</th>
+          <th class="tg-yw4l">Payment</th>
+        </tr>
+    {% for ss in ss_rn_golist %}
+        <tr>
+          <td class="tg-yw4l">{{ss.service_type}}</td>
+          <td class="tg-yw4l">{{ss.starts_on.strftime("%H:%M")}}</td>
+          <td class="tg-yw4l">{{ss.name}}</td>
+          <td class="tg-yw4l">{{ss.customer}}</td>
+          <td class="tg-yw4l">{{ss.contact_phone or "-"}}</td>
+          <td class="tg-yw4l">{{ss.service_address_display}}</td>          
+          <td class="tg-yw4l">{{ss.notes or "-"}}</td>
+          <td class="tg-yw4l"></td>
+          <td class="tg-yw4l">{{ss.cleaner}}</td>
+          <td class="tg-yw4l"></td>
+        </tr>
+    {% endfor %}
+      </table>
+    {% endif %}  
 
-{%  if ss_rn_prolist|length >0 %}
-  <table class="tg" style="text-align:left;vertical-align:middle;">
-    <tr>
-      <th class="tg-yw4l">Type</th>
-      <th class="tg-yw4l">Time</th>
-      <th class="tg-yw4l">ID</th>
-      <th class="tg-yw4l">Name</th>
-      <th class="tg-yw4l">Contact</th>
-      <th class="tg-yw4l">Address</th>            
-      <th class="tg-yw4l">Comments</th>
-      <th class="tg-yw4l">Car</th>
-      <th class="tg-yw4l">Cleaner/ Cleaner Sign</th>
-      <th class="tg-yw4l">Payment</th>
-    </tr>
-{%  for ss in ss_rn_prolist %}
-    <tr>
-      <td class="tg-yw4l">{{ss.service_type}}</td>
-      <td class="tg-yw4l">{{ss.starts_on.strftime("%H:%M")}}</td>
-      <td class="tg-yw4l">{{ss.name}}</td>
-      <td class="tg-yw4l">{{ss.customer}}</td>
-      <td class="tg-yw4l">{{ss.contact_phone or "-"}}</td>
-      <td class="tg-yw4l">{{ss.service_address_display}}</th>          
-      <td class="tg-yw4l">{{ss.notes or "-"}}</td>
-      <td class="tg-yw4l"></td>
-      <td class="tg-yw4l">{{ss.cleaner}}</td>
-      <td class="tg-yw4l"></td>
-    </tr>
-{% endfor %}
-  </table>  
-{% endif %}  
+    {%  if ss_rn_prolist|length >0 %}
+      <table class="tg" style="text-align:left;vertical-align:middle;">
+        <tr>
+          <th class="tg-yw4l">Type</th>
+          <th class="tg-yw4l">Time</th>
+          <th class="tg-yw4l">ID</th>
+          <th class="tg-yw4l">Name</th>
+          <th class="tg-yw4l">Contact</th>
+          <th class="tg-yw4l">Address</th>            
+          <th class="tg-yw4l">Comments</th>
+          <th class="tg-yw4l">Car</th>
+          <th class="tg-yw4l">Cleaner/ Cleaner Sign</th>
+          <th class="tg-yw4l">Payment</th>
+        </tr>
+    {%  for ss in ss_rn_prolist %}
+        <tr>
+          <td class="tg-yw4l">{{ss.service_type}}</td>
+          <td class="tg-yw4l">{{ss.starts_on.strftime("%H:%M")}}</td>
+          <td class="tg-yw4l">{{ss.name}}</td>
+          <td class="tg-yw4l">{{ss.customer}}</td>
+          <td class="tg-yw4l">{{ss.contact_phone or "-"}}</td>
+          <td class="tg-yw4l">{{ss.service_address_display}}</td>          
+          <td class="tg-yw4l">{{ss.notes or "-"}}</td>
+          <td class="tg-yw4l"></td>
+          <td class="tg-yw4l">{{ss.cleaner}}</td>
+          <td class="tg-yw4l"></td>
+        </tr>
+    {% endfor %}
+      </table>  
+    {% endif %}  
+  </body>
+</html>  
