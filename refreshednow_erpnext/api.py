@@ -367,11 +367,14 @@ def cancel_all_allocations(employee, day_of_week):
 	frappe.db.commit()
 
 def item_validate(self, method):
-	if (self.rn_break_duration % 15 != 0):
-		frappe.throw("Break duration must be in intervals of 15 minutes.")
+	if self.is_stock_item == 0:
+		if (self.rn_break_duration % 15 != 0):
+			frappe.throw("Break duration must be in intervals of 15 minutes.")
 
-	if (self.rn_service_duration % 15 != 0):
-		frappe.throw("Service duration must be in intervals of 15 minutes.")
+		if (self.rn_service_duration % 15 != 0):
+			frappe.throw("Service duration must be in intervals of 15 minutes.")
+	else:
+		pass		
 
 @frappe.whitelist()
 def get_availability_for_team_dow(team, day_of_week):
@@ -510,7 +513,8 @@ def print_job_sheet(names):
 	pdf_options = {
 		"no-outline": None,
 		"encoding": "UTF-8",
-		"title": "Job Sheet"
+		"title": "Job Sheet",
+		"orientation": "landscape"
 	}
 
 	#frappe.local.response.filename = "{filename}.pdf".format(filename="job_sheet_list".replace(" ", "-").replace("/", "-"))
@@ -539,8 +543,9 @@ def prepare_bulk_print_html(names):
 
 	ss_rn_golist = sorted(ss_rn_golist, key=lambda v:v.get("starts_on"))
 	ss_rn_prolist = sorted(ss_rn_prolist, key=lambda v:v.get("starts_on"))
+	date_for_title = frappe.utils.data.format_datetime(frappe.utils.data.add_to_date(frappe.utils.today(), days=1),"d-MMM")	
 
-	html_params = { "ss_rn_golist": ss_rn_golist or [], "ss_rn_prolist": ss_rn_prolist or []}
+	html_params = { "ss_rn_golist": ss_rn_golist or [], "ss_rn_prolist": ss_rn_prolist or [], "date_for_title": date_for_title or ""}
 	final_html = frappe.render_template("refreshednow_erpnext/templates/includes/refreshed_jobsheet.html", html_params)
 
 	return final_html
@@ -595,11 +600,12 @@ def get_tomorrows_servicelist():
 	pdf_options = {
 					"no-outline": None,
 					"encoding": "UTF-8",
-					"title": "Job Sheet"
+					"title": "Job Sheet",
+					"orientation": "landscape"
 				}
 	pdf_data, pdf_fname = rn_get_pdf(final_html, pdf_options)
 
-	return pdf_data, pdf_fname
+	return tomorrow, pdf_data, pdf_fname
 
 def cleanup(fname):
 	if os.path.exists(fname):
@@ -650,9 +656,17 @@ def send_jobsheet():
 	#Comparison times are adjusted for SF time.
 	if nowtime_ak.hour in [20]:
 		try:
-			pdf_file, pdf_fname = get_tomorrows_servicelist()
-			attachment = frappe._dict({"fname": pdf_fname, "fcontent":pdf_file})
-			frappe.sendmail(sender="hello@refreshednow.com", recipients=["hello@refreshednow.com", "manish@refreshednow.com"], subject="Refreshed Now Job Sheet", message="[Test Message] PFA Job Sheet for tomorrow.", attachments=attachment)
+			tomorrow, pdf_file, pdf_fname = get_tomorrows_servicelist()
+			# pdf_name = os.path.basename(pdf_fname)
+			pdf_name = "job-sheet-" + frappe.utils.data.format_datetime(tomorrow,"dd-MM-YYYY") + ".pdf"
+			
+			attachment = frappe._dict({"fname": pdf_name, "fcontent":pdf_file})
+			frappe.sendmail(
+				sender="hello@refreshednow.com",
+				recipients=["hello@refreshednow.com", "manish@refreshednow.com"],
+				subject="Refreshed Job Sheet for " + frappe.utils.data.format_datetime(tomorrow,"d-MMM"), 
+				message="Attached is the Job Sheet for " + frappe.utils.data.format_datetime(tomorrow,"EEEE d-MMM-Y"),
+				attachments=attachment)
 		except Exception as e:
 			msg = "Job sheet was not sent. <br> Reason: {0}".format(e.message)
 		else:

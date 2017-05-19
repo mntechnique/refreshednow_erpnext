@@ -16,5 +16,14 @@
   "name": "Contact-Client", 
   "script": "frappe.ui.form.on(\"Contact\", \"validate\", function(frm) {\n    if (frm.doc.phone.length != 10 ) {\n        msgprint(\"Please enter a valid 10-digit mobile no in this field.\");\n        validated = false;\n    }\n});", 
   "script_type": "Client"
+ }, 
+ {
+  "docstatus": 0, 
+  "doctype": "Custom Script", 
+  "dt": "Item", 
+  "modified": "2017-05-19 20:27:40.676972", 
+  "name": "Item-Client", 
+  "script": "frappe.ui.form.on(\"Item\", \"is_stock_item\", function(frm) {\n    if (frm.doc.is_stock_item == 1 ) {\n\tcur_frm.set_df_property(\"rn_sb_service_item_info\", \"hidden\");\n\tfrm.set_value(\"rn_start_time_hours\", \"\"); \n\tfrm.set_value(\"rn_end_time_hours\", \"\");\n\tfrm.set_value(\"rn_break_start_time_hours\", \"\");\n\tfrm.set_value(\"rn_break_duration\", \"\");\n\tfrm.set_value(\"rn_start_time_minutes\", \"\"); \n\tfrm.set_value(\"rn_end_time_minutes\", \"\");\n\tfrm.set_value(\"rn_break_start_time_minutes\", \"\");\n\tfrm.set_value(\"rn_service_duration\", \"\");\n    }\n});", 
+  "script_type": "Client"
  }
 ]
