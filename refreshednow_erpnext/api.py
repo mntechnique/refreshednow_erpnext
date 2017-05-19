@@ -652,10 +652,13 @@ def send_jobsheet():
 	if nowtime_ak.hour in [20]:
 		try:
 			tomorrow, pdf_file, pdf_fname = get_tomorrows_servicelist()
-			attachment = frappe._dict({"fname": pdf_fname, "fcontent":pdf_file})
+			# pdf_name = os.path.basename(pdf_fname)
+			pdf_name = "job-sheet-" + frappe.utils.data.format_datetime(tomorrow,"dd-MM-YYYY") + ".pdf"
+			
+			attachment = frappe._dict({"fname": pdf_name, "fcontent":pdf_file})
 			frappe.sendmail(
 				sender="hello@refreshednow.com",
-				recipients=["hello@refreshednow.com", "manish@refreshednow.com"], 
+				recipients=["hello@refreshednow.com", "manish@refreshednow.com"],
 				subject="Refreshed Job Sheet for " + frappe.utils.data.format_datetime(tomorrow,"d-MMM"), 
 				message="Attached is the Job Sheet for " + frappe.utils.data.format_datetime(tomorrow,"EEEE d-MMM-Y"),
 				attachments=attachment)
