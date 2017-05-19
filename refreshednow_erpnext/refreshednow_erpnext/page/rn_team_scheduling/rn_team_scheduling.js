@@ -365,9 +365,10 @@ function on_day_click(date, service_type, team, wrapper) {
 	console.log("ONDAYCLICK Date", date);
 
 	var service_item = wrapper.page.service_item_data.filter(function(item) { return item.item_code == service_type})[0]
-
+    
 	var rnss = frappe.model.make_new_doc_and_get_name('RN Scheduled Service');
 	rnss = locals["RN Scheduled Service"][rnss];
+	rnss.naming_series = "REF-.#####";
 	rnss.service_type = service_type;
 	rnss.scheduled_date = frappe.datetime.obj_to_str(date);
 	rnss.scheduled_time = date.format("HH:mm:ss");

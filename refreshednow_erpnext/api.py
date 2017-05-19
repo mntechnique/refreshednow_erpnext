@@ -508,10 +508,10 @@ def print_job_sheet(names):
 
 	final_html = prepare_bulk_print_html(names)
 	pdf_options = {
-					"no-outline": None,
-					"encoding": "UTF-8",
-					"title": "Job Sheet"
-				}
+		"no-outline": None,
+		"encoding": "UTF-8",
+		"title": "Job Sheet"
+	}
 
 	#frappe.local.response.filename = "{filename}.pdf".format(filename="job_sheet_list".replace(" ", "-").replace("/", "-"))
 	filecontent, filename = rn_get_pdf(final_html, options=pdf_options)
