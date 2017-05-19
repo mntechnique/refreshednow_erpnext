@@ -24,9 +24,8 @@ class RNScheduledService(Document):
 		self.save_service_summary()
 		self.trim_contactphone_spaces()
 
-	def set_unsubscribe_sms(self):
-		frappe.db.set_value("Customer", self.customer, "rn_unsubscribe_sms", self.rn_unsubscribe_sms)
-		return frappe.utils.cint(frappe.db.get_value("Customer", self.customer, "rn_unsubscribe_sms"))
+	def on_update(self):
+		self.set_unsubscribe_sms()
 
 	def before_submit(self):
 		if not self.sales_order:
@@ -221,6 +220,15 @@ class RNScheduledService(Document):
 	def trim_contactphone_spaces(self):
 		# self.contact_phone = self.contact_phone.strip()
 		self.contact_phone = self.contact_phone.replace(" ","")
+
+	def set_unsubscribe_sms(self): 
+		unsubscribe_val = frappe.db.get_value("Customer", self.customer, "rn_unsubscribe_sms")
+
+		if unsubscribe_val != self.rn_unsubscribe_sms:
+			frappe.db.set_value("Customer", self.customer, "rn_unsubscribe_sms", self.rn_unsubscribe_sms)
+			frappe.msgprint("SMS will {0} sent to {1}."
+				.format("be" if self.rn_unsubscribe_sms == 1 else "not be", self.customer))
+
 
 @frappe.whitelist()
 def get_contact_info(contact_name):
