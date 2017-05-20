@@ -521,7 +521,7 @@ def print_job_sheet(names):
 	filecontent, filename = rn_get_pdf(final_html, options=pdf_options)
 
 	frappe.local.response.filecontent = filecontent
-	frappe.local.response.filename = "{filename}.pdf".format(filename=filename).replace(" ", "-").replace("/", "-")
+	frappe.local.response.filename = "refreshed-jobsheet-{0}.pdf".format(frappe.utils.data.format_datetime(frappe.utils.today(),"YYYY-MM-dd"))
 	frappe.local.response.type = "download"
 
 def prepare_bulk_print_html(names):
@@ -554,7 +554,7 @@ def prepare_bulk_print_html(names):
 def rn_get_pdf(html, options=None):
 	print "RN GET PDF"
 	date = frappe.utils.add_days(frappe.utils.getdate(), 1)
-	fname = os.path.join(frappe.get_site_path(), "public","files", "refreshed-jobsheet-{0}.pdf ".format(frappe.utils.data.format_datetime(date,"YYYY-MM-dd")))
+	fname = os.path.join(frappe.get_site_path(), "public","files", "refreshed-jobsheet-{0}.pdf".format(frappe.utils.data.format_datetime(date,"YYYY-MM-dd")))
 	cleanup(fname)
 	try:
 		pdfkit.from_string(html, fname, options=options or {})
